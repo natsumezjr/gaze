@@ -20,14 +20,11 @@ Python可用sklearn或pyRANSAC-3D等库。
 # 训练大模型是用到的损失函数可以优化
 
 使用Cosine Similarity Loss（余弦相似度损失）：
-$$
-\text { loss }=\frac{1}{N} \sum_{i=1}^N\left(1-\frac{u_i \cdot v_i}{\left\|u_i\right\| \cdot\left\|v_i\right\|}\right)
-$$
-
-\text { loss }=\frac{1}{N} \sum_{i=1}^N\left(1-\frac{u_i \cdot v_i}{\left\|u_i\right\| \cdot\left\|v_i\right\|}\right)
 
 loss $=\frac{1}{N} \sum_{i=1}^N\left(1-\frac{u_i \cdot v_i}{\left\|u_i\right\| \cdot\left\|v_i\right\|}\right)$
 
-\begin{equation}
-\text { loss }=\frac{1}{N} \sum_{i=1}^N\left(1-\frac{u_i \cdot v_i}{\left\|u_i\right\| \cdot\left\|v_i\right\|}\right)
-\end{equation}
+余弦相似度损失（Cosine Similarity Loss）：
+
+\[
+\text{loss} = \frac{1}{N} \sum_{i=1}^{N} \left( 1 - \frac{u_i \cdot v_i}{\|u_i\| \cdot \|v_i\|} \right)
+\]
