@@ -1,4 +1,4 @@
-# 对于眼球中心点更好的确定方法（放置出现之前把鼻孔识别成眼睛等情况）
+##### 对于眼球以及瞳孔等中心点更好的确定方法（防止出现之前把鼻孔识别成眼睛等情况）
 
 1）对虹膜进行深度了解
 使用深度学习分割模型获得完整虹膜轮廓，再采样更多点进行球面拟合。
@@ -17,14 +17,10 @@ AI推荐的，本人不是很懂：RANSAC鲁棒球面拟合（推荐！）
 自动排除异常点，适合实际虹膜点有误检/漏检的情况。
 Python可用sklearn或pyRANSAC-3D等库。
 
-# 训练大模型是用到的损失函数可以优化
+##### 训练大模型时用到的损失函数可以优化
 
 使用Cosine Similarity Loss（余弦相似度损失）：
 
 loss $=\frac{1}{N} \sum_{i=1}^N\left(1-\frac{u_i \cdot v_i}{\left\|u_i\right\| \cdot\left\|v_i\right\|}\right)$
 
-余弦相似度损失（Cosine Similarity Loss）：
-
-\[
-\text{loss} = \frac{1}{N} \sum_{i=1}^{N} \left( 1 - \frac{u_i \cdot v_i}{\|u_i\| \cdot \|v_i\|} \right)
-\]
+这个损失函数更精确于两个向量的夹角偏差，更符合本项目的需求，而不是MSE所在意的欧几里得距离
