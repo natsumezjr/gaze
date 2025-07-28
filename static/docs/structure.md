@@ -166,9 +166,9 @@
 
 #### 2. 关键公式（含参数解释）
 
-- **球面拟合（最小二乘法）**  
+- **球面拟合（RANSAC鲁棒拟合）**  
   $$
-  \min_{\mathbf{C}_{\text{eye}}, r} \sum_{i=1}^N \left( \left\| \mathbf{P}_i - \mathbf{C}_{\text{eye}} \right\| - r \right)^2
+  (x-c_x)^2 + (y-c_y)^2 + (z-c_z)^2 = r^2
   $$
   - $\mathbf{P}_i$：第$i$个虹膜边界点的三维坐标
   - $\mathbf{C}_{\text{eye}}$：拟合得到的眼球球心
@@ -203,29 +203,30 @@
 
 ---
 
-#### 3. 最小二乘法拟合说明
+#### 3. RANSAC球面拟合说明
 
 **定性说明：**  
-最小二乘法是一种常用的拟合方法，核心思想是：  
-我们有一组点（比如虹膜边界点），希望找到一个“最合适的球”，让这些点尽量都落在球面上。  
-“最合适”指的是：所有点到球心的距离和球半径的差的平方之和最小。  
-换句话说，最小二乘法就是让所有点“离球面最近”，整体误差最小。  
-这种方法不需要你掌握复杂的数学推导，只要理解它是在“让所有点都尽量贴合球面”即可。
+RANSAC（随机采样一致性）是一种鲁棒拟合算法，适用于数据中存在离群点（异常点）的情况。其核心思想是：
+- 随机多次从点集中选取最小子集，拟合球面模型
+- 统计所有点中有多少“内点”与该模型足够接近
+- 选取“内点”最多的模型作为最终结果
+- 用所有内点再做一次最小二乘法精细拟合
+
+这样，即使有较多离群点，RANSAC也能找到最优拟合结果，极大提升鲁棒性。
 
 **实际应用场景举例：**  
-- 在眼动追踪中，我们用最小二乘法拟合虹膜边界点，得到眼球的球心和半径，为后续视线计算提供基础。
+- 在眼动追踪中，虹膜边界点可能受遮挡、反光、检测误差等影响，出现“离群点”。RANSAC能有效提升球心拟合的稳定性。
 
 ---
 
 #### 4. 举例说明
 
 假设：
-- 已知4个虹膜边界点三维坐标 $\mathbf{P}_1, \mathbf{P}_2, \mathbf{P}_3, \mathbf{P}_4$
+- 已知若干虹膜边界点三维坐标 $\mathbf{P}_1, \mathbf{P}_2, ...$
 - 瞳孔中心三维坐标 $\mathbf{C}_{\text{pupil}}$
 - 注视点三维坐标 $\mathbf{P}_{\text{target}}$
 
-1. 用最小二乘法拟合球面，得到球心 $\mathbf{C}_{\text{eye}}$ 和半径 $r$  
-   （见下方Python示例，自动完成拟合）
+1. 用RANSAC拟合球面，得到球心 $\mathbf{C}_{\text{eye}}$ 和半径 $r$  
 2. 计算理论视线向量：
    $$
    \vec{gaze}_{\text{theory}} = \frac{\mathbf{C}_{\text{pupil}} - \mathbf{C}_{\text{eye}}}{\left\| \mathbf{C}_{\text{pupil}} - \mathbf{C}_{\text{eye}} \right\|}
@@ -242,42 +243,68 @@
    \vec{gaze}_{\text{final}} = \text{Rotate}(\vec{gaze}_{\text{theory}}, \kappa)
    $$
 
-**最小二乘法计算示例：**  
-见下方“球面拟合算法示例”代码，输入点云，自动输出最优球心和半径。
-
 ---
 
 #### 5. Python简明示例
 
-球面拟合算法示例
+RANSAC球面拟合算法示例
 ```python
 import numpy as np
 from scipy.optimize import least_squares
 
-# points: N x 3 的虹膜边界点三维坐标数组
-def fit_sphere(points):
-    # 残差函数：每个点到球心距离与半径的差
-    def residuals(params, xyz):
-        cx, cy, cz, r = params
-        return np.sqrt((xyz[:,0]-cx)**2 + (xyz[:,1]-cy)**2 + (xyz[:,2]-cz)**2) - r
-    # 初始猜测：球心为点云均值，半径为均值到点的距离
-    center_init = np.mean(points, axis=0)
-    r_init = np.mean(np.linalg.norm(points - center_init, axis=1))
-    params_init = np.append(center_init, r_init)
-    # 最小二乘拟合
-    result = least_squares(residuals, params_init, args=(points,))
-    cx, cy, cz, r = result.x
-    return np.array([cx, cy, cz]), r
+# 球面残差函数
+def sphere_residuals(params, xyz):
+    cx, cy, cz, r = params
+    return np.sqrt((xyz[:,0]-cx)**2 + (xyz[:,1]-cy)**2 + (xyz[:,2]-cz)**2) - r
 
-# 示例数据（4个虹膜边界点）
+# RANSAC球面拟合主流程
+def ransac_fit_sphere(points, threshold=0.5, max_trials=100):
+    n_points = points.shape[0]
+    best_inliers = []
+    best_params = None
+
+    for _ in range(max_trials):
+        # 随机选4个点
+        idx = np.random.choice(n_points, 4, replace=False)
+        sample = points[idx]
+        # 初始猜测
+        center_init = np.mean(sample, axis=0)
+        r_init = np.mean(np.linalg.norm(sample - center_init, axis=1))
+        params_init = np.append(center_init, r_init)
+        # 拟合
+        try:
+            result = least_squares(sphere_residuals, params_init, args=(sample,))
+            params = result.x
+        except:
+            continue
+        # 计算所有点残差
+        residuals = np.abs(sphere_residuals(params, points))
+        inliers = np.where(residuals < threshold)[0]
+        if len(inliers) > len(best_inliers):
+            best_inliers = inliers
+            best_params = params
+
+    # 用所有内点再精细拟合
+    if best_inliers is not None and len(best_inliers) >= 4:
+        inlier_points = points[best_inliers]
+        center_init = np.mean(inlier_points, axis=0)
+        r_init = np.mean(np.linalg.norm(inlier_points - center_init, axis=1))
+        params_init = np.append(center_init, r_init)
+        result = least_squares(sphere_residuals, params_init, args=(inlier_points,))
+        return result.x[:3], result.x[3]
+    else:
+        raise RuntimeError("RANSAC未找到有效拟合")
+
+# 示例数据
 iris_points = np.array([
     [1.0, 0.0, 0.0],
     [0.0, 1.0, 0.0],
     [-1.0, 0.0, 0.0],
-    [0.0, -1.0, 0.0]
+    [0.0, -1.0, 0.0],
+    [5.0, 5.0, 5.0]  # 离群点
 ])
-C_eye, r = fit_sphere(iris_points)
-print('拟合球心:', C_eye, '拟合半径:', r)
+C_eye, r = ransac_fit_sphere(iris_points)
+print('RANSAC拟合球心:', C_eye, '半径:', r)
 ```
 
 Kappa补偿算法示例
@@ -306,6 +333,26 @@ print(f'Kappa角（弧度）: {kappa:.4f}')
 # 补偿后的视线向量（示例：实际应用中应用旋转，这里仅演示计算Kappa）
 # 实际补偿时可用scipy.spatial.transform.Rotation等工具
 ```
+
+---
+
+#### 6. 优缺点对比
+
+| 方法         | 精度      | 鲁棒性   | 速度     | 易用性   | 依赖库         |
+|--------------|-----------|----------|----------|----------|----------------|
+| 最小二乘法   | 高（无异常点） | 差（对离群点敏感） | 快      | 简单      | numpy, scipy   |
+| RANSAC拟合   | 高        | 强（可容忍大量离群点） | 较慢（需多次迭代） | 一般      | sklearn, numpy |
+
+**结论：**
+- 数据干净时，最小二乘法足够且速度快  
+- 数据含异常点时，RANSAC能显著提升拟合精度，推荐作为实际工程方案
+
+---
+
+#### 7. 总结
+
+- RANSAC球面拟合能有效提升鲁棒性，适合实际虹膜点存在异常的场景
+- 推荐在工程实现中优先采用RANSAC+最小二乘法精细拟合的组合方案
 
 ---
 
