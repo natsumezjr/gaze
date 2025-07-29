@@ -35,10 +35,10 @@ def extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
         min_detection_confidence=0.5
     )
     
-    # 转换图像格式（MediaPipe需要RGB格式）
+    # 检查输入图像格式（MediaPipe需要RGB格式）
     if len(rgb_image.shape) == 3 and rgb_image.shape[2] == 3:
-        # 确保是RGB格式
-        rgb_image_rgb = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB) if rgb_image.dtype == np.uint8 else rgb_image
+        # 输入图像已经是RGB格式（由detector统一处理）
+        rgb_image_rgb = rgb_image
     else:
         raise ValueError("输入图像必须是3通道RGB图像")
     
@@ -176,7 +176,7 @@ def get_landmark_indices():
         "left_earlobe_bottom": list(range(448, 468))
     }
 
-def validate_landmarks(landmarks: List) -> bool:
+def validate_landmarks(landmarks: List[Tuple[float, float, float]]) -> bool:
     """
     验证关键点质量
     
@@ -252,7 +252,7 @@ def validate_landmarks(landmarks: List) -> bool:
     
     return True
 
-def get_eye_landmarks(landmarks: List, eye_type: str) -> List[Tuple[float, float, float]]:
+def get_eye_landmarks(landmarks: List[Tuple[float, float, float]], eye_type: str) -> List[Tuple[float, float, float]]:
     """
     提取指定眼睛的关键点
     
@@ -302,7 +302,7 @@ def get_eye_landmarks(landmarks: List, eye_type: str) -> List[Tuple[float, float
     
     return eye_landmarks
 
-def get_pupil_landmarks(landmarks: List) -> Dict[str, Tuple[float, float, float]]:
+def get_pupil_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str, Tuple[float, float, float]]:
     """
     提取左右瞳孔中心关键点
     
@@ -383,7 +383,7 @@ def calculate_center(points: List[Tuple[float, float, float]]) -> Tuple[float, f
     
     return (center_x, center_y, center_z)
 
-def get_iris_landmarks(landmarks: List) -> Dict[str, List[Tuple[float, float, float]]]:
+def get_iris_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str, List[Tuple[float, float, float]]]:
     """
     提取左右虹膜边界关键点
     

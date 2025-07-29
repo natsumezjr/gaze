@@ -45,7 +45,7 @@ def normalized_to_pixel(norm_coords: Tuple[float, float], image_shape: Tuple[int
     
     return (x_pixel, y_pixel)
 
-def pixel_to_3d(pixel_coords: Tuple[int, int], depth_map: np.ndarray, camera_params: dict) -> np.ndarray:
+def pixel_to_3d(pixel_coords: Tuple[int, int], depth_map_meters: np.ndarray, camera_params: dict) -> np.ndarray:
     """
     像素坐标结合深度转三维坐标
     
@@ -53,12 +53,12 @@ def pixel_to_3d(pixel_coords: Tuple[int, int], depth_map: np.ndarray, camera_par
     示例
     pixel_coords = (640, 360)  # (x_pixel, y_pixel) 像素坐标
     
-    :param depth_map: 深度图
+    :param depth_map_meters: 深度图（米单位）
     示例
-    depth_map = np.ndarray(
+    depth_map_meters = np.ndarray(
         shape=(720, 1280),  # 深度图尺寸 (高度, 宽度)
-        dtype=np.uint16,    # 深度数据类型 (16位无符号整数)
-        data=[[depth_value, ...], ...]  # 深度值数组
+        dtype=np.float32,   # 深度数据类型 (浮点数，米单位)
+        data=[[depth_meters, ...], ...]  # 深度值数组（米）
     )
     
     :param camera_params: 相机内参
@@ -88,25 +88,25 @@ def pixel_to_3d(pixel_coords: Tuple[int, int], depth_map: np.ndarray, camera_par
     if not isinstance(pixel_coords, tuple) or len(pixel_coords) != 2:
         raise ValueError("pixel_coords 必须是包含2个元素的元组")
     
-    if not isinstance(depth_map, np.ndarray) or depth_map.ndim != 2:
-        raise ValueError("depth_map 必须是2维numpy数组")
+    if not isinstance(depth_map_meters, np.ndarray) or depth_map_meters.ndim != 2:
+        raise ValueError("depth_map_meters 必须是2维numpy数组")
     
     if not isinstance(camera_params, dict):
         raise ValueError("camera_params 必须是字典")
     
     # 提取像素坐标
     x_pixel, y_pixel = pixel_coords
-    height, width = depth_map.shape
+    height, width = depth_map_meters.shape
     
     # 检查像素坐标是否在图像范围内
     if not (0 <= x_pixel < width and 0 <= y_pixel < height):
         raise ValueError("像素坐标超出图像范围")
     
-    # 获取深度值
-    depth_value = depth_map[y_pixel, x_pixel]
+    # 获取深度值（已经是米单位）
+    depth_meters = depth_map_meters[y_pixel, x_pixel]
     
     # 检查深度值是否有效
-    if depth_value == 0 or np.isnan(depth_value):
+    if depth_meters <= 0 or np.isnan(depth_meters):
         raise ValueError("无效的深度值")
     
     # 提取相机内参
@@ -115,12 +115,8 @@ def pixel_to_3d(pixel_coords: Tuple[int, int], depth_map: np.ndarray, camera_par
     fy = intrinsic_params.get("fy", 1.0)
     cx = intrinsic_params.get("cx", width / 2)
     cy = intrinsic_params.get("cy", height / 2)
-    depth_scale = camera_params.get("depth_scale", 1.0)
     
-    # 将深度值转换为实际距离（米）
-    depth_meters = depth_value * depth_scale
-    
-    # 使用相机内参计算三维坐标
+    # 使用相机内参计算三维坐标（OpenCV坐标系）
     # 公式：X = (x - cx) * depth / fx, Y = (y - cy) * depth / fy, Z = depth
     x_3d = (x_pixel - cx) * depth_meters / fx
     y_3d = (y_pixel - cy) * depth_meters / fy
@@ -128,7 +124,7 @@ def pixel_to_3d(pixel_coords: Tuple[int, int], depth_map: np.ndarray, camera_par
     
     return np.array([x_3d, y_3d, z_3d])
 
-def batch_convert_landmarks(landmarks: List, depth_map: np.ndarray, camera_params: dict) -> List[np.ndarray]:
+def batch_convert_landmarks(landmarks: List[Tuple[float, float, float]], depth_map_meters: np.ndarray, camera_params: dict) -> List[np.ndarray]:
     """
     批量转换关键点为三维坐标
     
@@ -141,12 +137,12 @@ def batch_convert_landmarks(landmarks: List, depth_map: np.ndarray, camera_param
         (xn, yn, zn)   # 关键点n坐标
     ]
     
-    :param depth_map: 深度图
+    :param depth_map_meters: 深度图（米单位）
     示例
-    depth_map = np.ndarray(
+    depth_map_meters = np.ndarray(
         shape=(720, 1280),  # 深度图尺寸 (高度, 宽度)
-        dtype=np.uint16,    # 深度数据类型
-        data=[[depth_value, ...], ...]  # 深度值数组
+        dtype=np.float32,   # 深度数据类型（浮点数，米单位）
+        data=[[depth_meters, ...], ...]  # 深度值数组（米）
     )
     
     :param camera_params: 相机内参
@@ -176,15 +172,15 @@ def batch_convert_landmarks(landmarks: List, depth_map: np.ndarray, camera_param
     if not isinstance(landmarks, list) or len(landmarks) == 0:
         raise ValueError("landmarks 必须是非空列表")
     
-    if not isinstance(depth_map, np.ndarray) or depth_map.ndim != 2:
-        raise ValueError("depth_map 必须是2维numpy数组")
+    if not isinstance(depth_map_meters, np.ndarray) or depth_map_meters.ndim != 2:
+        raise ValueError("depth_map_meters 必须是2维numpy数组")
     
     if not isinstance(camera_params, dict):
         raise ValueError("camera_params 必须是字典")
     
     # 批量转换关键点
     coords_3d = []
-    height, width = depth_map.shape
+    height, width = depth_map_meters.shape
     
     for landmark in landmarks:
         if not isinstance(landmark, tuple) or len(landmark) != 3:
@@ -198,7 +194,7 @@ def batch_convert_landmarks(landmarks: List, depth_map: np.ndarray, camera_param
         
         try:
             # 使用pixel_to_3d函数转换单个关键点
-            coord_3d = pixel_to_3d((int(x_pixel), int(y_pixel)), depth_map, camera_params)
+            coord_3d = pixel_to_3d((int(x_pixel), int(y_pixel)), depth_map_meters, camera_params)
             coords_3d.append(coord_3d)
         except (ValueError, IndexError):
             # 如果转换失败，跳过该关键点
