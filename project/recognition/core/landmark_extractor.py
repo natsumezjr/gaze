@@ -1,33 +1,31 @@
 import numpy as np
 import mediapipe as mp
 import cv2
+import base64
 from typing import List, Dict, Tuple
 
-def extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]:
+def decode_base64_image(b64_string: str) -> np.ndarray:
     """
-    输入：一张包含人脸的RGB图片
-    处理：使用MediaPipe Face Mesh模型分析图片
-    输出：468个精确的2D坐标点，代表人脸的关键部位
-    
-    :param rgb_image: RGB图像数据
-    示例
-    rgb_image = np.ndarray(
-        shape=(720, 1280, 3),  # 图像尺寸 (高度, 宽度, 3通道)
-        dtype=np.uint8,        # 数据类型 (0-255的整数)
-        data=[[[R,G,B], ...], ...]  # RGB像素值数组
-    )
-    
-    调用关系：
-    被调用：
-    - detector.py 中的 detect_face() 调用此函数
-    
-    调用：
-    - mediapipe.solutions.face_mesh.FaceMesh() (mediapipe库)
-    - face_mesh.process() (mediapipe库)
-    
-    可能用到的库函数：mediapipe, opencv
+    将base64编码的jpg/png图像字符串解码为numpy数组（BGR格式，OpenCV默认）
     """
-    # 初始化MediaPipe Face Mesh
+    img_bytes = base64.b64decode(b64_string)
+    img_array = np.frombuffer(img_bytes, dtype=np.uint8)
+    img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+    return img
+
+def extract_landmarks(bgr_image_b64: str) -> List[List[float]]:
+    """
+    输入：一张包含人脸的base64编码的jpg/png图像字符串（BGR格式，OpenCV默认）
+    处理：使用MediaPipe Face Mesh模型分析图片（内部自动BGR->RGB）
+    输出：468个精确的2D/3D关键点，格式为[[x, y, z], ...]
+
+    :param bgr_image_b64: base64编码的jpg/png图像字符串（BGR格式）
+    示例：
+    bgr_image_b64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA..."  # base64字符串
+
+    :return: 468个关键点的嵌套列表
+    """
+    bgr_image = decode_base64_image(bgr_image_b64)
     mp_face_mesh = mp.solutions.face_mesh
     face_mesh = mp_face_mesh.FaceMesh(
         static_image_mode=True,
@@ -35,36 +33,22 @@ def extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
         refine_landmarks=True,
         min_detection_confidence=0.5
     )
-    
-    # 检查输入图像格式（MediaPipe需要RGB格式）
-    if len(rgb_image.shape) == 3 and rgb_image.shape[2] == 3:
-        # 输入图像已经是RGB格式（由detector统一处理）
-        rgb_image_rgb = rgb_image
+    if len(bgr_image.shape) == 3 and bgr_image.shape[2] == 3:
+        rgb_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
     else:
-        raise ValueError("输入图像必须是3通道RGB图像")
-    
-    # 获取图像尺寸
-    height, width = rgb_image_rgb.shape[:2]
-    
-    # 检测人脸关键点
-    results = face_mesh.process(rgb_image_rgb)
-    
+        raise ValueError("输入图像必须是3通道BGR图像")
+    height, width = rgb_image.shape[:2]
+    results = face_mesh.process(rgb_image)
     if results.multi_face_landmarks:
-        # 获取第一个检测到的人脸的关键点
         face_landmarks = results.multi_face_landmarks[0]
-        
-        # 转换关键点格式
         landmarks = []
         for landmark in face_landmarks.landmark:
-            # 将相对坐标转换为像素坐标
             x = landmark.x * width
             y = landmark.y * height
-            z = landmark.z # 预测的深度值
-            landmarks.append((x, y, z))
-        
+            z = landmark.z
+            landmarks.append([x, y, z])
         return landmarks
     else:
-        # 如果没有检测到人脸，返回空列表
         return []
 
 # 关键点索引说明（MediaPipe Face Mesh的468个关键点）

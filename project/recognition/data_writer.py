@@ -6,9 +6,13 @@ import threading
 import time
 from datetime import datetime
 from pathlib import Path
+from recognition.config.settings import DATA_PATH
 
-def encode_image_to_base64(image):
-    _, buffer = cv2.imencode('.jpg', image)
+def encode_image_to_base64(bgr_image):
+    """
+    将BGR格式（OpenCV默认）的图像编码为base64字符串
+    """
+    _, buffer = cv2.imencode('.jpg', bgr_image)
     return base64.b64encode(buffer).decode('utf-8')
 
 def clean_old_entries(data_dict, max_age_sec=10):
@@ -18,15 +22,18 @@ def clean_old_entries(data_dict, max_age_sec=10):
         if (now - datetime.fromisoformat(v["timestamp"]).timestamp()) < max_age_sec
     }
 
-def convert_to_json(rgb, frame_id):
-    h, w = rgb.shape[:2]
+def convert_to_json(bgr_image, frame_id):
+    """
+    将BGR格式（OpenCV默认）的图像和帧信息转为JSON结构
+    """
+    h, w = bgr_image.shape[:2]
     return {
         "frame_id": frame_id,
         "timestamp": datetime.now().isoformat(),
         "camera": {
             "resolution": [w, h]
         },
-        "rgb_data": encode_image_to_base64(rgb),
+        "rgb_data": encode_image_to_base64(bgr_image),  # 实际为BGR格式的base64字符串
         "depth_data": None,  # 无深度数据
         "eye_centers": {"left": None, "right": None},
         "pupil_centers": {"left": None, "right": None},
@@ -45,8 +52,8 @@ def auto_clean_thread(data_dict, lock, max_age_sec=10, interval=1):
 def main():
     cap = cv2.VideoCapture(0)
     frame_id = 0
-    Path("project/recognition/data").mkdir(exist_ok=True)
-    output_path = "project/recognition/data/rgbd_input.json"
+    Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
+    output_path = f"{DATA_PATH}/rgbd_input.json"
     data_dict = {}
     lock = threading.Lock()
 

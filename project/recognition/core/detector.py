@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
+import base64
 from typing import List, Dict, Tuple
+import io
 
 class FaceDetector:
     def __init__(self, camera_params: dict):
@@ -51,72 +53,37 @@ class FaceDetector:
         可能用到的库函数：无
         """
         self.camera_params = camera_params
-        self._rgb_image = None
+        self._bgr_image = None
         self._depth_map_meters = None
         self._landmarks = None
         self._detection_success = False
 
-    def detect_face(self, rgb_image: np.ndarray, depth_map: np.ndarray) -> bool:
+    def _decode_base64_image(self, b64_string: str) -> np.ndarray:
         """
-        输入：一张包含人脸的RGB图片和深度图
-        处理：处理流程见下
-        输出：是否成功检测到人脸
+        将base64编码的jpg/png图像字符串解码为numpy数组（BGR格式，OpenCV默认）
+        """
+        img_bytes = base64.b64decode(b64_string)
+        img_array = np.frombuffer(img_bytes, dtype=np.uint8)
+        img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+        return img
+
+    def detect_face(self, bgr_image_b64: str, depth_map: np.ndarray) -> bool:
+        """
+        检测人脸和关键点
         
-        :param rgb_image: RGB图像，numpy数组格式，形状为(H, W, 3)
-        注意：输入图像可以是BGR或RGB格式，函数内部会统一转换为RGB格式处理
-        示例
-        rgb_image = np.array([
-            [[255, 0, 0], [0, 255, 0], ...],  # 第一行像素，RGB格式
-            [[0, 0, 255], [128, 128, 128], ...],  # 第二行像素
-            ...
-        ], dtype=np.uint8, shape=(720, 1280, 3))
-        
+        :param bgr_image_b64: base64编码的jpg/png图像字符串（BGR格式，OpenCV默认）
         :param depth_map: 深度图，numpy数组格式，形状为(H, W)
-        注意：深度值为相机原始单位，函数内部会乘以depth_scale转换为米
-        示例
-        depth_map = np.array([
-            [1000, 1005, 1010, ...],  # 第一行深度值（相机原始单位）
-            [1002, 1008, 1015, ...],  # 第二行深度值
-            ...
-        ], dtype=np.uint16, shape=(720, 1280))
+        
+        示例：
+        bgr_image_b64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA..."  # base64字符串
         
         :return: 检测是否成功
-        返回值示例：
-        True   # 检测成功，找到人脸
-        False  # 检测失败，未找到人脸
-        
-        处理流程：
-        1. 统一RGB格式处理（BGR转RGB）
-        2. 深度图转换为米单位
-        3. 使用MediaPipe检测人脸关键点
-        4. 验证关键点质量
-        5. 使用_enhance_depth_with_landmarks()融合深度信息
-        6. 存储处理后的数据供后续方法调用
-        
-        调用关系：
-        被调用：
-        - main.py 中的主循环调用此函数
-        
-        调用：
-        - extract_landmarks() (landmark_extractor.py，提取关键点，返回468个关键点(x,y,z)列表)
-        - validate_landmarks() (landmark_extractor.py，验证关键点质量，返回True/False)
-        - _enhance_depth_with_landmarks() (内部方法，融合深度信息)
-        - _convert_to_rgb() (内部方法，将输入图像转换为RGB格式)
-        - _convert_depth_to_meters() (内部方法，将深度图从相机原始单位转换为米)
-        
-        可能用到的库函数：mediapipe, opencv
         """
-        # 1. 统一RGB格式处理
-        self._rgb_image = self._convert_to_rgb(rgb_image)
-        
-        # 2. 深度图转换为米单位
+        bgr_image = self._decode_base64_image(bgr_image_b64)
+        self._bgr_image = bgr_image
         self._depth_map_meters = self._convert_depth_to_meters(depth_map)
-        
-        # 3. 检测人脸关键点
         from .landmark_extractor import extract_landmarks, validate_landmarks
-        landmarks = extract_landmarks(self._rgb_image)
-        
-        # 4. 验证关键点质量
+        landmarks = extract_landmarks(bgr_image_b64)
         if validate_landmarks(landmarks):
             self._landmarks = landmarks
             self._detection_success = True
@@ -306,22 +273,6 @@ class FaceDetector:
         else:
             return "检测失败"
     
-    def _convert_to_rgb(self, rgb_image: np.ndarray) -> np.ndarray:
-        """
-        统一转换为RGB格式
-        
-        :param rgb_image: 输入图像（BGR或RGB格式）
-        :return: RGB格式图像
-        """
-        if len(rgb_image.shape) == 3 and rgb_image.shape[2] == 3:
-            # 检查是否为BGR格式（OpenCV默认格式）
-            if rgb_image.dtype == np.uint8:
-                return cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
-            else:
-                return rgb_image
-        else:
-            raise ValueError("输入图像必须是3通道RGB图像")
-    
     def _convert_depth_to_meters(self, depth_map: np.ndarray) -> np.ndarray:
         """
         将深度图从相机原始单位转换为米
@@ -345,8 +296,8 @@ class FaceDetector:
         fy = intrinsic_params.get("fy", 1.0)
         
         # 主点坐标：如果未指定，使用图像中心
-        if self._rgb_image is not None:
-            height, width = self._rgb_image.shape[:2]
+        if self._bgr_image is not None:
+            height, width = self._bgr_image.shape[:2]
             cx = intrinsic_params.get("cx", width / 2)
             cy = intrinsic_params.get("cy", height / 2)
         else:
