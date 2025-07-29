@@ -45,8 +45,8 @@ def auto_clean_thread(data_dict, lock, max_age_sec=10, interval=1):
 def main():
     cap = cv2.VideoCapture(0)
     frame_id = 0
-    Path("data").mkdir(exist_ok=True)
-    output_path = "data/rgbd_input.json"
+    Path("project/recognition/data").mkdir(exist_ok=True)
+    output_path = "project/recognition/data/rgbd_input.json"
     data_dict = {}
     lock = threading.Lock()
 
