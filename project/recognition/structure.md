@@ -13,7 +13,7 @@
 
 ---
 
-## 二、文件结构设计
+## 二、文件结构设计以及调用关系
 
 ```
 recognition/
@@ -39,6 +39,18 @@ recognition/
 └── main.py                       # 主入口文件（包含大while循环）
 ```
 
+调用关系
+main.py (主循环)
+    ↓ 调用
+detector.py (核心检测器)
+    ↓ 调用
+├── landmark_extractor.py (关键点提取)
+│   └── models/face_detector.py (人脸检测模型)
+├── coordinate_converter.py (坐标转换)
+└── utils/ (工具函数)
+    ├── camera_calibration.py
+    ├── depth_processor.py
+    └── validation.py
 ---
 
 ## 三、各文件功能详细说明

@@ -5,7 +5,9 @@ from typing import List, Dict, Tuple
 
 def extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]:
     """
-    提取468个人脸关键点
+    输入：一张包含人脸的RGB图片
+    处理：使用MediaPipe Face Mesh模型分析图片
+    输出：468个精确的2D坐标点，代表人脸的关键部位
     
     :param rgb_image: RGB图像数据
     示例
@@ -15,14 +17,13 @@ def extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
         data=[[[R,G,B], ...], ...]  # RGB像素值数组
     )
     
-    传入参数的函数：
-    cv2.imread(file_path: str) -> np.ndarray
-        传入参数：file_path (图像文件路径)
-        返回：RGB图像数组
+    调用关系：
+    被调用：
+    - detector.py 中的 detect_face() 调用此函数
     
-    cv2.VideoCapture.read() -> (bool, np.ndarray)
-        传入参数：无 (从摄像头读取)
-        返回：(成功标志, RGB图像数组)
+    调用：
+    - mediapipe.solutions.face_mesh.FaceMesh() (mediapipe库)
+    - face_mesh.process() (mediapipe库)
     
     可能用到的库函数：mediapipe, opencv
     """
@@ -58,7 +59,7 @@ def extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
             # 将相对坐标转换为像素坐标
             x = landmark.x * width
             y = landmark.y * height
-            z = landmark.z  # 保持相对深度值
+            z = landmark.z # 预测的深度值
             landmarks.append((x, y, z))
         
         return landmarks
@@ -66,53 +67,10 @@ def extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
         # 如果没有检测到人脸，返回空列表
         return []
 
-# 示例函数：展示如何使用extract_landmarks
-def example_usage():
-    """
-    使用示例：
-    1. 从摄像头读取图像
-    2. 提取人脸关键点
-    3. 在图像上绘制关键点
-    """
-    # 示例1：从摄像头读取图像
-    cap = cv2.VideoCapture(0)
-    ret, frame = cap.read()
-    cap.release()
-    
-    if ret:
-        # 提取关键点
-        landmarks = extract_landmarks(frame)
-        
-        if landmarks:
-            print(f"成功检测到人脸，提取了 {len(landmarks)} 个关键点")
-            
-            # 示例：获取第一个关键点的坐标
-            first_landmark = landmarks[0]
-            print(f"第一个关键点坐标: x={first_landmark[0]:.2f}, y={first_landmark[1]:.2f}, z={first_landmark[2]:.2f}")
-            
-            # 示例：在图像上绘制关键点
-            for i, (x, y, z) in enumerate(landmarks):
-                cv2.circle(frame, (int(x), int(y)), 2, (0, 255, 0), -1)
-                if i == 0:  # 只标注第一个关键点
-                    cv2.putText(frame, f"Point 0", (int(x)+5, int(y)-5), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-            
-            # 显示结果
-            cv2.imshow('Face Landmarks', frame)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-        else:
-            print("未检测到人脸")
-    
-    # 示例2：从图像文件读取
-    # image_path = "path/to/your/image.jpg"
-    # frame = cv2.imread(image_path)
-    # landmarks = extract_landmarks(frame)
-
 # 关键点索引说明（MediaPipe Face Mesh的468个关键点）
-def get_landmark_indices():
+def get_landmark_indices() -> Dict[str, List[int]]:
     """
-    返回重要关键点的索引
+    返回重要关键点的索引，后续可以用于直接字符串键值对获取值。
     
     返回：关键点索引字典
     示例
@@ -144,7 +102,14 @@ def get_landmark_indices():
         "left_earlobe_bottom": [448, 449, 450, ..., 467]         # 左耳垂底部索引
     }
     
-    传入参数的函数：无
+    调用关系：
+    被调用：
+    - get_eye_landmarks() 调用此函数
+    - get_pupil_landmarks() 调用此函数
+    - get_iris_landmarks() 调用此函数
+    
+    调用：
+    - 无直接调用其他函数
     
     可能用到的库函数：无
     """
@@ -178,7 +143,7 @@ def get_landmark_indices():
 
 def validate_landmarks(landmarks: List[Tuple[float, float, float]]) -> bool:
     """
-    验证关键点质量
+    输入：landmarks的
     
     :param landmarks: 关键点列表
     示例
@@ -189,10 +154,12 @@ def validate_landmarks(landmarks: List[Tuple[float, float, float]]) -> bool:
         (x468, y468, z468)  # 关键点468坐标
     ]
     
-    传入参数的函数：
-    extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
-        传入参数：rgb_image (RGB图像数组)
-        返回：468个关键点列表
+    调用关系：
+    被调用：
+    - detector.py 中的 detect_face() 调用此函数
+    
+    调用：
+    - 无直接调用其他函数
     
     可能用到的库函数：numpy
     """
@@ -254,7 +221,8 @@ def validate_landmarks(landmarks: List[Tuple[float, float, float]]) -> bool:
 
 def get_eye_landmarks(landmarks: List[Tuple[float, float, float]], eye_type: str) -> List[Tuple[float, float, float]]:
     """
-    提取指定眼睛的关键点
+    输入：468个关键点(x,y,z)
+    输出：眼睛的关键点
     
     :param landmarks: 关键点列表
     示例
@@ -270,10 +238,12 @@ def get_eye_landmarks(landmarks: List[Tuple[float, float, float]], eye_type: str
     eye_type = "left"   # 左眼
     eye_type = "right"  # 右眼
     
-    传入参数的函数：
-    extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
-        传入参数：rgb_image (RGB图像数组)
-        返回：468个关键点列表
+    调用关系：
+    被调用：
+    - detector.py 中的 get_eye_centers() 调用此函数
+    
+    调用：
+    - get_landmark_indices() (内部函数)
     
     可能用到的库函数：无
     """
@@ -315,10 +285,12 @@ def get_pupil_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str
         (x468, y468, z468)  # 关键点468坐标
     ]
     
-    传入参数的函数：
-    extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
-        传入参数：rgb_image (RGB图像数组)
-        返回：468个关键点列表
+    调用关系：
+    被调用：
+    - detector.py 中的 get_pupil_centers() 调用此函数
+    
+    调用：
+    - calculate_center() (内部函数)
     
     可能用到的库函数：无
     """
@@ -362,10 +334,13 @@ def calculate_center(points: List[Tuple[float, float, float]]) -> Tuple[float, f
         (xn, yn, zn)   # 点n坐标
     ]
     
-    传入参数的函数：
-    get_iris_landmarks(landmarks: List) -> Dict[str, List[Tuple[float, float, float]]]
-        传入参数：landmarks (关键点列表)
-        返回：虹膜关键点字典
+    调用关系：
+    被调用：
+    - get_pupil_landmarks() 调用此函数
+    - get_iris_landmarks() 调用此函数
+    
+    调用：
+    - 无直接调用其他函数
     
     可能用到的库函数：无
     """
@@ -396,10 +371,12 @@ def get_iris_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str,
         (x468, y468, z468)  # 关键点468坐标
     ]
     
-    传入参数的函数：
-    extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
-        传入参数：rgb_image (RGB图像数组)
-        返回：468个关键点列表
+    调用关系：
+    被调用：
+    - detector.py 中的 get_iris_boundaries() 调用此函数
+    
+    调用：
+    - get_landmark_indices() (内部函数)
     
     可能用到的库函数：无
     """

@@ -48,11 +48,6 @@ class FaceDetector:
             "notes": "相机内参通过OpenCV标定获得"  # 备注信息
         }
         
-        传入参数的函数：
-        load_camera_params(file_path: str) -> dict
-            传入参数：file_path (配置文件路径)
-            返回：相机参数字典
-        
         可能用到的库函数：无
         """
         self.camera_params = camera_params
@@ -61,255 +56,236 @@ class FaceDetector:
         self._landmarks = None
         self._detection_success = False
 
-def detect_face(self, rgb_image: np.ndarray, depth_map: np.ndarray) -> bool:
-    """
-    检测人脸和关键点
-    
-    :param rgb_image: RGB图像，numpy数组格式，形状为(H, W, 3)
-    注意：输入图像可以是BGR或RGB格式，函数内部会统一转换为RGB格式处理
-    示例
-    rgb_image = np.array([
-        [[255, 0, 0], [0, 255, 0], ...],  # 第一行像素，RGB格式
-        [[0, 0, 255], [128, 128, 128], ...],  # 第二行像素
-        ...
-    ], dtype=np.uint8, shape=(720, 1280, 3))
-    
-    :param depth_map: 深度图，numpy数组格式，形状为(H, W)
-    注意：深度值为相机原始单位，函数内部会乘以depth_scale转换为米
-    示例
-    depth_map = np.array([
-        [1000, 1005, 1010, ...],  # 第一行深度值（相机原始单位）
-        [1002, 1008, 1015, ...],  # 第二行深度值
-        ...
-    ], dtype=np.uint16, shape=(720, 1280))
-    
-    :return: 检测是否成功
-    返回值示例：
-    True   # 检测成功，找到人脸
-    False  # 检测失败，未找到人脸
-    
-    处理流程：
-    1. 统一RGB格式处理（BGR转RGB）
-    2. 深度图转换为米单位
-    3. 使用MediaPipe检测人脸关键点
-    4. 验证关键点质量
-    5. 存储处理后的数据供后续方法调用
-    
-    传入参数的函数：
-    extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]:
-        传入参数：rgb_image (RGB图像)
-        返回：468个关键点(x,y,z)列表
-    
-    validate_landmarks(landmarks: List[Tuple[float, float, float]]) -> bool
-        传入参数：landmarks (关键点列表,(x,y,z))
-        返回：关键点是否有效
-    
-    可能用到的库函数：mediapipe, opencv
-    """
-    # 1. 统一RGB格式处理
-    self._rgb_image = self._convert_to_rgb(rgb_image)
-    
-    # 2. 深度图转换为米单位
-    self._depth_map_meters = self._convert_depth_to_meters(depth_map)
-    
-    # 3. 检测人脸关键点
-    from .landmark_extractor import extract_landmarks, validate_landmarks
-    landmarks = extract_landmarks(self._rgb_image)
-    
-    # 4. 验证关键点质量
-    if validate_landmarks(landmarks):
-        self._landmarks = landmarks
-        self._detection_success = True
-        return True
-    else:
-        self._detection_success = False
-        return False
+    def detect_face(self, rgb_image: np.ndarray, depth_map: np.ndarray) -> bool:
+        """
+        输入：一张包含人脸的RGB图片和深度图
+        处理：处理流程见下
+        输出：是否成功检测到人脸
+        
+        :param rgb_image: RGB图像，numpy数组格式，形状为(H, W, 3)
+        注意：输入图像可以是BGR或RGB格式，函数内部会统一转换为RGB格式处理
+        示例
+        rgb_image = np.array([
+            [[255, 0, 0], [0, 255, 0], ...],  # 第一行像素，RGB格式
+            [[0, 0, 255], [128, 128, 128], ...],  # 第二行像素
+            ...
+        ], dtype=np.uint8, shape=(720, 1280, 3))
+        
+        :param depth_map: 深度图，numpy数组格式，形状为(H, W)
+        注意：深度值为相机原始单位，函数内部会乘以depth_scale转换为米
+        示例
+        depth_map = np.array([
+            [1000, 1005, 1010, ...],  # 第一行深度值（相机原始单位）
+            [1002, 1008, 1015, ...],  # 第二行深度值
+            ...
+        ], dtype=np.uint16, shape=(720, 1280))
+        
+        :return: 检测是否成功
+        返回值示例：
+        True   # 检测成功，找到人脸
+        False  # 检测失败，未找到人脸
+        
+        处理流程：
+        1. 统一RGB格式处理（BGR转RGB）
+        2. 深度图转换为米单位
+        3. 使用MediaPipe检测人脸关键点
+        4. 验证关键点质量
+        5. 使用_enhance_depth_with_landmarks()融合深度信息
+        6. 存储处理后的数据供后续方法调用
+        
+        调用关系：
+        被调用：
+        - main.py 中的主循环调用此函数
+        
+        调用：
+        - extract_landmarks() (landmark_extractor.py，提取关键点，返回468个关键点(x,y,z)列表)
+        - validate_landmarks() (landmark_extractor.py，验证关键点质量，返回True/False)
+        - _enhance_depth_with_landmarks() (内部方法，融合深度信息)
+        - _convert_to_rgb() (内部方法，将输入图像转换为RGB格式)
+        - _convert_depth_to_meters() (内部方法，将深度图从相机原始单位转换为米)
+        
+        可能用到的库函数：mediapipe, opencv
+        """
+        # 1. 统一RGB格式处理
+        self._rgb_image = self._convert_to_rgb(rgb_image)
+        
+        # 2. 深度图转换为米单位
+        self._depth_map_meters = self._convert_depth_to_meters(depth_map)
+        
+        # 3. 检测人脸关键点
+        from .landmark_extractor import extract_landmarks, validate_landmarks
+        landmarks = extract_landmarks(self._rgb_image)
+        
+        # 4. 验证关键点质量
+        if validate_landmarks(landmarks):
+            self._landmarks = landmarks
+            self._detection_success = True
+            return True
+        else:
+            self._detection_success = False
+            return False
 
-def get_eye_centers(self) -> Dict[str, np.ndarray]:
-    """
-    获取左右眼球中心三维坐标
-    
-    :return: 左右眼球中心的三维坐标字典
-    返回格式：
-    {
-        'left': np.array([x_left, y_left, z_left]),   # 左眼球中心坐标
-        'right': np.array([x_right, y_right, z_right]) # 右眼球中心坐标
-    }
-    
-    坐标说明（OpenCV标准坐标系）：
-    - x, y, z: 相机坐标系下的三维坐标（米）
-    - x: 水平方向，向右为正（图像宽度方向）
-    - y: 垂直方向，向下为正（图像高度方向）
-    - z: 深度方向，向前为正（相机光轴方向，指向物体）
-    
-    返回值示例：
-    {
-        'left': np.array([0.1, 0.05, 0.8]),   # 左眼球中心：(0.1m, 0.05m, 0.8m)
-        'right': np.array([0.15, 0.05, 0.8])  # 右眼球中心：(0.15m, 0.05m, 0.8m)
-    }
-    
-    处理流程：
-    1. 从已检测的关键点中提取眼球区域关键点
-    2. 计算眼球区域的几何中心
-    3. 结合深度信息转换为三维坐标
-    4. 返回左右眼球的中心坐标
-    
-    前置条件：
-    - 必须先调用detect_face()方法进行人脸检测
-    - 检测结果必须成功且置信度足够高
-    
-    传入参数的函数：
-    get_eye_landmarks(landmarks: List[Tuple[float, float, float]], eye_type: str) -> List[Tuple[float, float, float]]
-        传入参数：landmarks (关键点列表), eye_type ('left'或'right')
-        返回：指定眼睛的关键点列表
-    
-    pixel_to_3d(pixel_coords: Tuple[int, int], depth_map_meters: np.ndarray, camera_params: dict) -> np.ndarray
-        传入参数：pixel_coords (像素坐标), depth_map_meters (米单位深度图), camera_params (相机参数)
-        返回：三维坐标数组（米单位）
-    
-    可能用到的库函数：numpy
-    """
-    if not self._detection_success or self._landmarks is None:
-        return {'left': None, 'right': None}
-    
-    # 从已检测的关键点中提取眼球区域关键点
-    from .landmark_extractor import get_eye_landmarks
-    from .coordinate_converter import pixel_to_3d
-    
-    # 获取左右眼关键点
-    left_eye_landmarks = get_eye_landmarks(self._landmarks, 'left')
-    right_eye_landmarks = get_eye_landmarks(self._landmarks, 'right')
-    
-    # 计算眼球中心
-    if left_eye_landmarks:
-        left_center = self._calculate_center(left_eye_landmarks)
-        left_3d = pixel_to_3d((int(left_center[0]), int(left_center[1])), self._depth_map_meters, self.camera_params)
-    else:
-        left_3d = None
-    
-    if right_eye_landmarks:
-        right_center = self._calculate_center(right_eye_landmarks)
-        right_3d = pixel_to_3d((int(right_center[0]), int(right_center[1])), self._depth_map_meters, self.camera_params)
-    else:
-        right_3d = None
-    
-    return {'left': left_3d, 'right': right_3d}
+    def get_eye_centers(self) -> Dict[str, np.ndarray]:
+        """
+        输入：一张包含人脸的RGB图片和深度图（已经通过detect_face()处理）
+        处理：处理流程见下
+        输出：左右眼球中心的三维坐标字典
+        
+        返回格式：
+        {
+            'left': np.array([x_left, y_left, z_left]),   # 左眼球中心坐标
+            'right': np.array([x_right, y_right, z_right]) # 右眼球中心坐标
+        }
+        
+        坐标说明（OpenCV标准坐标系）：
+        - x, y, z: 相机坐标系下的三维坐标（米）
+        - x: 水平方向，向右为正（图像宽度方向）
+        - y: 垂直方向，向下为正（图像高度方向）
+        - z: 深度方向，向前为正（相机光轴方向，指向物体）
+        
+        返回值示例：
+        {
+            'left': np.array([0.1, 0.05, 0.8]),   # 左眼球中心：(0.1m, 0.05m, 0.8m)
+            'right': np.array([0.15, 0.05, 0.8])  # 右眼球中心：(0.15m, 0.05m, 0.8m)
+        }
+        
+        处理流程：
+        1. 从已检测的关键点中提取眼球区域关键点
+        2. 计算眼球区域的几何中心
+        3. 结合深度信息转换为三维坐标
+        4. 返回左右眼球的中心坐标
+        
+        前置条件：
+        - 必须先调用detect_face()方法进行人脸检测
+        - 检测结果必须成功且置信度足够高
+        
+        调用关系：
+        被调用：
+        - main.py 中的主循环调用此函数
+        
+        调用：
+        - get_eye_landmarks() (landmark_extractor.py)
+        - pixel_to_3d() (coordinate_converter.py)
+        - _calculate_center() (内部方法)
+        
+        可能用到的库函数：numpy
+        """
+        pass
 
-def get_pupil_centers(self) -> Dict[str, np.ndarray]:
-    """
-    获取左右瞳孔中心三维坐标
-    
-    :return: 左右瞳孔中心的三维坐标字典
-    返回格式：
-    {
-        'left': np.array([x_left, y_left, z_left]),   # 左瞳孔中心坐标
-        'right': np.array([x_right, y_right, z_right]) # 右瞳孔中心坐标
-    }
-    
-    坐标说明（OpenCV标准坐标系）：
-    - x, y, z: 相机坐标系下的三维坐标（米）
-    - x: 水平方向，向右为正（图像宽度方向）
-    - y: 垂直方向，向下为正（图像高度方向）
-    - z: 深度方向，向前为正（相机光轴方向，指向瞳孔）
-    
-    返回值示例：
-    {
-        'left': np.array([0.12, 0.06, 0.82]),   # 左瞳孔中心：(0.12m, 0.06m, 0.82m)
-        'right': np.array([0.18, 0.06, 0.82])   # 右瞳孔中心：(0.18m, 0.06m, 0.82m)
-    }
-    
-    处理流程：
-    1. 从已检测的关键点中提取瞳孔中心关键点（索引468和473）
-    2. 获取瞳孔中心的像素坐标
-    3. 结合深度图获取该点的深度值
-    4. 使用相机内参转换为三维坐标
-    5. 返回左右瞳孔的三维坐标
-    
-    前置条件：
-    - 必须先调用detect_face()方法进行人脸检测
-    - 检测结果必须成功且置信度足够高
-    - 瞳孔中心关键点必须被正确检测到
-    
-    传入参数的函数：
-    get_pupil_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str, Tuple[float, float, float]]
-        传入参数：landmarks (关键点列表)
-        返回：{'left': (x,y,z), 'right': (x,y,z)}
-    
-    pixel_to_3d(pixel_coords: Tuple[int, int], depth_map_meters: np.ndarray, camera_params: dict) -> np.ndarray
-        传入参数：pixel_coords (像素坐标), depth_map_meters (米单位深度图), camera_params (相机参数)
-        返回：三维坐标数组（米单位）
-    
-    可能用到的库函数：numpy
-    """
-    pass
+    def get_pupil_centers(self) -> Dict[str, np.ndarray]:
+        """
+        获取左右瞳孔中心三维坐标
+        
+        :return: 左右瞳孔中心的三维坐标字典
+        返回格式：
+        {
+            'left': np.array([x_left, y_left, z_left]),   # 左瞳孔中心坐标
+            'right': np.array([x_right, y_right, z_right]) # 右瞳孔中心坐标
+        }
+        
+        坐标说明（OpenCV标准坐标系）：
+        - x, y, z: 相机坐标系下的三维坐标（米）
+        - x: 水平方向，向右为正（图像宽度方向）
+        - y: 垂直方向，向下为正（图像高度方向）
+        - z: 深度方向，向前为正（相机光轴方向，指向瞳孔）
+        
+        返回值示例：
+        {
+            'left': np.array([0.12, 0.06, 0.82]),   # 左瞳孔中心：(0.12m, 0.06m, 0.82m)
+            'right': np.array([0.18, 0.06, 0.82])   # 右瞳孔中心：(0.18m, 0.06m, 0.82m)
+        }
+        
+        处理流程：
+        1. 从已检测的关键点中提取瞳孔中心关键点（索引468和473）
+        2. 获取瞳孔中心的像素坐标
+        3. 结合深度图获取该点的深度值
+        4. 使用相机内参转换为三维坐标
+        5. 返回左右瞳孔的三维坐标
+        
+        前置条件：
+        - 必须先调用detect_face()方法进行人脸检测
+        - 检测结果必须成功且置信度足够高
+        - 瞳孔中心关键点必须被正确检测到
+        
+        调用关系：
+        被调用：
+        - main.py 中的主循环调用此函数
+        
+        调用：
+        - get_pupil_landmarks() (landmark_extractor.py)
+        - pixel_to_3d() (coordinate_converter.py)
+        - _calculate_center() (内部方法)
+        
+        可能用到的库函数：numpy
+        """
+        pass
 
-def get_iris_boundaries(self) -> Dict[str, List[np.ndarray]]:
-    """
-    获取左右虹膜边界点三维坐标
-    
-    :return: 左右虹膜边界点的三维坐标字典
-    返回格式：
-    {
-        'left': [
-            np.array([x_0, y_0, z_0]),   # 左虹膜边界点0
-            np.array([x_1, y_1, z_1]),   # 左虹膜边界点1
-            np.array([x_2, y_2, z_2]),   # 左虹膜边界点2
-            np.array([x_3, y_3, z_3])    # 左虹膜边界点3
-        ],
-        'right': [
-            np.array([x_0, y_0, z_0]),   # 右虹膜边界点0
-            np.array([x_1, y_1, z_1]),   # 右虹膜边界点1
-            np.array([x_2, y_2, z_2]),   # 右虹膜边界点2
-            np.array([x_3, y_3, z_3])    # 右虹膜边界点3
-        ]
-    }
-    
-    坐标说明（OpenCV标准坐标系）：
-    - x, y, z: 相机坐标系下的三维坐标（米）
-    - x: 水平方向，向右为正（图像宽度方向）
-    - y: 垂直方向，向下为正（图像高度方向）
-    - z: 深度方向，向前为正（相机光轴方向，指向虹膜）
-    
-    返回值示例：
-    {
-        'left': [
-            np.array([0.11, 0.05, 0.81]),  # 左虹膜边界点0
-            np.array([0.13, 0.05, 0.81]),  # 左虹膜边界点1
-            np.array([0.11, 0.07, 0.81]),  # 左虹膜边界点2
-            np.array([0.13, 0.07, 0.81])   # 左虹膜边界点3
-        ],
-        'right': [
-            np.array([0.17, 0.05, 0.81]),  # 右虹膜边界点0
-            np.array([0.19, 0.05, 0.81]),  # 右虹膜边界点1
-            np.array([0.17, 0.07, 0.81]),  # 右虹膜边界点2
-            np.array([0.19, 0.07, 0.81])   # 右虹膜边界点3
-        ]
-    }
-    
-    处理流程：
-    1. 从已检测的关键点中提取虹膜边界点（索引469-472为左眼，474-477为右眼）
-    2. 获取每个边界点的像素坐标
-    3. 结合深度图获取各点的深度值
-    4. 使用相机内参转换为三维坐标
-    5. 返回左右虹膜的边界点三维坐标列表
-    
-    前置条件：
-    - 必须先调用detect_face()方法进行人脸检测
-    - 检测结果必须成功且置信度足够高
-    - 虹膜边界点必须被正确检测到
-    
-    传入参数的函数：
-    get_iris_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str, List[Tuple[float, float, float]]]
-        传入参数：landmarks (关键点列表)
-        返回：{'left': [(x,y,z)...], 'right': [(x,y,z)...]}
-    
-    pixel_to_3d(pixel_coords: Tuple[int, int], depth_map_meters: np.ndarray, camera_params: dict) -> np.ndarray
-        传入参数：pixel_coords (像素坐标), depth_map_meters (米单位深度图), camera_params (相机参数)
-        返回：三维坐标数组（米单位）
-    
-    可能用到的库函数：numpy
-    """
-    pass
+    def get_iris_boundaries(self) -> Dict[str, List[np.ndarray]]:
+        """
+        获取左右虹膜边界点三维坐标
+        
+        :return: 左右虹膜边界点的三维坐标字典
+        返回格式：
+        {
+            'left': [
+                np.array([x_0, y_0, z_0]),   # 左虹膜边界点0
+                np.array([x_1, y_1, z_1]),   # 左虹膜边界点1
+                np.array([x_2, y_2, z_2]),   # 左虹膜边界点2
+                np.array([x_3, y_3, z_3])    # 左虹膜边界点3
+            ],
+            'right': [
+                np.array([x_0, y_0, z_0]),   # 右虹膜边界点0
+                np.array([x_1, y_1, z_1]),   # 右虹膜边界点1
+                np.array([x_2, y_2, z_2]),   # 右虹膜边界点2
+                np.array([x_3, y_3, z_3])    # 右虹膜边界点3
+            ]
+        }
+        
+        坐标说明（OpenCV标准坐标系）：
+        - x, y, z: 相机坐标系下的三维坐标（米）
+        - x: 水平方向，向右为正（图像宽度方向）
+        - y: 垂直方向，向下为正（图像高度方向）
+        - z: 深度方向，向前为正（相机光轴方向，指向虹膜）
+        
+        返回值示例：
+        {
+            'left': [
+                np.array([0.11, 0.05, 0.81]),  # 左虹膜边界点0
+                np.array([0.13, 0.05, 0.81]),  # 左虹膜边界点1
+                np.array([0.11, 0.07, 0.81]),  # 左虹膜边界点2
+                np.array([0.13, 0.07, 0.81])   # 左虹膜边界点3
+            ],
+            'right': [
+                np.array([0.17, 0.05, 0.81]),  # 右虹膜边界点0
+                np.array([0.19, 0.05, 0.81]),  # 右虹膜边界点1
+                np.array([0.17, 0.07, 0.81]),  # 右虹膜边界点2
+                np.array([0.19, 0.07, 0.81])   # 右虹膜边界点3
+            ]
+        }
+        
+        处理流程：
+        1. 从已检测的关键点中提取虹膜边界点（索引469-472为左眼，474-477为右眼）
+        2. 获取每个边界点的像素坐标
+        3. 结合深度图获取各点的深度值
+        4. 使用相机内参转换为三维坐标
+        5. 返回左右虹膜的边界点三维坐标列表
+        
+        前置条件：
+        - 必须先调用detect_face()方法进行人脸检测
+        - 检测结果必须成功且置信度足够高
+        - 虹膜边界点必须被正确检测到
+        
+        调用关系：
+        被调用：
+        - main.py 中的主循环调用此函数
+        
+        调用：
+        - get_iris_landmarks() (landmark_extractor.py)
+        - pixel_to_3d() (coordinate_converter.py)
+        
+        可能用到的库函数：numpy
+        """
+        pass
 
     def get_detection_confidence(self) -> float:
         """
@@ -379,6 +355,65 @@ def get_iris_boundaries(self) -> Dict[str, List[np.ndarray]]:
         
         return fx, fy, cx, cy
     
+    def _enhance_depth_with_landmarks(self) -> np.ndarray:
+        """
+        使用MediaPipe预估深度增强RGB-D深度图
+        
+        处理流程：
+        1. 遍历所有landmarks的(x,y,z)坐标
+        2. 获取对应位置的RGB-D深度值
+        3. 将MediaPipe预估深度z转换为米单位
+        4. 根据置信度权重融合两种深度信息
+        5. 更新_depth_map_meters中的对应位置
+        
+        :return: 增强后的深度图（米单位）
+        示例
+        enhanced_depth = np.ndarray(
+            shape=(720, 1280),  # 深度图尺寸 (高度, 宽度)
+            dtype=np.float32,   # 深度数据类型 (浮点数，米单位)
+            data=[[depth_meters, ...], ...]  # 融合后的深度值数组（米）
+        )
+        
+        调用关系：
+        被调用：
+        - detect_face() 调用此函数
+        
+        调用：
+        - _calculate_depth_confidence() (内部方法)
+        - _calculate_estimated_confidence() (内部方法)
+        - _convert_estimated_depth_to_meters() (内部方法)
+        
+        可能用到的库函数：numpy
+        """
+        pass
+
+    def _calculate_depth_confidence(self, depth_d: float) -> float:
+        """
+        计算RGB-D深度置信度
+        
+        :param depth_d: RGB-D深度值（米单位）
+        :return: 置信度值（0-1范围）
+        """
+        pass
+
+    def _calculate_estimated_confidence(self, z: float) -> float:
+        """
+        计算MediaPipe预估深度置信度
+        
+        :param z: MediaPipe预估的相对深度值（-1到1范围）
+        :return: 置信度值（0-1范围）
+        """
+        pass
+
+    def _convert_estimated_depth_to_meters(self, z: float) -> float:
+        """
+        将MediaPipe相对深度转换为米单位
+        
+        :param z: MediaPipe预估的相对深度值（-1到1范围）
+        :return: 转换后的深度值（米单位）
+        """
+        pass
+
     def _calculate_center(self, points: List[Tuple[float, float, float]]) -> Tuple[float, float, float]:
         """
         计算多个点的中心点
