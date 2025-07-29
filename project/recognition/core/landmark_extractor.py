@@ -6,10 +6,24 @@ from typing import List, Dict, Tuple
 def extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]:
     """
     提取468个人脸关键点
-    :param rgb_image: RGB图像 - 这是一个numpy数组，形状为(height, width, 3)，
-                      包含RGB颜色通道的图像数据。通常来自摄像头或图像文件。
-    :return: 关键点列表 - 返回468个关键点的列表，每个关键点是一个包含(x, y, z)坐标的元组
-              其中x, y是像素坐标，z是深度信息（相对深度，值越小越近）
+    
+    :param rgb_image: RGB图像数据
+    示例
+    rgb_image = np.ndarray(
+        shape=(720, 1280, 3),  # 图像尺寸 (高度, 宽度, 3通道)
+        dtype=np.uint8,        # 数据类型 (0-255的整数)
+        data=[[[R,G,B], ...], ...]  # RGB像素值数组
+    )
+    
+    传入参数的函数：
+    cv2.imread(file_path: str) -> np.ndarray
+        传入参数：file_path (图像文件路径)
+        返回：RGB图像数组
+    
+    cv2.VideoCapture.read() -> (bool, np.ndarray)
+        传入参数：无 (从摄像头读取)
+        返回：(成功标志, RGB图像数组)
+    
     可能用到的库函数：mediapipe, opencv
     """
     # 初始化MediaPipe Face Mesh
@@ -99,32 +113,40 @@ def example_usage():
 def get_landmark_indices():
     """
     返回重要关键点的索引
-    MediaPipe Face Mesh的468个关键点包括：
-    - 0-9: 右眼轮廓
-    - 10-19: 左眼轮廓  
-    - 20-31: 右眼虹膜
-    - 32-43: 左眼虹膜
-    - 44-67: 鼻子
-    - 68-83: 嘴巴外轮廓
-    - 84-107: 嘴巴内轮廓
-    - 108-127: 右眉毛
-    - 128-147: 左眉毛
-    - 148-167: 右脸颊
-    - 168-187: 左脸颊
-    - 188-207: 下巴
-    - 208-227: 额头
-    - 228-247: 右太阳穴
-    - 248-267: 左太阳穴
-    - 268-287: 右耳
-    - 288-307: 左耳
-    - 308-327: 右耳垂
-    - 328-347: 左耳垂
-    - 348-367: 右耳轮
-    - 368-387: 左耳轮
-    - 388-407: 右耳屏
-    - 408-427: 左耳屏
-    - 428-447: 右耳垂
-    - 448-467: 左耳垂
+    
+    返回：关键点索引字典
+    示例
+    indices = {
+        "right_eye_contour": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],      # 右眼轮廓索引
+        "left_eye_contour": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],  # 左眼轮廓索引
+        "right_iris": [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],  # 右眼虹膜索引
+        "left_iris": [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43],   # 左眼虹膜索引
+        "nose": [44, 45, 46, ..., 67],                           # 鼻子索引
+        "mouth_outer": [68, 69, 70, ..., 83],                    # 嘴巴外轮廓索引
+        "mouth_inner": [84, 85, 86, ..., 107],                   # 嘴巴内轮廓索引
+        "right_eyebrow": [108, 109, 110, ..., 127],              # 右眉毛索引
+        "left_eyebrow": [128, 129, 130, ..., 147],               # 左眉毛索引
+        "right_cheek": [148, 149, 150, ..., 167],                # 右脸颊索引
+        "left_cheek": [168, 169, 170, ..., 187],                 # 左脸颊索引
+        "chin": [188, 189, 190, ..., 207],                       # 下巴索引
+        "forehead": [208, 209, 210, ..., 227],                   # 额头索引
+        "right_temple": [228, 229, 230, ..., 247],               # 右太阳穴索引
+        "left_temple": [248, 249, 250, ..., 267],                # 左太阳穴索引
+        "right_ear": [268, 269, 270, ..., 287],                  # 右耳索引
+        "left_ear": [288, 289, 290, ..., 307],                   # 左耳索引
+        "right_earlobe": [308, 309, 310, ..., 327],              # 右耳垂索引
+        "left_earlobe": [328, 329, 330, ..., 347],               # 左耳垂索引
+        "right_ear_helix": [348, 349, 350, ..., 367],            # 右耳轮索引
+        "left_ear_helix": [368, 369, 370, ..., 387],             # 左耳轮索引
+        "right_ear_tragus": [388, 389, 390, ..., 407],           # 右耳屏索引
+        "left_ear_tragus": [408, 409, 410, ..., 427],            # 左耳屏索引
+        "right_earlobe_bottom": [428, 429, 430, ..., 447],       # 右耳垂底部索引
+        "left_earlobe_bottom": [448, 449, 450, ..., 467]         # 左耳垂底部索引
+    }
+    
+    传入参数的函数：无
+    
+    可能用到的库函数：无
     """
     return {
         "right_eye_contour": list(range(0, 10)),
@@ -157,8 +179,21 @@ def get_landmark_indices():
 def validate_landmarks(landmarks: List) -> bool:
     """
     验证关键点质量
-    :param landmarks: 关键点列表 - 包含468个关键点的列表，每个关键点是(x, y, z)元组
-    :return: 是否有效 - True表示关键点质量良好，False表示质量差或无效
+    
+    :param landmarks: 关键点列表
+    示例
+    landmarks = [
+        (x1, y1, z1),  # 关键点1坐标 (像素x, 像素y, 相对深度z)
+        (x2, y2, z2),  # 关键点2坐标
+        ...,
+        (x468, y468, z468)  # 关键点468坐标
+    ]
+    
+    传入参数的函数：
+    extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
+        传入参数：rgb_image (RGB图像数组)
+        返回：468个关键点列表
+    
     可能用到的库函数：numpy
     """
     if not landmarks or len(landmarks) != 468:
@@ -220,9 +255,26 @@ def validate_landmarks(landmarks: List) -> bool:
 def get_eye_landmarks(landmarks: List, eye_type: str) -> List[Tuple[float, float, float]]:
     """
     提取指定眼睛的关键点
-    :param landmarks: 关键点列表 - 包含468个关键点的列表
-    :param eye_type: 'left' 或 'right' - 指定要提取的眼睛类型
-    :return: 眼部关键点列表 - 返回指定眼睛的所有关键点，包括轮廓和虹膜
+    
+    :param landmarks: 关键点列表
+    示例
+    landmarks = [
+        (x1, y1, z1),  # 关键点1坐标
+        (x2, y2, z2),  # 关键点2坐标
+        ...,
+        (x468, y468, z468)  # 关键点468坐标
+    ]
+    
+    :param eye_type: 眼睛类型
+    示例
+    eye_type = "left"   # 左眼
+    eye_type = "right"  # 右眼
+    
+    传入参数的函数：
+    extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
+        传入参数：rgb_image (RGB图像数组)
+        返回：468个关键点列表
+    
     可能用到的库函数：无
     """
     if not landmarks or len(landmarks) != 468:
@@ -253,8 +305,21 @@ def get_eye_landmarks(landmarks: List, eye_type: str) -> List[Tuple[float, float
 def get_pupil_landmarks(landmarks: List) -> Dict[str, Tuple[float, float, float]]:
     """
     提取左右瞳孔中心关键点
-    :param landmarks: 关键点列表 - 包含468个关键点的列表
-    :return: {'left': landmark, 'right': landmark} - 左右瞳孔中心的关键点坐标
+    
+    :param landmarks: 关键点列表
+    示例
+    landmarks = [
+        (x1, y1, z1),  # 关键点1坐标
+        (x2, y2, z2),  # 关键点2坐标
+        ...,
+        (x468, y468, z468)  # 关键点468坐标
+    ]
+    
+    传入参数的函数：
+    extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
+        传入参数：rgb_image (RGB图像数组)
+        返回：468个关键点列表
+    
     可能用到的库函数：无
     """
     if not landmarks or len(landmarks) != 468:
@@ -287,8 +352,22 @@ def get_pupil_landmarks(landmarks: List) -> Dict[str, Tuple[float, float, float]
 def calculate_center(points: List[Tuple[float, float, float]]) -> Tuple[float, float, float]:
     """
     计算多个点的中心点
-    :param points: 点列表，每个点是(x, y, z)元组
-    :return: 中心点坐标(x, y, z)
+    
+    :param points: 点列表
+    示例
+    points = [
+        (x1, y1, z1),  # 点1坐标
+        (x2, y2, z2),  # 点2坐标
+        ...,
+        (xn, yn, zn)   # 点n坐标
+    ]
+    
+    传入参数的函数：
+    get_iris_landmarks(landmarks: List) -> Dict[str, List[Tuple[float, float, float]]]
+        传入参数：landmarks (关键点列表)
+        返回：虹膜关键点字典
+    
+    可能用到的库函数：无
     """
     if not points:
         return (0.0, 0.0, 0.0)
@@ -307,8 +386,21 @@ def calculate_center(points: List[Tuple[float, float, float]]) -> Tuple[float, f
 def get_iris_landmarks(landmarks: List) -> Dict[str, List[Tuple[float, float, float]]]:
     """
     提取左右虹膜边界关键点
-    :param landmarks: 关键点列表 - 包含468个关键点的列表
-    :return: {'left': [landmark...], 'right': [landmark...]} - 左右虹膜边界的关键点列表
+    
+    :param landmarks: 关键点列表
+    示例
+    landmarks = [
+        (x1, y1, z1),  # 关键点1坐标
+        (x2, y2, z2),  # 关键点2坐标
+        ...,
+        (x468, y468, z468)  # 关键点468坐标
+    ]
+    
+    传入参数的函数：
+    extract_landmarks(rgb_image: np.ndarray) -> List[Tuple[float, float, float]]
+        传入参数：rgb_image (RGB图像数组)
+        返回：468个关键点列表
+    
     可能用到的库函数：无
     """
     if not landmarks or len(landmarks) != 468:
