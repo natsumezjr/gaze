@@ -17,10 +17,6 @@ recognition/
 │   ├── detector.py                # 人脸检测器核心类
 │   ├── landmark_extractor.py      # 关键点提取器
 │   └── coordinate_converter.py    # 坐标转换器
-├── models/                        # 模型文件
-│   ├── __init__.py
-│   ├── face_detector.py          # 人脸检测模型
-│   └── eye_detector.py           # 眼部检测模型
 ├── utils/                         # 工具文件
 │   ├── __init__.py
 │   ├── camera_calibration.py     # 相机标定工具
@@ -64,6 +60,7 @@ result = detector.detect_face(rgb_image, depth_map)
 # 获取结果
 eye_centers = detector.get_eye_centers()
 pupil_centers = detector.get_pupil_centers()
+iris_boundaries = detector.get_iris_boundaries()
 ```
 
 ### 实时处理

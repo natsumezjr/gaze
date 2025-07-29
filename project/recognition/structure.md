@@ -23,10 +23,6 @@ recognition/
 │   ├── detector.py                # 人脸检测器核心类
 │   ├── landmark_extractor.py      # 关键点提取器
 │   └── coordinate_converter.py    # 坐标转换器
-├── models/
-│   ├── __init__.py
-│   ├── face_detector.py          # 人脸检测模型
-│   └── eye_detector.py           # 眼部检测模型
 ├── utils/
 │   ├── __init__.py
 │   ├── camera_calibration.py     # 相机标定工具
@@ -45,7 +41,6 @@ main.py (主循环)
 detector.py (核心检测器)
     ↓ 调用
 ├── landmark_extractor.py (关键点提取)
-│   └── models/face_detector.py (人脸检测模型)
 ├── coordinate_converter.py (坐标转换)
 └── utils/ (工具函数)
     ├── camera_calibration.py
@@ -107,27 +102,13 @@ Y = (y_pixel - cy) × Z / fy
 Z = D(x_pixel, y_pixel)
 ```
 
-### 3.2 模型文件（models/）
+### 3.2 核心功能整合
 
-#### `face_detector.py` - 人脸检测模型
-**功能**：封装MediaPipe人脸检测功能
-
-**主要方法**：
-- `detect(rgb_image)`：检测人脸
-- `get_face_mesh()`：获取人脸网格
-- `is_face_detected()`：判断是否检测到人脸
-- `get_face_confidence()`：获取人脸检测置信度
-- `reset_detector()`：重置检测器状态
-
-#### `eye_detector.py` - 眼部检测模型
-**功能**：专门处理眼部区域的检测和验证
-
-**主要方法**：
-- `detect_eyes(face_landmarks)`：检测双眼
-- `validate_eye_detection(eye_landmarks)`：验证眼部检测质量
-- `get_eye_region(landmarks, eye_type)`：获取眼部区域
-- `get_eye_confidence(eye_landmarks)`：获取眼部检测置信度
-- `filter_eye_landmarks(landmarks, eye_type)`：滤波眼部关键点
+**功能整合说明**：
+- 原models层的功能已整合到core层中
+- `landmark_extractor.py` 直接实现人脸检测和关键点提取
+- `detector.py` 整合了所有检测流程
+- 简化了调用关系，提高了代码效率
 
 ### 3.3 工具文件（utils/）
 
