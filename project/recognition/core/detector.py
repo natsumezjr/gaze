@@ -1,8 +1,6 @@
 import numpy as np
 import cv2
-import base64
 from typing import List, Dict, Tuple
-import io
 
 class FaceDetector:
     def __init__(self, camera_params: dict):
@@ -58,32 +56,22 @@ class FaceDetector:
         self._landmarks = None
         self._detection_success = False
 
-    def _decode_base64_image(self, b64_string: str) -> np.ndarray:
-        """
-        将base64编码的jpg/png图像字符串解码为numpy数组（BGR格式，OpenCV默认）
-        """
-        img_bytes = base64.b64decode(b64_string)
-        img_array = np.frombuffer(img_bytes, dtype=np.uint8)
-        img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-        return img
-
-    def detect_face(self, bgr_image_b64: str, depth_map: np.ndarray) -> bool:
+    def detect_face(self, bgr_image: np.ndarray, depth_map: np.ndarray) -> bool:
         """
         检测人脸和关键点
         
-        :param bgr_image_b64: base64编码的jpg/png图像字符串（BGR格式，OpenCV默认）
+        :param bgr_image: BGR格式的numpy数组，形状为(H, W, 3)
         :param depth_map: 深度图，numpy数组格式，形状为(H, W)
         
         示例：
-        bgr_image_b64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA..."  # base64字符串
+        bgr_image = np.ndarray(shape=(720, 1280, 3), dtype=np.uint8)  # BGR图像
         
         :return: 检测是否成功
         """
-        bgr_image = self._decode_base64_image(bgr_image_b64)
         self._bgr_image = bgr_image
         self._depth_map_meters = self._convert_depth_to_meters(depth_map)
         from .landmark_extractor import extract_landmarks, validate_landmarks
-        landmarks = extract_landmarks(bgr_image_b64)
+        landmarks = extract_landmarks(bgr_image)
         if validate_landmarks(landmarks):
             self._landmarks = landmarks
             self._detection_success = True

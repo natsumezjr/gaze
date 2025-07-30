@@ -1,55 +1,21 @@
 import numpy as np
 import mediapipe as mp
 import cv2
-import base64
 from typing import List, Dict, Tuple
 
-def decode_base64_image(b64_string: str) -> np.ndarray:
+def extract_landmarks(bgr_image: np.ndarray) -> List[List[float]]:
     """
-    将base64编码的jpg/png图像字符串解码为numpy数组（BGR格式，OpenCV默认）
-    """
-    img_bytes = base64.b64decode(b64_string)
-    img_array = np.frombuffer(img_bytes, dtype=np.uint8)
-    img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-    return img
-
-def extract_landmarks(bgr_image_b64: str) -> List[List[float]]:
-    """
-    输入：一张包含人脸的base64编码的jpg/png图像字符串（BGR格式，OpenCV默认）
-    处理：使用MediaPipe Face Mesh模型分析图片（内部自动BGR->RGB）
+    输入：一张包含人脸的BGR格式numpy数组图像
+    处理：使用MediaPipe Face Mesh模型分析图片
     输出：468个精确的2D/3D关键点，格式为[[x, y, z], ...]
 
-    :param bgr_image_b64: base64编码的jpg/png图像字符串（BGR格式）
+    :param bgr_image: BGR格式的numpy数组，形状为(H, W, 3)
     示例：
-    bgr_image_b64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA..."  # base64字符串
+    bgr_image = np.ndarray(shape=(720, 1280, 3), dtype=np.uint8)  # BGR图像
 
     :return: 468个关键点的嵌套列表
     """
-    bgr_image = decode_base64_image(bgr_image_b64)
-    mp_face_mesh = mp.solutions.face_mesh
-    face_mesh = mp_face_mesh.FaceMesh(
-        static_image_mode=True,
-        max_num_faces=1,
-        refine_landmarks=True,
-        min_detection_confidence=0.5
-    )
-    if len(bgr_image.shape) == 3 and bgr_image.shape[2] == 3:
-        rgb_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
-    else:
-        raise ValueError("输入图像必须是3通道BGR图像")
-    height, width = rgb_image.shape[:2]
-    results = face_mesh.process(rgb_image)
-    if results.multi_face_landmarks:
-        face_landmarks = results.multi_face_landmarks[0]
-        landmarks = []
-        for landmark in face_landmarks.landmark:
-            x = landmark.x * width
-            y = landmark.y * height
-            z = landmark.z
-            landmarks.append([x, y, z])
-        return landmarks
-    else:
-        return []
+    pass
 
 # 关键点索引说明（MediaPipe Face Mesh的468个关键点）
 def get_landmark_indices() -> Dict[str, List[int]]:

@@ -1,19 +1,12 @@
 import cv2
 import numpy as np
 import json
-import base64
 import threading
 import time
 from datetime import datetime
 from pathlib import Path
 from recognition.config.settings import DATA_PATH
-
-def encode_image_to_base64(bgr_image):
-    """
-    将BGR格式（OpenCV默认）的图像编码为base64字符串
-    """
-    _, buffer = cv2.imencode('.jpg', bgr_image)
-    return base64.b64encode(buffer).decode('utf-8')
+from recognition.utils.data_parser import encode_image_to_base64
 
 def clean_old_entries(data_dict, max_age_sec=10):
     now = time.time()
