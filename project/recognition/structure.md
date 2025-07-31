@@ -28,6 +28,7 @@ recognition/
 │   └── coordinate_converter.py    # 坐标转换器
 ├── utils/
 │   ├── __init__.py
+│   ├── data_manager.py           # 数据管理器（单例模式）
 │   ├── camera_calibration.py     # 相机标定工具
 │   ├── depth_processor.py        # 深度图处理工具
 │   └── validation.py             # 数据验证工具
@@ -46,6 +47,7 @@ detector.py (核心检测器)
 ├── landmark_extractor.py (关键点提取)
 ├── coordinate_converter.py (坐标转换)
 └── utils/ (工具函数)
+    ├── data_manager.py (数据管理)
     ├── camera_calibration.py
     ├── depth_processor.py
     └── validation.py
@@ -114,6 +116,35 @@ Z = D(x_pixel, y_pixel)
 - 简化了调用关系，提高了代码效率
 
 ### 3.3 工具文件（utils/）
+
+#### `data_manager.py` - 数据管理器（单例模式）
+**功能**：统一管理BGR图像和深度图数据的内存存储
+
+**主要方法**：
+- `add_frame(frame_id, bgr_image, depth_map)`：添加帧数据到内存
+- `get_image(frame_id)`：获取指定帧的BGR图像
+- `get_depth(frame_id)`：获取指定帧的深度图
+- `get_frame_count()`：获取当前帧数量
+- `get_resolution()`：获取图像分辨率
+- `clear_all()`：清空所有数据
+
+**数据结构**：
+```python
+_data_dict = {
+    frame_id: {
+        "bgr_image": np.ndarray(shape=(H,W,3), dtype=np.uint8),
+        "depth_map": np.ndarray(shape=(H,W), dtype=np.float32),
+        "timestamp": str
+    }
+}
+```
+
+**特点**：
+- 单例模式，全局唯一实例
+- 内存存储，无需文件I/O
+- 线程安全，支持并发访问
+- 自动分辨率设置
+- 数据格式验证
 
 #### `camera_calibration.py` - 相机标定工具
 **功能**：处理相机内参的加载、验证和转换

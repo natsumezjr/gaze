@@ -16,7 +16,12 @@ recognition/
 ├── structure.md                   # 详细结构说明文档
 ├── README.md                      # 本文件
 ├── main.py                        # 主入口文件（包含大while循环）
-├── run_data_writer.py             # 数据写入器启动脚本
+├── gaze_recognition.egg-info/     # 包安装信息（自动生成）
+│   ├── PKG-INFO                   # 包信息
+│   ├── SOURCES.txt                # 源文件列表
+│   ├── dependency_links.txt       # 依赖链接
+│   ├── requires.txt               # 依赖要求
+│   └── top_level.txt             # 顶级包名
 ├── core/                          # 核心功能模块
 │   ├── __init__.py
 │   ├── detector.py                # 人脸检测器核心类
@@ -24,8 +29,7 @@ recognition/
 │   └── coordinate_converter.py    # 坐标转换器
 ├── utils/                         # 工具文件
 │   ├── __init__.py
-│   ├── data_writer.py             # 数据写入工具
-│   ├── data_parser.py             # 数据解析工具
+│   ├── data_manager.py            # 数据管理器（单例模式）
 │   ├── camera_calibration.py     # 相机标定工具
 │   ├── depth_processor.py        # 深度图处理工具
 │   └── validation.py             # 数据验证工具
@@ -68,9 +72,8 @@ python -c "from core.landmark_extractor import get_landmark_indices; print('测�
 
 #### 方式3：作为包导入
 ```python
-# 导入工具函数
-from utils.data_writer import convert_to_json, clean_old_entries
-from utils.data_parser import encode_image_to_base64
+# 导入数据管理器
+from utils.data_manager import add_frame, get_image, get_depth
 
 # 导入核心功能
 from core.landmark_extractor import get_landmark_indices, validate_landmarks
@@ -129,6 +132,17 @@ if __name__ == "__main__":
 3. **可扩展性**: 新功能可以轻松添加到对应模块
 4. **可安装性**: 可以作为包安装到任何Python环境
 5. **开发友好**: 支持IDE的自动补全和错误检查
+
+### gaze_recognition.egg-info 说明
+`gaze_recognition.egg-info/` 目录是Python包安装时自动生成的元数据目录，包含：
+
+- **PKG-INFO**: 包的版本、描述、作者等基本信息
+- **SOURCES.txt**: 列出包中包含的所有源文件
+- **dependency_links.txt**: 额外的依赖下载链接
+- **requires.txt**: 包的依赖要求列表
+- **top_level.txt**: 顶级包名列表
+
+这个目录在运行 `pip install -e .` 时自动创建，用于Python包管理系统识别和安装包。**不要手动修改此目录中的文件**，它们会在重新安装包时自动更新。
 
 ### 模块说明
 - **core/**: 核心算法模块，包含关键点提取、坐标转换等核心功能

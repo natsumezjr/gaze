@@ -229,37 +229,66 @@ is_valid = validate_3d_coordinates(coords_3d)
 
 ### Utils模块
 
-#### 1. data_parser.py
+#### 1. data_manager.py
 ```python
-def decode_base64_image(b64_string: str) -> np.ndarray
-# 示例：
-b64_string = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA..."
-bgr_image = decode_base64_image(b64_string)
-# 返回：np.ndarray(data=[[[255, 0, 0], [0, 255, 0]], [[128, 64, 32], [64, 128, 64]]], shape=(2, 2, 3), dtype=np.uint8)
+# DataManager单例类
+class DataManager:
+    def __init__(self) -> None
+    # 单例模式初始化
+    
+    def add_frame(self, frame_id: int, bgr_image: np.ndarray, depth_map: Optional[np.ndarray] = None) -> None
+    # 示例：
+    frame_id = 0
+    bgr_image = np.ndarray(shape=(480, 640, 3), dtype=np.uint8)
+    depth_map = np.ndarray(shape=(480, 640), dtype=np.float32)
+    data_manager.add_frame(frame_id, bgr_image, depth_map)
+    # 返回：无返回值，直接存储到内存
+    
+    def get_image(self, frame_id: int) -> Optional[np.ndarray]
+    # 示例：
+    bgr_image = data_manager.get_image(0)
+    # 返回：np.ndarray(shape=(480, 640, 3), dtype=np.uint8) 或 None
+    
+    def get_depth(self, frame_id: int) -> Optional[np.ndarray]
+    # 示例：
+    depth_map = data_manager.get_depth(0)
+    # 返回：np.ndarray(shape=(480, 640), dtype=np.float32) 或 None
+    
+    def get_frame_count(self) -> int
+    # 示例：
+    count = data_manager.get_frame_count()
+    # 返回：当前存储的帧数量
+    
+    def get_resolution(self) -> Optional[Tuple[int, int]]
+    # 示例：
+    resolution = data_manager.get_resolution()
+    # 返回：(width, height) 元组，如 (640, 480)
 
-def parse_rgbd_json(json_data: Union[str, Dict]) -> Tuple[np.ndarray, Optional[np.ndarray], Dict]
+# 便捷函数接口
+def add_frame(frame_id: int, bgr_image: np.ndarray, depth_map: Optional[np.ndarray] = None) -> None
 # 示例：
-json_data = {"frame_id": 1, "rgb_data": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA...", "depth_data": None}
-rgb_image, depth_map, metadata = parse_rgbd_json(json_data)
-# 返回：(np.ndarray(shape=(720, 1280, 3), dtype=np.uint8), None, {"frame_id": 1, "timestamp": "2024-01-15T10:30:00"})
+add_frame(0, bgr_image, depth_map)
+# 返回：无返回值
 
-def load_rgbd_from_file(file_path: str) -> Tuple[np.ndarray, Optional[np.ndarray], Dict]
+def get_image(frame_id: int) -> Optional[np.ndarray]
 # 示例：
-file_path = "data/rgbd_input.json"
-rgb_image, depth_map, metadata = load_rgbd_from_file(file_path)
-# 返回：(np.ndarray(shape=(720, 1280, 3), dtype=np.uint8), np.ndarray(shape=(720, 1280), dtype=np.float32), {"frame_id": 1})
+bgr_image = get_image(0)
+# 返回：np.ndarray(shape=(H,W,3), dtype=np.uint8) 或 None
 
-def encode_image_to_base64(image: np.ndarray, format: str = '.jpg') -> str
+def get_depth(frame_id: int) -> Optional[np.ndarray]
 # 示例：
-image = np.ndarray(data=[[[255, 0, 0], [0, 255, 0]], [[128, 64, 32], [64, 128, 64]]], shape=(2, 2, 3), dtype=np.uint8)
-b64_string = encode_image_to_base64(image)
-# 返回："/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA..."
+depth_map = get_depth(0)
+# 返回：np.ndarray(shape=(H,W), dtype=np.float32) 或 None
 
-def validate_image_format(image: np.ndarray) -> bool
+def get_resolution() -> Optional[Tuple[int, int]]
 # 示例：
-image = np.ndarray(data=[[[255, 0, 0], [0, 255, 0]], [[128, 64, 32], [64, 128, 64]]], shape=(2, 2, 3), dtype=np.uint8)
-is_valid = validate_image_format(image)
-# 返回：True 或 False
+resolution = get_resolution()
+# 返回：(width, height) 元组
+
+def get_frame_count() -> int
+# 示例：
+count = get_frame_count()
+# 返回：当前帧数量
 ```
 
 #### 2. depth_processor.py
@@ -429,19 +458,21 @@ DATA_PATH = "project/recognition/data"  # 数据文件存储路径
 
 ### 标准数据流
 ```
-JSON文件/字符串 → utils/data_parser.py → numpy数组 → core模块 → 结果输出
+摄像头数据 → DataManager内存存储 → core模块处理 → 结果输出
 ```
 
 ### 示例使用流程
 ```python
-# 1. 数据解析（utils层）
-from recognition.utils.data_parser import load_rgbd_from_file
-rgb_image, depth_map, metadata = load_rgbd_from_file("data/rgbd_input.json")
+# 1. 数据管理（utils层）
+from recognition.utils.data_manager import add_frame, get_image, get_depth
+add_frame(0, bgr_image, depth_map)
+bgr_image = get_image(0)
+depth_map = get_depth(0)
 
 # 2. 业务处理（core层）
 from recognition.core.detector import FaceDetector
 detector = FaceDetector(camera_params)
-success = detector.detect_face(rgb_image, depth_map)
+success = detector.detect_face(bgr_image, depth_map)
 
 # 3. 结果获取
 if success:
