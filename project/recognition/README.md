@@ -54,8 +54,6 @@ pip install -e .
 
 #### 方式1：使用启动脚本（推荐）
 ```bash
-# 运行数据写入器
-python run_data_writer.py
 
 # 运行主程序
 python main.py
