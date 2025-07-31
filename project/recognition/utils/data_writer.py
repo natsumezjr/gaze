@@ -5,8 +5,8 @@ import threading
 import time
 from datetime import datetime
 from pathlib import Path
-from recognition.config.settings import DATA_PATH
-from recognition.utils.data_parser import encode_image_to_base64
+from config.settings import DATA_PATH
+from utils.data_parser import encode_image_to_base64
 
 def clean_old_entries(data_dict, max_age_sec=10):
     now = time.time()
