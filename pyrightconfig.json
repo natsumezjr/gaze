@@ -1,0 +1,27 @@
+{
+    "include": [
+        "."
+    ],
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        "**/mediapipe/**",
+        "**/landmark_extractor.py"
+    ],
+    "extraPaths": [
+        "./project/recognition"
+    ],
+    "typeCheckingMode": "off",
+    "reportMissingImports": "none",
+    "reportMissingTypeStubs": false,
+    "reportAttributeAccessIssue": "none",
+    "reportGeneralTypeIssues": "none",
+    "reportOptionalMemberAccess": "none",
+    "reportOptionalSubscript": "none",
+    "reportOptionalIterable": "none",
+    "reportOptionalContextManager": "none",
+    "reportOptionalOperand": "none",
+    "pythonVersion": "3.8",
+    "pythonPlatform": "Windows",
+    "useLibraryCodeForTypes": false
+} 

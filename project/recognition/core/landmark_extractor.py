@@ -1,7 +1,7 @@
 import numpy as np
 import mediapipe as mp
 import cv2
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional, Union
 
 def extract_landmarks(bgr_image: np.ndarray) -> List[List[float]]:
     """
@@ -15,7 +15,46 @@ def extract_landmarks(bgr_image: np.ndarray) -> List[List[float]]:
 
     :return: 468个关键点的嵌套列表
     """
-    pass
+    # 初始化MediaPipe Face Mesh
+    # type: ignore - MediaPipe API可能因版本而异
+    mp_face_mesh = mp.solutions.face_mesh
+    face_mesh = mp_face_mesh.FaceMesh(  # type: ignore[reportAttributeAccessIssue]
+        static_image_mode=True,
+        max_num_faces=1,
+        refine_landmarks=True,
+        min_detection_confidence=0.5
+    )
+    
+    # 将BGR转换为RGB（MediaPipe需要RGB格式）
+    rgb_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
+    
+    # 检测人脸关键点
+    results = face_mesh.process(rgb_image)
+    
+    # 释放资源
+    face_mesh.close()
+    
+    # 如果没有检测到人脸，返回空列表
+    if not results.multi_face_landmarks:
+        return []
+    
+    # 获取第一个检测到的人脸关键点
+    face_landmarks = results.multi_face_landmarks[0]
+    
+    # 获取图像尺寸
+    height, width = bgr_image.shape[:2]
+    
+    # 提取468个关键点坐标
+    landmarks = []
+    for landmark in face_landmarks.landmark:
+        # 将相对坐标转换为像素坐标
+        x = landmark.x * width
+        y = landmark.y * height
+        z = landmark.z  # z坐标保持相对值
+        
+        landmarks.append([x, y, z])
+    
+    return landmarks
 
 # 关键点索引说明（MediaPipe Face Mesh的468个关键点）
 def get_landmark_indices() -> Dict[str, List[int]]:
@@ -222,7 +261,7 @@ def get_eye_landmarks(landmarks: List[Tuple[float, float, float]], eye_type: str
     
     return eye_landmarks
 
-def get_pupil_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str, Tuple[float, float, float]]:
+def get_pupil_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str, Union[Tuple[float, float, float], None]]:
     """
     提取左右瞳孔中心关键点
     
@@ -245,6 +284,7 @@ def get_pupil_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str
     可能用到的库函数：无
     """
     if not landmarks or len(landmarks) != 468:
+        # 返回None值，但类型注解允许None
         return {'left': None, 'right': None}
     
     # MediaPipe Face Mesh中瞳孔中心的索引
