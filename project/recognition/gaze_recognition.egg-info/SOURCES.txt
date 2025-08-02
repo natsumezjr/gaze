@@ -14,7 +14,6 @@ gaze_recognition.egg-info/requires.txt
 gaze_recognition.egg-info/top_level.txt
 utils/__init__.py
 utils/camera_calibration.py
-utils/data_parser.py
-utils/data_writer.py
+utils/data_manager.py
 utils/depth_processor.py
 utils/validation.py

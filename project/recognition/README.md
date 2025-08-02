@@ -54,18 +54,17 @@ pip install -e .
 
 #### 方式1：使用启动脚本（推荐）
 ```bash
-
 # 运行主程序
 python main.py
 ```
 
 #### 方式2：直接运行模块
 ```bash
-# 运行数据写入器
-python utils/data_writer.py
-
 # 运行关键点提取器测试
-python -c "from core.landmark_extractor import get_landmark_indices; print('测试成功')"
+python core/landmark_extractor.py
+
+# 运行数据管理器测试
+python utils/data_manager.py
 ```
 
 #### 方式3：作为包导入
@@ -74,7 +73,8 @@ python -c "from core.landmark_extractor import get_landmark_indices; print('测�
 from utils.data_manager import add_frame, get_image, get_depth
 
 # 导入核心功能
-from core.landmark_extractor import get_landmark_indices, validate_landmarks
+from core.landmark_extractor import extract_landmarks, get_eye_landmarks
+from core.detector import FaceDetector
 ```
 
 ## 主要功能
@@ -85,8 +85,10 @@ from core.landmark_extractor import get_landmark_indices, validate_landmarks
 - 相机内参：包含fx, fy, cx, cy的字典或矩阵
 
 ### 输出
+- 468个面部关键点：包含眼睛、鼻子、嘴巴等面部特征
 - 眼球中心坐标：左右眼的三维坐标（相机参考系）
 - 瞳孔中心坐标：左右眼瞳孔的三维坐标（相机参考系）
+- 虹膜边界点：左右眼虹膜的边界关键点
 - 置信度：检测结果的置信度分数
 - 状态信息：检测是否成功、错误信息等
 
@@ -167,7 +169,10 @@ if __name__ == "__main__":
 - OpenCV (cv2) >= 4.5.0
 - MediaPipe >= 0.10.0
 - NumPy >= 1.20.0
-- SciPy
+- SciPy >= 1.7.0
+- Pillow >= 8.0.0
+- matplotlib >= 3.3.0
+- pandas >= 1.3.0
 
 ## 详细文档
 

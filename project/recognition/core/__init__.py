@@ -4,3 +4,4 @@ Core Package
 """
 
 from .detector import *
+from .landmark_extractor import *

@@ -2,6 +2,8 @@ import numpy as np
 import mediapipe as mp
 import cv2
 from typing import List, Dict, Tuple, Optional, Union
+from config.constants import *
+from config.settings import *
 
 def extract_landmarks(bgr_image: np.ndarray) -> List[List[float]]:
     """
@@ -21,8 +23,8 @@ def extract_landmarks(bgr_image: np.ndarray) -> List[List[float]]:
     face_mesh = mp_face_mesh.FaceMesh(  # type: ignore[reportAttributeAccessIssue]
         static_image_mode=True,
         max_num_faces=1,
-        refine_landmarks=True,
-        min_detection_confidence=0.5
+        refine_landmarks=False,  # 改为False以保持468个关键点
+        min_detection_confidence=DETECTION_CONFIDENCE_THRESHOLD
     )
     
     # 将BGR转换为RGB（MediaPipe需要RGB格式）
@@ -388,3 +390,170 @@ def get_iris_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str,
         'left': left_iris_landmarks,
         'right': right_iris_landmarks
     }
+
+if __name__ == "__main__":
+    print(" landmark_extractor模块实时测试")
+    print("=" * 50)
+    
+    def initialize_camera():
+        """初始化摄像头"""
+        cap = cv2.VideoCapture(0)
+        if cap.isOpened():
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            cap.set(cv2.CAP_PROP_FPS, 30)
+            return cap
+        return None
+    
+    def draw_landmarks_on_image(image, landmarks):
+        """在图像上绘制关键点"""
+        if not landmarks:
+            return image
+        
+        # 绘制所有关键点（绿色小点）
+        for point in landmarks:
+            x, y = int(point[0]), int(point[1])
+            cv2.circle(image, (x, y), 1, (0, 255, 0), -1)
+        
+        # 绘制眼睛区域
+        try:
+            landmark_indices = get_landmark_indices()
+            
+            # 左眼（蓝色）
+            left_eye_indices = landmark_indices['left_eye_contour'] + landmark_indices['left_iris']
+            for idx in left_eye_indices:
+                if idx < len(landmarks):
+                    x, y = int(landmarks[idx][0]), int(landmarks[idx][1])
+                    cv2.circle(image, (x, y), 2, (255, 0, 0), -1)
+            
+            # 右眼（红色）
+            right_eye_indices = landmark_indices['right_eye_contour'] + landmark_indices['right_iris']
+            for idx in right_eye_indices:
+                if idx < len(landmarks):
+                    x, y = int(landmarks[idx][0]), int(landmarks[idx][1])
+                    cv2.circle(image, (x, y), 2, (0, 0, 255), -1)
+                    
+        except Exception:
+            pass
+        
+        return image
+    
+    def analyze_and_display_results(landmarks, frame_count):
+        """分析并显示结果"""
+        if not landmarks:
+            print(f"帧 {frame_count}: ❌ 未检测到人脸")
+            return
+        
+        try:
+            landmarks_tuple = [(point[0], point[1], point[2]) for point in landmarks]
+            
+            # 验证数据质量
+            is_valid = validate_landmarks(landmarks_tuple)
+            
+            # 获取眼睛关键点
+            left_eye = get_eye_landmarks(landmarks_tuple, "left")
+            right_eye = get_eye_landmarks(landmarks_tuple, "right")
+            
+            # 获取瞳孔中心
+            pupil_centers = get_pupil_landmarks(landmarks_tuple)
+            
+            # 获取虹膜边界
+            iris_boundaries = get_iris_landmarks(landmarks_tuple)
+            
+            # 计算z值统计信息
+            z_values = [point[2] for point in landmarks]
+            z_min = min(z_values)
+            z_max = max(z_values)
+            z_avg = sum(z_values) / len(z_values)
+            
+            # 显示结果
+            status = "✅ 有效" if is_valid else "❌ 无效"
+            print(f"帧 {frame_count}: {status} | 关键点: {len(landmarks)} | 左眼: {len(left_eye)} | 右眼: {len(right_eye)} | 虹膜L/R: {len(iris_boundaries['left'])}/{len(iris_boundaries['right'])}")
+            print(f"   Z值范围: {z_min:.3f} ~ {z_max:.3f} (平均: {z_avg:.3f})")
+            
+            if pupil_centers['left']:
+                print(f"   左眼瞳孔中心: ({pupil_centers['left'][0]:.1f}, {pupil_centers['left'][1]:.1f}, z={pupil_centers['left'][2]:.3f})")
+            if pupil_centers['right']:
+                print(f"   右眼瞳孔中心: ({pupil_centers['right'][0]:.1f}, {pupil_centers['right'][1]:.1f}, z={pupil_centers['right'][2]:.3f})")
+                
+        except Exception as e:
+            print(f"帧 {frame_count}: ❌ 分析失败 - {e}")
+    
+    def run_real_time_test():
+        """运行实时测试"""
+        print("🚀 启动实时测试...")
+        
+        cap = initialize_camera()
+        if cap is None:
+            print("❌ 无法初始化摄像头")
+            return
+        
+        import time
+        frame_count = 0
+        start_time = time.time()
+        
+        try:
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                
+                frame_count += 1
+                
+                # 使用data_manager存储图像
+                from utils.data_manager import add_frame, get_image
+                
+                # 模拟深度图
+                h, w = frame.shape[:2]
+                depth_map = np.random.rand(h, w).astype(np.float32) * 2.0
+                
+                # 存储到data_manager
+                add_frame(frame_count, frame, depth_map)
+                
+                # 从data_manager获取图像进行测试
+                stored_image = get_image(frame_count)
+                if stored_image is not None:
+                    # 提取关键点
+                    landmarks = extract_landmarks(stored_image)
+                    
+                    # 分析并显示结果
+                    analyze_and_display_results(landmarks, frame_count)
+                    
+                    # 绘制关键点
+                    if landmarks:
+                        frame = draw_landmarks_on_image(frame, landmarks)
+                    
+                    # 显示图像
+                    cv2.imshow('Landmark Extractor Test', frame)
+                    
+                    # 检查退出条件
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                    
+                    # 每10帧显示一次统计
+                    if frame_count % 10 == 0:
+                        elapsed_time = time.time() - start_time
+                        fps = frame_count / elapsed_time
+                        print(f"📊 统计: 帧数={frame_count}, FPS={fps:.1f}")
+                
+        except KeyboardInterrupt:
+            print("\n👋 用户中断")
+        finally:
+            cap.release()
+            cv2.destroyAllWindows()
+            
+            # 显示最终统计
+            from utils.data_manager import get_frame_count
+            elapsed_time = time.time() - start_time
+            fps = frame_count / elapsed_time if elapsed_time > 0 else 0
+            print(f"\n📊 最终统计:")
+            print(f"   处理帧数: {frame_count}")
+            print(f"   平均FPS: {fps:.1f}")
+            print(f"   存储帧数: {get_frame_count()}")
+            print("✅ 测试完成")
+    
+    # 运行测试
+    try:
+        run_real_time_test()
+    except Exception as e:
+        print(f"❌ 测试错误: {e}")
