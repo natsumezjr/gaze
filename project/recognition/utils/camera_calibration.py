@@ -1,4 +1,5 @@
 import numpy as np
+import json
 from typing import Dict
 
 def load_camera_params(file_path: str) -> Dict:
@@ -8,7 +9,9 @@ def load_camera_params(file_path: str) -> Dict:
     :return: 相机参数字典
     可能用到的库函数：json
     """
-    pass
+    with open(file_path, 'r', encoding='utf-8') as f:
+        params = json.load(f)
+    return params
 
 def validate_camera_params(params: Dict) -> bool:
     """
@@ -17,7 +20,8 @@ def validate_camera_params(params: Dict) -> bool:
     :return: 是否有效
     可能用到的库函数：无
     """
-    pass
+    required_keys = ['fx', 'fy', 'cx', 'cy']
+    return all(key in params and isinstance(params[key], (int, float)) for key in required_keys)
 
 def get_intrinsic_matrix(params: Dict) -> np.ndarray:
     """
@@ -26,7 +30,13 @@ def get_intrinsic_matrix(params: Dict) -> np.ndarray:
     :return: 3x3内参矩阵
     可能用到的库函数：numpy
     """
-    pass
+    fx = params['fx']
+    fy = params['fy']
+    cx = params['cx']
+    cy = params['cy']
+    return np.array([[fx, 0, cx],
+                     [0, fy, cy],
+                     [0,  0,  1]])
 
 def save_camera_params(params: Dict, file_path: str):
     """
@@ -35,7 +45,8 @@ def save_camera_params(params: Dict, file_path: str):
     :param file_path: 保存路径
     可能用到的库函数：json
     """
-    pass
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(params, f, indent=4, ensure_ascii=False)
 
 def get_camera_info(params: Dict) -> str:
     """
@@ -44,4 +55,9 @@ def get_camera_info(params: Dict) -> str:
     :return: 信息字符串
     可能用到的库函数：无
     """
-    pass
+    info = (
+        f"相机内参：\n"
+        f"fx = {params.get('fx', 'N/A')}, fy = {params.get('fy', 'N/A')}\n"
+        f"cx = {params.get('cx', 'N/A')}, cy = {params.get('cy', 'N/A')}"
+    )
+    return info
