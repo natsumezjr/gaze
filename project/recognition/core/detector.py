@@ -1,60 +1,60 @@
 import numpy as np
 import cv2
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 class FaceDetector:
+    """
+    人脸检测器核心类
+    
+    功能：
+    - 从RGB-D图像中检测人脸和关键点
+    - 提取眼球中心、瞳孔中心和虹膜边界点的三维坐标
+    - 提供检测置信度和状态信息
+    
+    使用方法：
+    1. 初始化检测器并传入相机参数
+    2. 调用detect_face()方法检测人脸
+    3. 调用get_eye_centers()等方法获取三维坐标
+    """
+    
     def __init__(self, camera_params: dict):
         """
         初始化检测器
         
-        :param camera_params: 相机内参字典
-        示例
-        camera_params = {
-            # 相机基本信息
-            "camera_name": "Intel RealSense D435i",  # 相机型号名称
-            "camera_type": "RGB-D",                  # 相机类型（RGB-D表示同时有RGB和深度）
-            
-            # 相机内参矩阵参数（用于坐标转换）
-            "intrinsic_params": {
-                "fx": 925.0,  # 焦距x（像素单位），用于X方向坐标转换
-                "fy": 925.0,  # 焦距y（像素单位），用于Y方向坐标转换  
-                "cx": 640.0,  # 主点x坐标（像素），图像中心X坐标
-                "cy": 360.0   # 主点y坐标（像素），图像中心Y坐标
-            },
-            
-            # 图像分辨率信息
-            "image_resolution": {
-                "width": 1280,   # 图像宽度（像素）
-                "height": 720    # 图像高度（像素）
-            },
-            
-            # 深度相关参数
-            "depth_scale": 0.001,  # 深度值缩放因子（米/单位）
-            "min_depth": 0.1,      # 最小有效深度（米）
-            "max_depth": 10.0,     # 最大有效深度（米）
-            
-            # 畸变系数（可选，用于图像校正）
-            "distortion_coeffs": {
-                "k1": 0.0,  # 径向畸变系数1
-                "k2": 0.0,  # 径向畸变系数2
-                "p1": 0.0,  # 切向畸变系数1
-                "p2": 0.0,  # 切向畸变系数2
-                "k3": 0.0   # 径向畸变系数3
-            },
-            
-            # 标定信息（可选）
-            "calibration_date": "2024-01-15",     # 标定日期
-            "calibration_method": "OpenCV",        # 标定方法
-            "notes": "相机内参通过OpenCV标定获得"  # 备注信息
-        }
+        Args:
+            camera_params: 相机内参字典，包含以下必需字段：
+                - intrinsic_params: 相机内参 {fx, fy, cx, cy}
+                - depth_scale: 深度值缩放因子（米/单位）
+                - min_depth: 最小有效深度（米）
+                - max_depth: 最大有效深度（米）
         
-        可能用到的库函数：无
+        示例:
+            camera_params = {
+                "camera_name": "Intel RealSense D435i",
+                "camera_type": "RGB-D",
+                "intrinsic_params": {
+                    "fx": 925.0, "fy": 925.0,
+                    "cx": 640.0, "cy": 360.0
+                },
+                "image_resolution": {"width": 1280, "height": 720},
+                "depth_scale": 0.001,
+                "min_depth": 0.1,
+                "max_depth": 10.0,
+                "distortion_coeffs": {
+                    "k1": 0.0, "k2": 0.0, "p1": 0.0, "p2": 0.0, "k3": 0.0
+                }
+            }
         """
+        # 验证相机参数
+        self._validate_camera_params(camera_params)
+        
         self.camera_params = camera_params
         self._bgr_image = None
         self._depth_map_meters = None
         self._landmarks = None
         self._detection_success = False
+        self._detection_confidence = 0.0
+        self._error_message = ""
 
     def detect_face(self, bgr_image: np.ndarray, depth_map: np.ndarray) -> bool:
         """
@@ -68,16 +68,39 @@ class FaceDetector:
         
         :return: 检测是否成功
         """
-        self._bgr_image = bgr_image
-        self._depth_map_meters = self._convert_depth_to_meters(depth_map)
-        from .landmark_extractor import extract_landmarks, validate_landmarks
-        landmarks = extract_landmarks(bgr_image)
-        if validate_landmarks(landmarks):
-            self._landmarks = landmarks
-            self._detection_success = True
-            return True
-        else:
+        try:
+            # 验证输入参数
+            self._validate_input_images(bgr_image, depth_map)
+            
+            # 保存输入数据
+            self._bgr_image = bgr_image
+            self._depth_map_meters = self._convert_depth_to_meters(depth_map)
+            
+            # 导入landmark_extractor模块
+            from .landmark_extractor import extract_landmarks, validate_landmarks
+            
+            # 提取关键点
+            landmarks = extract_landmarks(bgr_image)
+            
+            if landmarks and validate_landmarks(landmarks):
+                # 将List[List[float]]转换为List[Tuple[float, float, float]]格式以便内部使用
+                self._landmarks = [(point[0], point[1], point[2]) for point in landmarks]
+                self._detection_success = True
+                self._detection_confidence = self._calculate_detection_confidence()
+                self._error_message = ""
+                return True
+            else:
+                self._detection_success = False
+                self._landmarks = None
+                self._detection_confidence = 0.0
+                self._error_message = "关键点提取失败或质量不佳"
+                return False
+                
+        except Exception as e:
             self._detection_success = False
+            self._landmarks = None
+            self._detection_confidence = 0.0
+            self._error_message = f"检测过程中发生错误: {str(e)}"
             return False
 
     def get_eye_centers(self) -> Dict[str, np.ndarray]:
@@ -125,7 +148,61 @@ class FaceDetector:
         
         可能用到的库函数：numpy
         """
-        pass
+        # 检查前置条件
+        if not self._detection_success or self._landmarks is None:
+            return {
+                'left': np.array([0.0, 0.0, 0.0]), 
+                'right': np.array([0.0, 0.0, 0.0])
+            }
+        
+        try:
+            # 导入所需模块
+            from .landmark_extractor import get_eye_landmarks
+            from .coordinate_converter import pixel_to_3d
+            
+            # 获取左右眼关键点
+            left_eye_landmarks = get_eye_landmarks(self._landmarks, "left")
+            right_eye_landmarks = get_eye_landmarks(self._landmarks, "right")
+            
+            # 检查是否成功获取眼部关键点
+            if not left_eye_landmarks or not right_eye_landmarks:
+                return {
+                    'left': np.array([0.0, 0.0, 0.0]), 
+                    'right': np.array([0.0, 0.0, 0.0])
+                }
+            
+            # 计算眼球中心（像素坐标）
+            left_eye_center_pixel = self._calculate_center(left_eye_landmarks)
+            right_eye_center_pixel = self._calculate_center(right_eye_landmarks)
+            
+            # 转换为三维坐标
+            left_x, left_y, _ = left_eye_center_pixel
+            right_x, right_y, _ = right_eye_center_pixel
+            
+            left_eye_center_3d = pixel_to_3d(
+                (int(left_x), int(left_y)),
+                self._depth_map_meters,
+                self.camera_params
+            )
+            
+            right_eye_center_3d = pixel_to_3d(
+                (int(right_x), int(right_y)),
+                self._depth_map_meters,
+                self.camera_params
+            )
+            
+            return {
+                'left': left_eye_center_3d,
+                'right': right_eye_center_3d
+            }
+            
+        except Exception as e:
+            # 如果转换失败，返回零向量
+            print(f"眼球中心坐标转换失败: {e}")
+            return {
+                'left': np.array([0.0, 0.0, 0.0]), 
+                'right': np.array([0.0, 0.0, 0.0])
+            }
 
     def get_pupil_centers(self) -> Dict[str, np.ndarray]:
         """
@@ -173,7 +250,56 @@ class FaceDetector:
         
         可能用到的库函数：numpy
         """
-        pass
+        # 检查前置条件
+        if not self._detection_success or self._landmarks is None:
+            return {
+                'left': np.array([0.0, 0.0, 0.0]), 
+                'right': np.array([0.0, 0.0, 0.0])
+            }
+        
+        try:
+            # 导入所需模块
+            from .landmark_extractor import get_pupil_landmarks
+            from .coordinate_converter import pixel_to_3d
+            
+            # 获取左右瞳孔中心关键点（像素坐标）
+            pupil_landmarks = get_pupil_landmarks(self._landmarks)
+            
+            # 检查是否成功获取瞳孔关键点
+            if not pupil_landmarks.get('left') or not pupil_landmarks.get('right'):
+                return {
+                    'left': np.array([0.0, 0.0, 0.0]), 
+                    'right': np.array([0.0, 0.0, 0.0])
+                }
+            
+            # 转换为三维坐标
+            left_x, left_y, _ = pupil_landmarks['left']
+            right_x, right_y, _ = pupil_landmarks['right']
+            
+            left_pupil_3d = pixel_to_3d(
+                (int(left_x), int(left_y)),
+                self._depth_map_meters,
+                self.camera_params
+            )
+            
+            right_pupil_3d = pixel_to_3d(
+                (int(right_x), int(right_y)),
+                self._depth_map_meters,
+                self.camera_params
+            )
+            
+            return {
+                'left': left_pupil_3d,
+                'right': right_pupil_3d
+            }
+            
+        except Exception as e:
+            # 如果转换失败，返回零向量
+            print(f"瞳孔中心坐标转换失败: {e}")
+            return {
+                'left': np.array([0.0, 0.0, 0.0]), 
+                'right': np.array([0.0, 0.0, 0.0])
+            }
 
     def get_iris_boundaries(self) -> Dict[str, List[np.ndarray]]:
         """
@@ -240,7 +366,87 @@ class FaceDetector:
         
         可能用到的库函数：numpy
         """
-        pass
+        # 检查前置条件
+        if not self._detection_success or self._landmarks is None:
+            return {'left': [], 'right': []}
+        
+        try:
+            # 导入所需模块
+            from .landmark_extractor import get_iris_landmarks
+            from .coordinate_converter import batch_convert_landmarks, pixel_to_3d
+            
+            # 获取左右虹膜边界关键点
+            iris_landmarks = get_iris_landmarks(self._landmarks)
+            
+            # 检查是否成功获取虹膜关键点
+            if not iris_landmarks.get('left') or not iris_landmarks.get('right'):
+                return {'left': [], 'right': []}
+            
+            # 尝试使用批量转换
+            try:
+                left_iris_3d = batch_convert_landmarks(
+                    iris_landmarks['left'],
+                    self._depth_map_meters,
+                    self.camera_params
+                )
+                
+                right_iris_3d = batch_convert_landmarks(
+                    iris_landmarks['right'],
+                    self._depth_map_meters,
+                    self.camera_params
+                )
+                
+                # 如果批量转换成功且结果不为空，直接返回
+                if left_iris_3d and right_iris_3d:
+                    return {
+                        'left': left_iris_3d,
+                        'right': right_iris_3d
+                    }
+            except Exception:
+                # 批量转换失败，使用单点转换
+                pass
+            
+            # 单点转换方法
+            left_iris_3d = []
+            right_iris_3d = []
+            
+            # 转换左虹膜边界点
+            for point in iris_landmarks['left']:
+                try:
+                    x, y, _ = point
+                    point_3d = pixel_to_3d(
+                        (int(x), int(y)),
+                        self._depth_map_meters,
+                        self.camera_params
+                    )
+                    left_iris_3d.append(point_3d)
+                except Exception:
+                    # 如果转换失败，添加零向量
+                    left_iris_3d.append(np.array([0.0, 0.0, 0.0]))
+            
+            # 转换右虹膜边界点
+            for point in iris_landmarks['right']:
+                try:
+                    x, y, _ = point
+                    point_3d = pixel_to_3d(
+                        (int(x), int(y)),
+                        self._depth_map_meters,
+                        self.camera_params
+                    )
+                    right_iris_3d.append(point_3d)
+                except Exception:
+                    # 如果转换失败，添加零向量
+                    right_iris_3d.append(np.array([0.0, 0.0, 0.0]))
+            
+            return {
+                'left': left_iris_3d,
+                'right': right_iris_3d
+            }
+            
+        except Exception as e:
+            # 如果转换过程中出现异常，返回空列表
+            print(f"虹膜边界点转换异常: {e}")
+            return {'left': [], 'right': []}
 
     def get_detection_confidence(self) -> float:
         """
@@ -248,7 +454,7 @@ class FaceDetector:
         :return: 置信度分数
         可能用到的库函数：无
         """
-        pass
+        return self._detection_confidence
 
     def get_detection_status(self) -> str:
         """
@@ -257,16 +463,79 @@ class FaceDetector:
         可能用到的库函数：无
         """
         if self._detection_success:
-            return "检测成功"
+            return f"检测成功 (置信度: {self._detection_confidence:.2f})"
         else:
-            return "检测失败"
+            return f"检测失败: {self._error_message}"
+    
+    # ==================== 私有方法 ====================
+    
+    def _validate_camera_params(self, camera_params: dict) -> None:
+        """
+        验证相机参数的有效性
+        
+        Args:
+            camera_params: 相机参数字典
+            
+        Raises:
+            ValueError: 相机参数不完整或无效
+        """
+        required_keys = ['intrinsic_params', 'depth_scale']
+        for key in required_keys:
+            if key not in camera_params:
+                raise ValueError(f"相机参数缺少必需字段: {key}")
+        
+        intrinsic_params = camera_params['intrinsic_params']
+        required_intrinsic_keys = ['fx', 'fy', 'cx', 'cy']
+        for key in required_intrinsic_keys:
+            if key not in intrinsic_params:
+                raise ValueError(f"相机内参缺少必需字段: {key}")
+            if not isinstance(intrinsic_params[key], (int, float)) or intrinsic_params[key] <= 0:
+                raise ValueError(f"相机内参 {key} 必须为正数")
+        
+        if not isinstance(camera_params['depth_scale'], (int, float)) or camera_params['depth_scale'] <= 0:
+            raise ValueError("depth_scale 必须为正数")
+    
+    def _validate_input_images(self, bgr_image: np.ndarray, depth_map: np.ndarray) -> None:
+        """
+        验证输入图像的有效性
+        
+        Args:
+            bgr_image: BGR图像
+            depth_map: 深度图
+            
+        Raises:
+            ValueError: 图像格式不正确
+        """
+        # 验证BGR图像
+        if not isinstance(bgr_image, np.ndarray):
+            raise ValueError("bgr_image 必须是 numpy.ndarray 类型")
+        
+        if len(bgr_image.shape) != 3 or bgr_image.shape[2] != 3:
+            raise ValueError(f"bgr_image 形状必须为 (H, W, 3)，当前为 {bgr_image.shape}")
+        
+        if bgr_image.dtype != np.uint8:
+            raise ValueError(f"bgr_image 数据类型必须为 uint8，当前为 {bgr_image.dtype}")
+        
+        # 验证深度图
+        if not isinstance(depth_map, np.ndarray):
+            raise ValueError("depth_map 必须是 numpy.ndarray 类型")
+        
+        if len(depth_map.shape) != 2:
+            raise ValueError(f"depth_map 形状必须为 (H, W)，当前为 {depth_map.shape}")
+        
+        # 验证图像尺寸匹配
+        if bgr_image.shape[:2] != depth_map.shape:
+            raise ValueError(f"BGR图像和深度图尺寸不匹配: {bgr_image.shape[:2]} vs {depth_map.shape}")
     
     def _convert_depth_to_meters(self, depth_map: np.ndarray) -> np.ndarray:
         """
         将深度图从相机原始单位转换为米
         
-        :param depth_map: 原始深度图
-        :return: 米单位的深度图
+        Args:
+            depth_map: 原始深度图
+            
+        Returns:
+            np.ndarray: 米单位的深度图
         """
         depth_scale = self.camera_params.get("depth_scale", 1.0)
         return depth_map.astype(np.float32) * depth_scale
@@ -275,11 +544,11 @@ class FaceDetector:
         """
         获取相机内参，支持动态图像尺寸
         
-        :return: (fx, fy, cx, cy) 相机内参
+        Returns:
+            Tuple[float, float, float, float]: (fx, fy, cx, cy) 相机内参
         """
         intrinsic_params = self.camera_params.get("intrinsic_params", {})
         
-        # 如果相机参数中没有内参，使用默认值
         fx = intrinsic_params.get("fx", 1.0)
         fy = intrinsic_params.get("fy", 1.0)
         
@@ -294,71 +563,51 @@ class FaceDetector:
         
         return fx, fy, cx, cy
     
-    def _enhance_depth_with_landmarks(self) -> np.ndarray:
+    def _calculate_detection_confidence(self) -> float:
         """
-        使用MediaPipe预估深度增强RGB-D深度图
+        计算检测置信度
         
-        处理流程：
-        1. 遍历所有landmarks的(x,y,z)坐标
-        2. 获取对应位置的RGB-D深度值
-        3. 将MediaPipe预估深度z转换为米单位
-        4. 根据置信度权重融合两种深度信息
-        5. 更新_depth_map_meters中的对应位置
-        
-        :return: 增强后的深度图（米单位）
-        示例
-        enhanced_depth = np.ndarray(
-            shape=(720, 1280),  # 深度图尺寸 (高度, 宽度)
-            dtype=np.float32,   # 深度数据类型 (浮点数，米单位)
-            data=[[depth_meters, ...], ...]  # 融合后的深度值数组（米）
-        )
-        
-        调用关系：
-        被调用：
-        - detect_face() 调用此函数
-        
-        调用：
-        - _calculate_depth_confidence() (内部方法)
-        - _calculate_estimated_confidence() (内部方法)
-        - _convert_estimated_depth_to_meters() (内部方法)
-        
-        可能用到的库函数：numpy
+        Returns:
+            float: 置信度分数，范围0.0-1.0
         """
-        pass
-
-    def _calculate_depth_confidence(self, depth_d: float) -> float:
-        """
-        计算RGB-D深度置信度
+        if not self._landmarks:
+            return 0.0
         
-        :param depth_d: RGB-D深度值（米单位）
-        :return: 置信度值（0-1范围）
-        """
-        pass
-
-    def _calculate_estimated_confidence(self, z: float) -> float:
-        """
-        计算MediaPipe预估深度置信度
-        
-        :param z: MediaPipe预估的相对深度值（-1到1范围）
-        :return: 置信度值（0-1范围）
-        """
-        pass
-
-    def _convert_estimated_depth_to_meters(self, z: float) -> float:
-        """
-        将MediaPipe相对深度转换为米单位
-        
-        :param z: MediaPipe预估的相对深度值（-1到1范围）
-        :return: 转换后的深度值（米单位）
-        """
-        pass
-
+        try:
+            # 转换为numpy数组进行计算
+            landmarks_array = np.array(self._landmarks)
+            
+            # 计算关键点的分布标准差，标准差越大，说明关键点分布越广，质量越好
+            x_std = np.std(landmarks_array[:, 0])
+            y_std = np.std(landmarks_array[:, 1])
+            z_std = np.std(landmarks_array[:, 2])
+            
+            # 标准化标准差，将其映射到0-1范围
+            # 假设正常人脸的标准差在一定范围内
+            x_quality = min(1.0, x_std / 100.0)
+            y_quality = min(1.0, y_std / 100.0)
+            z_quality = min(1.0, z_std / 0.5)
+            
+            # 综合评分，权重可以根据实际情况调整
+            landmark_quality = (x_quality * 0.4 + y_quality * 0.4 + z_quality * 0.2)
+            
+            # 最终置信度，结合关键点质量和其他因素
+            confidence = landmark_quality * 0.8 + 0.2  # 基础置信度0.2，最高1.0
+            
+            return min(1.0, max(0.0, confidence))  # 确保在0-1范围内
+            
+        except Exception:
+            return 0.0
+    
     def _calculate_center(self, points: List[Tuple[float, float, float]]) -> Tuple[float, float, float]:
         """
         计算多个点的中心点
         
-        :param points: 点列表
-        :return: 中心点坐标
+        Args:
+            points: 点列表，每个点为(x, y, z)元组
+            
+        Returns:
+            Tuple[float, float, float]: 中心点坐标(x, y, z)
         """
         if not points:
             return (0.0, 0.0, 0.0)
