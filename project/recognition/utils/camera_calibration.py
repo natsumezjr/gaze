@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Dict
+import json
 
 def load_camera_params(file_path: str) -> Dict:
     """
@@ -36,7 +37,9 @@ def load_camera_params(file_path: str) -> Dict:
     
     可能用到的库函数：json
     """
-    pass
+    with open(file_path, 'r') as f:
+        params = json.load(f)
+    return params
 
 def validate_camera_params(params: Dict) -> bool:
     """

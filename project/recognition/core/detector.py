@@ -17,6 +17,11 @@ class FaceDetector:
     3. 调用get_eye_centers()等方法获取三维坐标
     """
     
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, '_instance'):
+            cls._instance = super(FaceDetector, cls).__new__(cls)
+        return cls._instance
+    
     def __init__(self, camera_params: dict):
         """
         初始化检测器
@@ -308,13 +313,13 @@ class FaceDetector:
         :return: 左右虹膜边界点的三维坐标字典
         返回格式：
         {
-            'left': [
+            'left_iris': [
                 np.array([x_0, y_0, z_0]),   # 左虹膜边界点0
                 np.array([x_1, y_1, z_1]),   # 左虹膜边界点1
                 np.array([x_2, y_2, z_2]),   # 左虹膜边界点2
                 np.array([x_3, y_3, z_3])    # 左虹膜边界点3
             ],
-            'right': [
+            'right_iris': [
                 np.array([x_0, y_0, z_0]),   # 右虹膜边界点0
                 np.array([x_1, y_1, z_1]),   # 右虹膜边界点1
                 np.array([x_2, y_2, z_2]),   # 右虹膜边界点2
@@ -330,13 +335,13 @@ class FaceDetector:
         
         返回值示例：
         {
-            'left': [
+            'left_iris': [
                 np.array([0.11, 0.05, 0.81]),  # 左虹膜边界点0
                 np.array([0.13, 0.05, 0.81]),  # 左虹膜边界点1
                 np.array([0.11, 0.07, 0.81]),  # 左虹膜边界点2
                 np.array([0.13, 0.07, 0.81])   # 左虹膜边界点3
             ],
-            'right': [
+            'right_iris': [
                 np.array([0.17, 0.05, 0.81]),  # 右虹膜边界点0
                 np.array([0.19, 0.05, 0.81]),  # 右虹膜边界点1
                 np.array([0.17, 0.07, 0.81]),  # 右虹膜边界点2

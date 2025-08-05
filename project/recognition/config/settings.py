@@ -1,5 +1,7 @@
 # 这个是全局的路径配置
 DATA_PATH = "project/recognition/data"
+CAMERA_PARAMS_PATH = "project/recognition/config/camera_params.json"
+
 
 # 数据清理相关配置
 MAX_AGE_SECONDS = 10  # 数据最大保留时间（秒）

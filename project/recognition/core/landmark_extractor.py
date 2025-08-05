@@ -2,8 +2,13 @@ import numpy as np
 import mediapipe as mp
 import cv2
 from typing import List, Dict, Tuple, Optional, Union
-from config.constants import *
-from config.settings import *
+try:
+    from ..config.constants import *
+    from ..config.settings import *
+except ImportError:
+    # 如果相对导入失败，尝试绝对导入
+    from config.constants import *
+    from config.settings import *
 
 def extract_landmarks(bgr_image: np.ndarray) -> List[List[float]]:
     """

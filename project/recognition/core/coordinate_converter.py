@@ -33,28 +33,41 @@ import numpy as np
 from typing import List, Tuple, Optional, Dict, Union
 import logging
 from pathlib import Path
+import cv2
 
 # 导入项目配置
 try:
-    from config.constants import (
+    from ..config.constants import (
         LEFT_PUPIL_INDEX, RIGHT_PUPIL_INDEX,
         LEFT_IRIS_INDICES, RIGHT_IRIS_INDICES,
         STATUS_SUCCESS, STATUS_INVALID_DEPTH
     )
-    from config.settings import (
+    from ..config.settings import (
         DEPTH_VALIDATION_THRESHOLD,
         COORDINATE_QUALITY_THRESHOLD
     )
 except ImportError:
-    # 如果导入失败，使用默认值
-    LEFT_PUPIL_INDEX = 468
-    RIGHT_PUPIL_INDEX = 473
-    LEFT_IRIS_INDICES = [469, 470, 471, 472]
-    RIGHT_IRIS_INDICES = [474, 475, 476, 477]
-    STATUS_SUCCESS = 0
-    STATUS_INVALID_DEPTH = 3
-    DEPTH_VALIDATION_THRESHOLD = 0.1
-    COORDINATE_QUALITY_THRESHOLD = 0.8
+    try:
+        # 尝试绝对导入
+        from config.constants import (
+            LEFT_PUPIL_INDEX, RIGHT_PUPIL_INDEX,
+            LEFT_IRIS_INDICES, RIGHT_IRIS_INDICES,
+            STATUS_SUCCESS, STATUS_INVALID_DEPTH
+        )
+        from config.settings import (
+            DEPTH_VALIDATION_THRESHOLD,
+            COORDINATE_QUALITY_THRESHOLD
+        )
+    except ImportError:
+        # 如果导入失败，使用默认值
+        LEFT_PUPIL_INDEX = 468
+        RIGHT_PUPIL_INDEX = 473
+        LEFT_IRIS_INDICES = [469, 470, 471, 472]
+        RIGHT_IRIS_INDICES = [474, 475, 476, 477]
+        STATUS_SUCCESS = 0
+        STATUS_INVALID_DEPTH = 3
+        DEPTH_VALIDATION_THRESHOLD = 0.1
+        COORDINATE_QUALITY_THRESHOLD = 0.8
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -71,6 +84,11 @@ class CoordinateConverter:
     - 批量关键点转换
     - 坐标质量评估和验证
     """
+    
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, '_instance'):
+            cls._instance = super(CoordinateConverter, cls).__new__(cls)
+        return cls._instance
     
     def __init__(self, camera_params: Optional[Dict] = None):
         """
@@ -182,17 +200,17 @@ class CoordinateConverter:
             raise ValueError(f"图像尺寸必须为正数，当前值：({width}, {height})")
         
         # 转换公式：x_pixel = x_norm × W, y_pixel = y_norm × H
-        x_pixel = int(x_norm * width)
-        y_pixel = int(y_norm * height)
+        x_pixel = x_norm * width
+        y_pixel = y_norm * height
         
-        # 确保像素坐标在有效范围内
-        x_pixel = max(0, min(x_pixel, width - 1))
-        y_pixel = max(0, min(y_pixel, height - 1))
+        # 确保像素坐标在有效范围内（保留浮点精度）
+        x_pixel = max(0.0, min(x_pixel, width - 1.0))
+        y_pixel = max(0.0, min(y_pixel, height - 1.0))
         
         return (x_pixel, y_pixel)
     
     def pixel_to_3d(self, pixel_coords: Tuple[int, int], 
-                   depth_map: np.ndarray) -> np.ndarray:
+                   depth_map_meters: np.ndarray) -> np.ndarray:
         """
         像素坐标结合深度转三维坐标
         
@@ -204,8 +222,8 @@ class CoordinateConverter:
         Z = depth_value
         
         Args:
-            pixel_coords: 像素坐标 (x_pixel, y_pixel)
-            depth_map: 深度图，numpy数组，单位：米
+            pixel_coords: 像素坐标 (x_pixel, y_pixel)，支持浮点数
+            depth_map_meters: 深度图，numpy数组，单位：米
         
         Returns:
             coord_3d: 三维坐标 [X, Y, Z]，单位：米
@@ -214,26 +232,26 @@ class CoordinateConverter:
             ValueError: 输入参数无效或深度值无效时抛出
         
         示例：
-            pixel_coords = (640, 360)  # 像素坐标
-            depth_map = np.array([[0.5, 0.6], [0.7, 0.8]])  # 深度图（米）
+            pixel_coords = (640.5, 360.3)  # 浮点像素坐标
+            depth_map_meters = np.array([[0.5, 0.6], [0.7, 0.8]])  # 深度图（米）
             coord_3d = [0.0, 0.0, 0.5]  # 三维坐标（米）
         """
         # 输入验证
         if not isinstance(pixel_coords, tuple) or len(pixel_coords) != 2:
             raise ValueError("pixel_coords必须是包含2个元素的元组")
         
-        if not isinstance(depth_map, np.ndarray) or depth_map.ndim != 2:
-            raise ValueError("depth_map必须是2维numpy数组")
+        if not isinstance(depth_map_meters, np.ndarray) or depth_map_meters.ndim != 2:
+            raise ValueError("depth_map_meters必须是2维numpy数组")
         
         x_pixel, y_pixel = pixel_coords
-        height, width = depth_map.shape
+        height, width = depth_map_meters.shape
         
-        # 检查像素坐标是否在图像范围内
-        if not (0 <= x_pixel < width and 0 <= y_pixel < height):
+        # 检查像素坐标是否在图像范围内（支持浮点坐标）
+        if not (0.0 <= x_pixel < width and 0.0 <= y_pixel < height):
             raise ValueError(f"像素坐标({x_pixel}, {y_pixel})超出图像范围({width}, {height})")
         
-        # 获取深度值
-        depth_meters = depth_map[y_pixel, x_pixel]
+        # 获取深度值（使用OpenCV插值）
+        depth_meters = self._get_depth_interpolated(depth_map_meters, (x_pixel, y_pixel))
         
         # 验证深度值
         if not np.isfinite(depth_meters) or depth_meters <= DEPTH_VALIDATION_THRESHOLD:
@@ -245,6 +263,37 @@ class CoordinateConverter:
         z_3d = depth_meters
         
         return np.array([x_3d, y_3d, z_3d])
+    
+    def _get_depth_interpolated(self, depth_map: np.ndarray, 
+                               pixel_coords: Tuple[float, float]) -> float:
+        """
+        使用OpenCV remap进行高效插值获取深度值
+        
+        Args:
+            depth_map: 深度图
+            pixel_coords: 浮点像素坐标 (x, y)
+        
+        Returns:
+            depth_value: 插值后的深度值
+        """
+        x, y = pixel_coords
+        height, width = depth_map.shape
+        
+        # 边界处理
+        x = max(0, min(x, width - 1))
+        y = max(0, min(y, height - 1))
+        
+        # 创建坐标映射数组
+        map_x = np.array([[x]], dtype=np.float32)
+        map_y = np.array([[y]], dtype=np.float32)
+        
+        # 使用OpenCV remap进行插值
+        interpolated = cv2.remap(depth_map, map_x, map_y, 
+                                cv2.INTER_LINEAR,
+                                borderMode=cv2.BORDER_CONSTANT,
+                                borderValue=np.nan)
+        
+        return float(interpolated[0, 0])
     
     def convert_landmark_to_3d(self, landmark: Tuple[float, float, float], 
                               depth_map: np.ndarray) -> Optional[np.ndarray]:
@@ -259,12 +308,12 @@ class CoordinateConverter:
             coord_3d: 三维坐标，转换失败时返回None
         """
         try:
-            # 归一化坐标转像素坐标
+            # 归一化坐标转像素坐标（现在返回浮点数）
             norm_coords = (landmark[0], landmark[1])
             image_shape = (depth_map.shape[0], depth_map.shape[1])
             pixel_coords = self.normalized_to_pixel(norm_coords, image_shape)
             
-            # 像素坐标转三维坐标
+            # 像素坐标转三维坐标（使用插值）
             coord_3d = self.pixel_to_3d(pixel_coords, depth_map)
             
             return coord_3d
@@ -338,9 +387,6 @@ class CoordinateConverter:
                 - left_iris: 左眼虹膜边界点列表
                 - right_iris: 右眼虹膜边界点列表
         """
-        if len(landmarks) < 478:  # MediaPipe面部关键点总数
-            raise ValueError(f"关键点数量不足，需要至少478个，当前：{len(landmarks)}")
-        
         eye_coords = {
             "left_pupil": None,
             "right_pupil": None,
