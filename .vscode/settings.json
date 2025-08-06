@@ -1,0 +1,26 @@
+{
+    "python.analysis.extraPaths": [
+        "./project/recognition"
+    ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.stubPath": "./typings",
+    "python.analysis.ignore": [
+        "**/core/landmark_extractor",
+        "**/mediapipe/**",
+        "**/landmark_extractor.py"
+    ],
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportAttributeAccessIssue": "none",
+        "reportMissingImports": "none",
+        "reportGeneralTypeIssues": "none",
+        "reportOptionalMemberAccess": "none",
+        "reportOptionalSubscript": "none",
+        "reportOptionalIterable": "none",
+        "reportOptionalContextManager": "none",
+        "reportOptionalOperand": "none"
+    },
+    "python.analysis.useLibraryCodeForTypes": false
+} 
