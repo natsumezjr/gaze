@@ -38,11 +38,7 @@ def load_camera_params(file_path: str) -> Dict:
     
     可能用到的库函数：json
     """
-<<<<<<< HEAD
     with open(file_path, 'r', encoding='utf-8') as f:
-=======
-    with open(file_path, 'r') as f:
->>>>>>> 7fd74488cebdcc9603625bf1b2bf6928aae13b51
         params = json.load(f)
     return params
 
