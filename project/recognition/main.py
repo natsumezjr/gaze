@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -18,7 +17,13 @@ import cv2
 import numpy as np
 import time
 import logging
+import json
 from typing import Optional, Dict, Tuple
+
+# 抑制TensorFlow警告 - 必须在导入其他模块之前设置
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # 0=全部, 1=无INFO, 2=无WARNING, 3=无ERROR
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # 禁用GPU以避免CUDA相关警告
 
 # 添加项目根目录到Python路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,7 +34,7 @@ if project_root not in sys.path:
 # 导入项目模块
 try:
     from recognition.core.detector import FaceDetector
-    from recognition.utils.camera_calibration import load_camera_params
+    from recognition.utils.camera_calibration import CameraCalibrator
     from recognition.utils.data_manager import add_frame, get_image, get_depth
     from recognition.config.settings import DATA_PATH, CAMERA_PARAMS_PATH
     from recognition.config.constants import STATUS_SUCCESS, STATUS_NO_FACE_DETECTED
@@ -40,7 +45,7 @@ except ImportError as e:
 
 # 配置日志
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.ERROR,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
@@ -49,24 +54,18 @@ logger = logging.getLogger(__name__)
 def main():
     frame_id = 0
     
-    def initialize_camera():
-        """初始化摄像头"""
-        cap = cv2.VideoCapture(0)
-        if cap.isOpened():
-            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-            cap.set(cv2.CAP_PROP_FPS, 30)
-            return cap
-        return None
+    camera_calibrator = CameraCalibrator(rgb_d=True)
+    cap = camera_calibrator.get_cap()
     
-    # 初始化摄像头
-    cap = initialize_camera()
     if cap is None:
         logger.error("无法初始化摄像头")
         return
     
-    # 初始化人脸检测器（只创建一次）
-    face_detector = FaceDetector(load_camera_params(CAMERA_PARAMS_PATH))
+    camera_params = camera_calibrator.load_camera_params()
+    
+
+    # 初始化人脸检测器（使用调整后的相机参数）
+    face_detector = FaceDetector(camera_params)
     
     try:
         while True:
@@ -77,9 +76,10 @@ def main():
                 
             cv2.imshow("frame", frame)
             
-            # 模拟深度图
+            # 使用固定深度图（0.6米）
             h, w = frame.shape[:2]
-            depth_map = ((np.random.rand(h, w).astype(np.float32) - 0.5) * 0.1 + 0.7) / load_camera_params(CAMERA_PARAMS_PATH)['depth_scale']
+            fixed_depth_meters = 0.6  # 固定深度0.6米
+            depth_map = np.ones((h, w), dtype=np.float32) * (fixed_depth_meters / camera_params['depth_scale'])
             
             # 添加帧数据
             add_frame(frame_id, frame, depth_map)
@@ -87,19 +87,21 @@ def main():
             depth = get_depth(frame_id)
             
             if image is not None and depth is not None:
-                logger.info(f"id:{frame_id}，图像或深度图获取成功")
-                
                 if face_detector.detect_face(image, depth):
-                    logger.info(f"id:{frame_id}，检测到人脸")
+                    # 获取瞳孔中心
                     pupil_centers = face_detector.get_pupil_centers()
+                    
+                    # 获取虹膜边界
                     iris_boundaries = face_detector.get_iris_boundaries()
-                    logger.info(f"id:{frame_id}，瞳孔中心：{pupil_centers}")
-                    logger.info(f"id:{frame_id}，虹膜边界：{iris_boundaries}")
+                    
+                    # 获取眼轮廓
+                    eyes_contours = face_detector.get_eyes_contours()
                     
                     # 处理关键点坐标
                     key_coordinates = {
                         'pupil_centers': pupil_centers,
-                        'iris_boundaries': iris_boundaries
+                        'iris_boundaries': iris_boundaries,
+                        'eyes_contours': eyes_contours
                     }
                     
                     from fitting.main import main as fitting
@@ -131,4 +133,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

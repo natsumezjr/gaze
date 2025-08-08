@@ -36,27 +36,27 @@ depth_map = np.ndarray(
 ```
 
 ### 3. 关键点
-- **单个关键点**：`Tuple[float, float, float]` (x, y, z)
-- **关键点列表**：`List[Tuple[float, float, float]]`
-- **关键点字典**：`Dict[str, Tuple[float, float, float]]`
+- **单个关键点**：`List[float]` [x, y, z]
+- **关键点列表**：`List[List[float]]`
+- **关键点字典**：`Dict[str, List[float]]`
 
 **示例：**
 ```python
 # 单个关键点示例
-single_landmark = (640.5, 360.2, 0.8)  # (x像素, y像素, z相对深度)
+single_landmark = [640.5, 360.2, 0.8]  # [x像素, y像素, z相对深度]
 
 # 关键点列表示例
 landmarks_list = [
-    (100.0, 200.0, 0.1),  # 关键点1
-    (150.0, 250.0, 0.2),  # 关键点2
-    (200.0, 300.0, 0.3)   # 关键点3
+    [100.0, 200.0, 0.1],  # 关键点1
+    [150.0, 250.0, 0.2],  # 关键点2
+    [200.0, 300.0, 0.3]   # 关键点3
 ]
 
 # 关键点字典示例
 landmarks_dict = {
-    "left_eye": (120.5, 180.3, 0.15),
-    "right_eye": (280.7, 180.1, 0.16),
-    "nose": (200.0, 220.0, 0.20)
+    "left_eye": [120.5, 180.3, 0.15],
+    "right_eye": [280.7, 180.1, 0.16],
+    "nose": [200.0, 220.0, 0.20]
 }
 ```
 
@@ -124,42 +124,36 @@ def extract_landmarks(bgr_image: np.ndarray) -> List[List[float]]
 # 示例：
 bgr_image = np.ndarray(data=[[[255, 0, 0], [0, 255, 0]], [[128, 64, 32], [64, 128, 64]]], shape=(2, 2, 3), dtype=np.uint8)
 landmarks = extract_landmarks(bgr_image)
-# 返回：[[x1, y1, z1], [x2, y2, z2], ..., [x468, y468, z468]]
+# 返回：[[x1, y1, z1], [x2, y2, z2], ..., [x478, y478, z478]]
 
 def get_landmark_indices() -> Dict[str, List[int]]
 # 示例：
 indices = get_landmark_indices()
-# 返回：{"right_eye_contour": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "left_eye_contour": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19], ...}
+# 返回：{"right_eye_contour": [33, 7, 163, ...], "left_eye_contour": [362, 382, 381, ...], ...}
 
-def validate_landmarks(landmarks: List[Tuple[float, float, float]]) -> bool
+def validate_landmarks(landmarks: List[List[float]]) -> bool
 # 示例：
-landmarks = [(100.0, 200.0, 0.1), (150.0, 250.0, 0.2), (200.0, 300.0, 0.3)]
+landmarks = [[100.0, 200.0, 0.1], [150.0, 250.0, 0.2], [200.0, 300.0, 0.3]]
 is_valid = validate_landmarks(landmarks)
 # 返回：True 或 False
 
-def get_eye_landmarks(landmarks: List[Tuple[float, float, float]], eye_type: str) -> List[Tuple[float, float, float]]
+def get_pupil_centers_landmarks(landmarks: List[List[float]]) -> Dict[str, Optional[List[float]]]
 # 示例：
-landmarks = [(100.0, 200.0, 0.1), (150.0, 250.0, 0.2), (200.0, 300.0, 0.3)]
-left_eye = get_eye_landmarks(landmarks, "left")
-# 返回：[(x1, y1, z1), (x2, y2, z2), ...]
+landmarks = [[100.0, 200.0, 0.1], [150.0, 250.0, 0.2], [200.0, 300.0, 0.3]]
+pupils = get_pupil_centers_landmarks(landmarks)
+# 返回：{"left": [120.5, 180.3, 0.15], "right": [280.7, 180.1, 0.16]}
 
-def get_pupil_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str, Tuple[float, float, float]]
+def get_eye_contours_landmarks(landmarks: List[List[float]]) -> Dict[str, List[List[float]]]
 # 示例：
-landmarks = [(100.0, 200.0, 0.1), (150.0, 250.0, 0.2), (200.0, 300.0, 0.3)]
-pupils = get_pupil_landmarks(landmarks)
-# 返回：{"left": (120.5, 180.3, 0.15), "right": (280.7, 180.1, 0.16)}
+landmarks = [[100.0, 200.0, 0.1], [150.0, 250.0, 0.2], [200.0, 300.0, 0.3]]
+eye_contours = get_eye_contours_landmarks(landmarks)
+# 返回：{"left": [[x1, y1, z1], ...], "right": [[x1, y1, z1], ...]}
 
-def calculate_center(points: List[Tuple[float, float, float]]) -> Tuple[float, float, float]
+def get_iris_boundaries_landmarks(landmarks: List[List[float]]) -> Dict[str, List[List[float]]]
 # 示例：
-points = [(100.0, 200.0, 0.1), (150.0, 250.0, 0.2), (200.0, 300.0, 0.3)]
-center = calculate_center(points)
-# 返回：(150.0, 250.0, 0.2)
-
-def get_iris_landmarks(landmarks: List[Tuple[float, float, float]]) -> Dict[str, List[Tuple[float, float, float]]]
-# 示例：
-landmarks = [(100.0, 200.0, 0.1), (150.0, 250.0, 0.2), (200.0, 300.0, 0.3)]
-iris = get_iris_landmarks(landmarks)
-# 返回：{"left": [(x1, y1, z1), ...], "right": [(x1, y1, z1), ...]}
+landmarks = [[100.0, 200.0, 0.1], [150.0, 250.0, 0.2], [200.0, 300.0, 0.3]]
+iris = get_iris_boundaries_landmarks(landmarks)
+# 返回：{"left": [[x1, y1, z1], ...], "right": [[x1, y1, z1], ...]}
 ```
 
 #### 2. detector.py (FaceDetector类)
@@ -176,10 +170,10 @@ depth_map = np.ndarray(data=[[0.5, 0.6], [0.4, 0.5]], shape=(2, 2), dtype=np.flo
 success = detector.detect_face(bgr_image, depth_map)
 # 返回：True 或 False
 
-def get_eye_centers(self) -> Dict[str, np.ndarray]
+def get_eyes_contours(self) -> Dict[str, List[np.ndarray]]
 # 示例：
-eye_centers = detector.get_eye_centers()
-# 返回：{"left": np.array([0.10, 0.05, 0.80], dtype=np.float32), "right": np.array([0.15, 0.05, 0.80], dtype=np.float32)}
+eye_contours = detector.get_eyes_contours()
+# 返回：{"left": [np.array([x1, y1, z1]), ...], "right": [np.array([x1, y1, z1]), ...]}
 
 def get_pupil_centers(self) -> Dict[str, np.ndarray]
 # 示例：
@@ -254,15 +248,30 @@ class DataManager:
     depth_map = data_manager.get_depth(0)
     # 返回：np.ndarray(shape=(480, 640), dtype=np.float32) 或 None
     
-    def get_frame_count(self) -> int
+    def get_frame_data(self, frame_id: int) -> Optional[Dict]
     # 示例：
-    count = data_manager.get_frame_count()
-    # 返回：当前存储的帧数量
+    frame_data = data_manager.get_frame_data(0)
+    # 返回：{"bgr_image": np.ndarray, "depth_map": np.ndarray, "timestamp": str} 或 None
     
     def get_resolution(self) -> Optional[Tuple[int, int]]
     # 示例：
     resolution = data_manager.get_resolution()
     # 返回：(width, height) 元组，如 (640, 480)
+    
+    def get_frame_count(self) -> int
+    # 示例：
+    count = data_manager.get_frame_count()
+    # 返回：当前存储的帧数量
+    
+    def clear_all(self) -> None
+    # 示例：
+    data_manager.clear_all()
+    # 返回：无返回值，清空所有数据
+    
+    def remove_frame(self, frame_id: int) -> bool
+    # 示例：
+    success = data_manager.remove_frame(0)
+    # 返回：True 或 False
 
 # 便捷函数接口
 def add_frame(frame_id: int, bgr_image: np.ndarray, depth_map: Optional[np.ndarray] = None) -> None
@@ -291,139 +300,38 @@ count = get_frame_count()
 # 返回：当前帧数量
 ```
 
-#### 2. depth_processor.py
+#### 2. camera_calibration.py
 ```python
-def filter_depth_map(depth_map: np.ndarray) -> np.ndarray
-# 示例：
-depth_map = np.ndarray(data=[[0.5, 0.6, 0.7], [0.4, 0.5, 0.6], [0.3, 0.4, 0.5]], shape=(3, 3), dtype=np.float32)
-filtered_depth = filter_depth_map(depth_map)
-# 返回：np.ndarray(data=[[0.5, 0.6, 0.7], [0.4, 0.5, 0.6], [0.3, 0.4, 0.5]], shape=(3, 3), dtype=np.float32)
-
-def interpolate_depth(depth_map: np.ndarray, pixel_coords: Tuple[int, int]) -> float
-# 示例：
-depth_map = np.ndarray(data=[[0.5, 0.6, 0.7], [0.4, 0.5, 0.6], [0.3, 0.4, 0.5]], shape=(3, 3), dtype=np.float32)
-pixel_coords = (1, 1)
-depth_value = interpolate_depth(depth_map, pixel_coords)
-# 返回：0.5
-
-def validate_depth_value(depth_value: float) -> bool
-# 示例：
-depth_value = 0.85
-is_valid = validate_depth_value(depth_value)
-# 返回：True 或 False
-
-def get_depth_statistics(depth_map: np.ndarray) -> Dict
-# 示例：
-depth_map = np.ndarray(data=[[0.5, 0.6, 0.7], [0.4, 0.5, 0.6], [0.3, 0.4, 0.5]], shape=(3, 3), dtype=np.float32)
-stats = get_depth_statistics(depth_map)
-# 返回：{"min_depth": 0.3, "max_depth": 0.7, "mean_depth": 0.5, "std_depth": 0.15, "valid_pixels": 9}
-
-def normalize_depth_map(depth_map: np.ndarray) -> np.ndarray
-# 示例：
-depth_map = np.ndarray(data=[[0.5, 0.6, 0.7], [0.4, 0.5, 0.6], [0.3, 0.4, 0.5]], shape=(3, 3), dtype=np.float32)
-normalized_depth = normalize_depth_map(depth_map)
-# 返回：np.ndarray(data=[[0.5, 0.75, 1.0], [0.25, 0.5, 0.75], [0.0, 0.25, 0.5]], shape=(3, 3), dtype=np.float32)
-```
-
-#### 3. validation.py
-```python
-def validate_image(image: np.ndarray) -> bool
-# 示例：
-image = np.ndarray(data=[[[255, 0, 0], [0, 255, 0]], [[128, 64, 32], [64, 128, 64]]], shape=(2, 2, 3), dtype=np.uint8)
-is_valid = validate_image(image)
-# 返回：True 或 False
-
-def validate_depth_map(depth_map: np.ndarray) -> bool
-# 示例：
-depth_map = np.ndarray(data=[[0.5, 0.6, 0.7], [0.4, 0.5, 0.6], [0.3, 0.4, 0.5]], shape=(3, 3), dtype=np.float32)
-is_valid = validate_depth_map(depth_map)
-# 返回：True 或 False
-
-def check_coordinate_quality(coords_3d: List) -> bool
-# 示例：
-coords_3d = [np.array([0.10, 0.05, 0.80], dtype=np.float32), np.array([0.15, 0.05, 0.80], dtype=np.float32)]
-is_quality_good = check_coordinate_quality(coords_3d)
-# 返回：True 或 False
-
-def get_validation_report() -> str
-# 示例：
-report = get_validation_report()
-# 返回："验证报告：图像数据：通过，深度图数据：通过，三维坐标质量：通过，总体评估：合格"
-```
-
-#### 4. camera_calibration.py
-```python
-def load_camera_params(file_path: str) -> Dict
-# 示例：
-file_path = "config/camera_params.json"
-camera_params = load_camera_params(file_path)
-# 返回：{"intrinsic_params": {"fx": 925.0, "fy": 925.0, "cx": 640.0, "cy": 360.0}, "image_resolution": {"width": 1280, "height": 720}}
-
-def validate_camera_params(params: Dict) -> bool
-# 示例：
-params = {"intrinsic_params": {"fx": 925.0, "fy": 925.0, "cx": 640.0, "cy": 360.0}, "image_resolution": {"width": 1280, "height": 720}}
-is_valid = validate_camera_params(params)
-# 返回：True 或 False
-
-def get_intrinsic_matrix(params: Dict) -> np.ndarray
-# 示例：
-params = {"intrinsic_params": {"fx": 925.0, "fy": 925.0, "cx": 640.0, "cy": 360.0}}
-intrinsic_matrix = get_intrinsic_matrix(params)
-# 返回：np.ndarray(data=[[925.0, 0.0, 640.0], [0.0, 925.0, 360.0], [0.0, 0.0, 1.0]], shape=(3, 3), dtype=np.float32)
-
-def save_camera_params(params: Dict, file_path: str)
-# 示例：
-params = {"intrinsic_params": {"fx": 925.0, "fy": 925.0, "cx": 640.0, "cy": 360.0}}
-file_path = "config/camera_params.json"
-save_camera_params(params, file_path)
-# 返回：无返回值
-
-def get_camera_info(params: Dict) -> str
-# 示例：
-params = {"camera_name": "Intel RealSense D435i", "intrinsic_params": {"fx": 925.0, "fy": 925.0, "cx": 640.0, "cy": 360.0}}
-info = get_camera_info(params)
-# 返回："相机型号：Intel RealSense D435i，图像分辨率：1280x720，焦距：fx=925.0, fy=925.0，主点：cx=640.0, cy=360.0"
-```
-
-### Config模块
-
-#### 1. constants.py
-```python
-# 关键点索引常量
-LEFT_PUPIL_INDEX = 468  # 左瞳孔中心索引
-RIGHT_PUPIL_INDEX = 473  # 右瞳孔中心索引
-LEFT_IRIS_INDICES = [469, 470, 471, 472]  # 左虹膜边界索引列表
-RIGHT_IRIS_INDICES = [474, 475, 476, 477]  # 右虹膜边界索引列表
-
-# 状态码常量
-STATUS_SUCCESS = 0  # 成功状态
-STATUS_NO_FACE_DETECTED = 1  # 未检测到人脸
-STATUS_LOW_CONFIDENCE = 2  # 置信度低
-STATUS_INVALID_DEPTH = 3  # 深度数据无效
-
-# 检测阈值常量
-DETECTION_CONFIDENCE_THRESHOLD = 0.7  # 检测置信度阈值
-DEPTH_VALIDATION_THRESHOLD = 0.1  # 深度验证阈值（米）
-COORDINATE_QUALITY_THRESHOLD = 0.8  # 坐标质量阈值
-MAX_PROCESSING_TIME = 0.1  # 最大处理时间（秒）
-
-# 使用示例：
-# if confidence > DETECTION_CONFIDENCE_THRESHOLD:
-#     process_landmarks()
-# 
-# if depth_value > DEPTH_VALIDATION_THRESHOLD:
-#     use_depth_data()
-```
-
-#### 2. settings.py
-```python
-# 全局路径配置
-DATA_PATH = "project/recognition/data"  # 数据文件存储路径
-
-# 使用示例：
-# from recognition.config.settings import DATA_PATH
-# file_path = f"{DATA_PATH}/rgbd_input.json"
-# load_rgbd_from_file(file_path)
+# CameraCalibrator单例类
+class CameraCalibrator:
+    def __init__(self, file_path: str = None, rgb_d=False) -> None
+    # 示例：
+    calibrator = CameraCalibrator("config/camera_params.json", rgb_d=True)
+    
+    def get_cap(self) -> cv2.VideoCapture
+    # 示例：
+    cap = calibrator.get_cap()
+    # 返回：cv2.VideoCapture对象
+    
+    def load_camera_params(self) -> Dict
+    # 示例：
+    camera_params = calibrator.load_camera_params()
+    # 返回：{"intrinsic_params": {"fx": 925.0, "fy": 925.0, "cx": 640.0, "cy": 360.0}, ...}
+    
+    def get_image_resolution(self) -> Tuple[int, int]
+    # 示例：
+    resolution = calibrator.get_image_resolution()
+    # 返回：(width, height) 元组，如 (1280, 720)
+    
+    def get_intrinsics(self) -> Dict
+    # 示例：
+    intrinsics = calibrator.get_intrinsics()
+    # 返回：{"fx": 925.0, "fy": 925.0, "cx": 640.0, "cy": 360.0}
+    
+    def get_depth_scale(self) -> float
+    # 示例：
+    depth_scale = calibrator.get_depth_scale()
+    # 返回：0.001
 ```
 
 ## 统一约定
@@ -445,42 +353,15 @@ DATA_PATH = "project/recognition/data"  # 数据文件存储路径
   - Z轴：深度方向，向前为正（相机光轴方向）
 
 ### ✅ 类型定义统一
-- **关键点**：`Tuple[float, float, float]` (x, y, z)
+- **关键点**：`List[float]` [x, y, z]
 - **三维坐标**：`np.ndarray` 形状 `(3,)`
 - **相机参数**：`dict` 类型
 
 ### ✅ 职责分离统一
-- **数据解析**：`utils/data_parser.py` 专门处理JSON字符串到numpy数组的转换
+- **数据解析**：`utils/data_manager.py` 专门处理数据存储和管理
 - **业务逻辑**：`core/` 模块专注于算法处理
 - **工具函数**：`utils/` 模块提供辅助功能
 
 ## 数据流规范
 
 ### 标准数据流
-```
-摄像头数据 → DataManager内存存储 → core模块处理 → 结果输出
-```
-
-### 示例使用流程
-```python
-# 1. 数据管理（utils层）
-from recognition.utils.data_manager import add_frame, get_image, get_depth
-add_frame(0, bgr_image, depth_map)
-bgr_image = get_image(0)
-depth_map = get_depth(0)
-
-# 2. 业务处理（core层）
-from recognition.core.detector import FaceDetector
-detector = FaceDetector(camera_params)
-success = detector.detect_face(bgr_image, depth_map)
-
-# 3. 结果获取
-if success:
-    eye_centers = detector.get_eye_centers()
-    pupil_centers = detector.get_pupil_centers()
-    iris_boundaries = detector.get_iris_boundaries()
-```
-
----
-
-✅ **所有数据结构接口已统一，确保模块间数据传递的一致性和类型安全。** 

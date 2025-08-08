@@ -1,15 +1,15 @@
 {
-    "camera_name": "Intel RealSense D435i",
-    "camera_type": "RGB-D",
+    "camera_name": "HD Camera",
+    "camera_type": "RGB",
     "intrinsic_params": {
-        "fx": 925.0,
-        "fy": 925.0,
-        "cx": 640.0,
-        "cy": 360.0
+        "fx": 554.26,
+        "fy": 554.26,
+        "cx": 320.0,
+        "cy": 240.0
     },
     "image_resolution": {
-        "width": 1280,
-        "height": 720
+        "width": 640,
+        "height": 480
     },
     "depth_scale": 0.001,
     "min_depth": 0.1,
@@ -21,7 +21,7 @@
         "p2": 0.0,
         "k3": 0.0
     },
-    "calibration_date": "2024-01-15",
-    "calibration_method": "OpenCV",
-    "notes": "相机内参通过OpenCV标定获得"
-} 
+    "calibration_date": "2025-08-08",
+    "calibration_method": "Manual Fake Parameters for Code Testing",
+    "notes": "测试用假定内参，无真实标定"
+}

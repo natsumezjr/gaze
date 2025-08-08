@@ -5,9 +5,10 @@
 
 ## 概述
 
-识别模块是眼动追踪系统的核心组件，负责从RGB-D摄像头采集的图像中检测人脸、提取瞳孔中心和虹膜边界点，并将这些点的二维归一化坐标转换为相机参考系下的三维坐标。
+识别模块是眼动追踪系统的核心组件，负责从RGB-D摄像头采集的图像中检测人脸、提取瞳孔中心和虹膜边界点，并将这些点的像素坐标转换为相机参考系下的三维坐标。
 
 ## 项目结构
+
 
 ```
 recognition/
@@ -31,13 +32,12 @@ recognition/
 │   ├── __init__.py
 │   ├── data_manager.py            # 数据管理器（单例模式）
 │   ├── camera_calibration.py     # 相机标定工具
-│   ├── depth_processor.py        # 深度图处理工具
-│   └── validation.py             # 数据验证工具
 └── config/                        # 配置文件
     ├── __init__.py
     ├── settings.py               # 配置文件
     └── constants.py              # 常量定义
 ```
+
 
 ## 安装和使用
 
@@ -73,20 +73,20 @@ python utils/data_manager.py
 from utils.data_manager import add_frame, get_image, get_depth
 
 # 导入核心功能
-from core.landmark_extractor import extract_landmarks, get_eye_landmarks
+from core.landmark_extractor import extract_landmarks, get_pupil_centers_landmarks
 from core.detector import FaceDetector
 ```
 
 ## 主要功能
 
 ### 输入
-- RGB图像：numpy数组格式，BGR或RGB通道
-- 深度图：numpy数组格式，与RGB图像对应
+- BGR图像：numpy数组格式，BGR通道
+- 深度图：numpy数组格式，与BGR图像对应
 - 相机内参：包含fx, fy, cx, cy的字典或矩阵
 
 ### 输出
-- 468个面部关键点：包含眼睛、鼻子、嘴巴等面部特征
-- 眼球中心坐标：左右眼的三维坐标（相机参考系）
+- 478个面部关键点：包含眼睛、鼻子、嘴巴等面部特征
+- 眼球轮廓坐标：左右眼的三维坐标（相机参考系）
 - 瞳孔中心坐标：左右眼瞳孔的三维坐标（相机参考系）
 - 虹膜边界点：左右眼虹膜的边界关键点
 - 置信度：检测结果的置信度分数
@@ -97,19 +97,20 @@ from core.detector import FaceDetector
 ### 基本使用
 ```python
 from recognition.core.detector import FaceDetector
-from recognition.utils.camera_calibration import load_camera_params
+from recognition.utils.camera_calibration import CameraCalibrator
 
 # 加载相机参数
-camera_params = load_camera_params('camera_params.json')
+calibrator = CameraCalibrator("config/camera_params.json", rgb_d=True)
+camera_params = calibrator.load_camera_params()
 
 # 初始化检测器
 detector = FaceDetector(camera_params)
 
 # 检测人脸
-result = detector.detect_face(rgb_image, depth_map)
+result = detector.detect_face(bgr_image, depth_map)
 
 # 获取结果
-eye_centers = detector.get_eye_centers()
+eye_contours = detector.get_eyes_contours()
 pupil_centers = detector.get_pupil_centers()
 iris_boundaries = detector.get_iris_boundaries()
 ```
@@ -176,4 +177,4 @@ if __name__ == "__main__":
 
 ## 详细文档
 
-更多详细信息请参考 `structure.md` 文件。 
+更多详细信息请参考 `structure.md` 文件。

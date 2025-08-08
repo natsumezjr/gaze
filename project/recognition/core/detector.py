@@ -108,107 +108,153 @@ class FaceDetector:
             self._error_message = f"检测过程中发生错误: {str(e)}"
             return False
 
-    def get_eye_centers(self) -> Dict[str, np.ndarray]:
+    def get_eyes_contours(self) -> Dict[str, List[np.ndarray]]:
         """
-        输入：一张包含人脸的RGB图片和深度图（已经通过detect_face()处理）
-        处理：处理流程见下
-        输出：左右眼球中心的三维坐标字典
+        获取左右眼轮廓点三维坐标
         
+        :return: 左右眼轮廓点的三维坐标字典
         返回格式：
         {
-            'left': np.array([x_left, y_left, z_left]),   # 左眼球中心坐标
-            'right': np.array([x_right, y_right, z_right]) # 右眼球中心坐标
+            'left': [
+                np.array([x_0, y_0, z_0]),   # 左眼轮廓点0
+                np.array([x_1, y_1, z_1]),   # 左眼轮廓点1
+                ...,
+                np.array([x_n, y_n, z_n])    # 左眼轮廓点n
+            ],
+            'right': [
+                np.array([x_0, y_0, z_0]),   # 右眼轮廓点0
+                np.array([x_1, y_1, z_1]),   # 右眼轮廓点1
+                ...,
+                np.array([x_n, y_n, z_n])    # 右眼轮廓点n
+            ]
         }
         
         坐标说明（OpenCV标准坐标系）：
         - x, y, z: 相机坐标系下的三维坐标（米）
         - x: 水平方向，向右为正（图像宽度方向）
         - y: 垂直方向，向下为正（图像高度方向）
-        - z: 深度方向，向前为正（相机光轴方向，指向物体）
+        - z: 深度方向，向前为正（相机光轴方向，指向眼睛）
         
         返回值示例：
         {
-            'left': np.array([0.1, 0.05, 0.8]),   # 左眼球中心：(0.1m, 0.05m, 0.8m)
-            'right': np.array([0.15, 0.05, 0.8])  # 右眼球中心：(0.15m, 0.05m, 0.8m)
+            'left': [
+                np.array([0.11, 0.05, 0.81]),  # 左眼轮廓点0
+                np.array([0.13, 0.05, 0.81]),  # 左眼轮廓点1
+                np.array([0.11, 0.07, 0.81]),  # 左眼轮廓点2
+                np.array([0.13, 0.07, 0.81])   # 左眼轮廓点3
+            ],
+            'right': [
+                np.array([0.17, 0.05, 0.81]),  # 右眼轮廓点0
+                np.array([0.19, 0.05, 0.81]),  # 右眼轮廓点1
+                np.array([0.17, 0.07, 0.81]),  # 右眼轮廓点2
+                np.array([0.19, 0.07, 0.81])   # 右眼轮廓点3
+            ]
         }
         
         处理流程：
-        1. 从已检测的关键点中提取眼球区域关键点
-        2. 计算眼球区域的几何中心
-        3. 结合深度信息转换为三维坐标
-        4. 返回左右眼球的中心坐标
+        1. 从已检测的关键点中提取眼轮廓点
+        2. 获取每个轮廓点的像素坐标
+        3. 结合深度图获取各点的深度值
+        4. 使用相机内参转换为三维坐标
+        5. 返回左右眼的轮廓点三维坐标列表
         
         前置条件：
         - 必须先调用detect_face()方法进行人脸检测
         - 检测结果必须成功且置信度足够高
+        - 眼轮廓点必须被正确检测到
         
         调用关系：
         被调用：
         - main.py 中的主循环调用此函数
         
         调用：
-        - get_eye_landmarks() (landmark_extractor.py)
+        - get_eye_contours_landmarks() (landmark_extractor.py)
         - pixel_to_3d() (coordinate_converter.py)
-        - _calculate_center() (内部方法)
         
         可能用到的库函数：numpy
         """
         # 检查前置条件
         if not self._detection_success or self._landmarks is None:
-            return {
-                'left': np.array([0.0, 0.0, 0.0]), 
-                'right': np.array([0.0, 0.0, 0.0])
-            }
+            return {'left': [], 'right': []}
         
         try:
             # 导入所需模块
-            from .landmark_extractor import get_eye_landmarks
-            from .coordinate_converter import pixel_to_3d
+            from .landmark_extractor import get_eye_contours_landmarks
+            from .coordinate_converter import batch_convert_landmarks, pixel_to_3d
             
-            # 获取左右眼关键点
-            left_eye_landmarks = get_eye_landmarks(self._landmarks, "left")
-            right_eye_landmarks = get_eye_landmarks(self._landmarks, "right")
+            # 获取左右眼轮廓关键点
+            eye_contours_landmarks = get_eye_contours_landmarks(self._landmarks)
             
-            # 检查是否成功获取眼部关键点
-            if not left_eye_landmarks or not right_eye_landmarks:
-                return {
-                    'left': np.array([0.0, 0.0, 0.0]), 
-                    'right': np.array([0.0, 0.0, 0.0])
-                }
+            # 检查是否成功获取眼轮廓关键点
+            if not eye_contours_landmarks.get('left') or not eye_contours_landmarks.get('right'):
+                return {'left': [], 'right': []}
             
-            # 计算眼球中心（像素坐标）
-            left_eye_center_pixel = self._calculate_center(left_eye_landmarks)
-            right_eye_center_pixel = self._calculate_center(right_eye_landmarks)
+            # 尝试使用批量转换
+            try:
+                left_eye_3d = batch_convert_landmarks(
+                    eye_contours_landmarks['left'],
+                    self._depth_map_meters,
+                    self.camera_params
+                )
+                
+                right_eye_3d = batch_convert_landmarks(
+                    eye_contours_landmarks['right'],
+                    self._depth_map_meters,
+                    self.camera_params
+                )
+                
+                # 如果批量转换成功且结果不为空，直接返回
+                if left_eye_3d and right_eye_3d:
+                    return {
+                        'left': left_eye_3d,
+                        'right': right_eye_3d
+                    }
+            except Exception:
+                # 批量转换失败，使用单点转换
+                pass
             
-            # 转换为三维坐标
-            left_x, left_y, _ = left_eye_center_pixel
-            right_x, right_y, _ = right_eye_center_pixel
+            # 单点转换方法
+            left_eye_3d = []
+            right_eye_3d = []
             
-            left_eye_center_3d = pixel_to_3d(
-                (int(left_x), int(left_y)),
-                self._depth_map_meters,
-                self.camera_params
-            )
+            # 转换左眼轮廓点
+            for point in eye_contours_landmarks['left']:
+                try:
+                    x, y, _ = point
+                    point_3d = pixel_to_3d(
+                        (int(x), int(y)),
+                        self._depth_map_meters,
+                        self.camera_params
+                    )
+                    left_eye_3d.append(point_3d)
+                except Exception:
+                    # 如果转换失败，添加零向量
+                    left_eye_3d.append(np.array([0.0, 0.0, 0.0]))
             
-            right_eye_center_3d = pixel_to_3d(
-                (int(right_x), int(right_y)),
-                self._depth_map_meters,
-                self.camera_params
-            )
+            # 转换右眼轮廓点
+            for point in eye_contours_landmarks['right']:
+                try:
+                    x, y, _ = point
+                    point_3d = pixel_to_3d(
+                        (int(x), int(y)),
+                        self._depth_map_meters,
+                        self.camera_params
+                    )
+                    right_eye_3d.append(point_3d)
+                except Exception:
+                    # 如果转换失败，添加零向量
+                    right_eye_3d.append(np.array([0.0, 0.0, 0.0]))
             
             return {
-                'left': left_eye_center_3d,
-                'right': right_eye_center_3d
+                'left': left_eye_3d,
+                'right': right_eye_3d
             }
             
         except Exception as e:
-            # 如果转换失败，返回零向量
-            print(f"眼球中心坐标转换失败: {e}")
-            return {
-                'left': np.array([0.0, 0.0, 0.0]), 
-                'right': np.array([0.0, 0.0, 0.0])
-            }
-
+            # 如果转换过程中出现异常，返回空列表
+            print(f"眼轮廓点转换异常: {e}")
+            return {'left': [], 'right': []}
+    
     def get_pupil_centers(self) -> Dict[str, np.ndarray]:
         """
         获取左右瞳孔中心三维坐标
@@ -249,9 +295,8 @@ class FaceDetector:
         - main.py 中的主循环调用此函数
         
         调用：
-        - get_pupil_landmarks() (landmark_extractor.py)
+        - get_pupil_centers_landmarks() (landmark_extractor.py)
         - pixel_to_3d() (coordinate_converter.py)
-        - _calculate_center() (内部方法)
         
         可能用到的库函数：numpy
         """
@@ -264,11 +309,11 @@ class FaceDetector:
         
         try:
             # 导入所需模块
-            from .landmark_extractor import get_pupil_landmarks
+            from .landmark_extractor import get_pupil_centers_landmarks
             from .coordinate_converter import pixel_to_3d
             
             # 获取左右瞳孔中心关键点（像素坐标）
-            pupil_landmarks = get_pupil_landmarks(self._landmarks)
+            pupil_landmarks = get_pupil_centers_landmarks(self._landmarks)
             
             # 检查是否成功获取瞳孔关键点
             if not pupil_landmarks.get('left') or not pupil_landmarks.get('right'):
@@ -366,7 +411,7 @@ class FaceDetector:
         - main.py 中的主循环调用此函数
         
         调用：
-        - get_iris_landmarks() (landmark_extractor.py)
+        - get_iris_boundaries_landmarks() (landmark_extractor.py)
         - pixel_to_3d() (coordinate_converter.py)
         
         可能用到的库函数：numpy
@@ -377,11 +422,11 @@ class FaceDetector:
         
         try:
             # 导入所需模块
-            from .landmark_extractor import get_iris_landmarks
+            from .landmark_extractor import get_iris_boundaries_landmarks
             from .coordinate_converter import batch_convert_landmarks, pixel_to_3d
             
             # 获取左右虹膜边界关键点
-            iris_landmarks = get_iris_landmarks(self._landmarks)
+            iris_landmarks = get_iris_boundaries_landmarks(self._landmarks)
             
             # 检查是否成功获取虹膜关键点
             if not iris_landmarks.get('left') or not iris_landmarks.get('right'):
@@ -603,27 +648,3 @@ class FaceDetector:
             
         except Exception:
             return 0.0
-    
-    def _calculate_center(self, points: List[Tuple[float, float, float]]) -> Tuple[float, float, float]:
-        """
-        计算多个点的中心点
-        
-        Args:
-            points: 点列表，每个点为(x, y, z)元组
-            
-        Returns:
-            Tuple[float, float, float]: 中心点坐标(x, y, z)
-        """
-        if not points:
-            return (0.0, 0.0, 0.0)
-        
-        # 分别计算x, y, z的平均值
-        x_sum = sum(point[0] for point in points)
-        y_sum = sum(point[1] for point in points)
-        z_sum = sum(point[2] for point in points)
-        
-        center_x = x_sum / len(points)
-        center_y = y_sum / len(points)
-        center_z = z_sum / len(points)
-        
-        return (center_x, center_y, center_z)

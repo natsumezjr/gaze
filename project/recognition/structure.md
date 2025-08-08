@@ -8,7 +8,7 @@
 识别模块的目标是：**从摄像头采集的RGB图像和深度图中，自动检测出人脸、瞳孔中心和虹膜边界点，并将这些点的二维归一化坐标转换为相机参考系下的三维坐标。**
 
 ### 主要功能
-- 人脸检测与关键点提取
+- 人脸检测与关键点提取（478个关键点）
 - 瞳孔中心和虹膜边界点识别
 - 归一化坐标到像素坐标转换
 - 像素坐标结合深度图转换为三维坐标
@@ -17,27 +17,32 @@
 ---
 
 ## 二、文件结构设计以及调用关系
+根据现有文件@coordinate_converter.py @detector.py @landmark_extractor.py @camera_calibration.py @data_manager.py 中的函数（直接阅读函数定义即可）以及文件结构，更新@core.md @structure.md @README.md并且根据@README.md 进行编译
 
-```
+我将根据现有文件中的函数定义来更新文档，然后进行编译。让我先分析现有文件中的函数定义。
+现在我将根据现有文件中的函数定义来更新文档。首先更新core.md文件：
+每个文件直接给我，不要写文件，我粘贴就好，然后执行编译
+
+好的，我将根据现有文件中的函数定义为您提供更新后的文档内容。
+1. core.md 更新内容
+摄像头数据 → DataManager内存存储 → core模块处理 → 结果输出
+2. structure.md 更新内容
 recognition/
-├── __init__.py                    # 模块初始化
+├── init.py # 模块初始化
 ├── core/
-│   ├── __init__.py
-│   ├── detector.py                # 人脸检测器核心类
-│   ├── landmark_extractor.py      # 关键点提取器
-│   └── coordinate_converter.py    # 坐标转换器
+│ ├── init.py
+│ ├── detector.py # 人脸检测器核心类
+│ ├── landmark_extractor.py # 关键点提取器
+│ └── coordinate_converter.py # 坐标转换器
 ├── utils/
-│   ├── __init__.py
-│   ├── data_manager.py           # 数据管理器（单例模式）
-│   ├── camera_calibration.py     # 相机标定工具
-│   ├── depth_processor.py        # 深度图处理工具
-│   └── validation.py             # 数据验证工具
+│ ├── init.py
+│ ├── data_manager.py # 数据管理器（单例模式）
+│ ├── camera_calibration.py # 相机标定工具
 ├── config/
-│   ├── __init__.py
-│   ├── settings.py               # 配置文件
-│   └── constants.py              # 常量定义
-└── main.py                       # 主入口文件（包含大while循环）
-```
+│ ├── init.py
+│ ├── settings.py # 配置文件
+│ └── constants.py # 常量定义
+└── main.py # 主入口文件（包含大while循环）
 
 调用关系
 main.py (主循环)
@@ -52,7 +57,6 @@ detector.py (核心检测器)
     ├── depth_processor.py
     └── validation.py
 ---
-
 ## 三、各文件功能详细说明
 
 ### 3.1 核心文件（core/）
@@ -62,51 +66,49 @@ detector.py (核心检测器)
 
 **主要方法**：
 - `__init__(camera_params)`：初始化，接收相机内参
-- `detect_face(rgb_image, depth_map)`：主检测方法
-- `get_eye_centers()`：获取眼球中心三维坐标
+- `detect_face(bgr_image, depth_map)`：主检测方法
+- `get_eyes_contours()`：获取眼球轮廓三维坐标
 - `get_pupil_centers()`：获取瞳孔中心三维坐标
 - `get_iris_boundaries()`：获取虹膜边界点三维坐标
 - `get_detection_confidence()`：获取检测置信度
 - `get_detection_status()`：获取检测状态信息
 
 **输入输出**：
-- 输入：RGB图像(numpy数组)、深度图(numpy数组)、相机内参(dict)
-- 输出：三维坐标字典，包含眼球中心、瞳孔中心、虹膜边界点
+- 输入：BGR图像(numpy数组)、深度图(numpy数组)、相机内参(dict)
+- 输出：三维坐标字典，包含眼球轮廓、瞳孔中心、虹膜边界点
 
 #### `landmark_extractor.py` - 关键点提取器
 **功能**：专门处理MediaPipe人脸关键点的提取和验证
 
 **主要方法**：
-- `extract_landmarks(rgb_image)`：提取468个关键点
+- `extract_landmarks(bgr_image)`：提取478个关键点
 - `validate_landmarks(landmarks)`：验证关键点质量
-- `get_eye_landmarks(landmarks, eye_type)`：提取指定眼睛的关键点
-- `get_pupil_landmarks(landmarks)`：提取瞳孔中心关键点
-- `get_iris_landmarks(landmarks)`：提取虹膜边界关键点
+- `get_pupil_centers_landmarks(landmarks)`：提取瞳孔中心关键点
+- `get_eye_contours_landmarks(landmarks)`：提取眼球轮廓关键点
+- `get_iris_boundaries_landmarks(landmarks)`：提取虹膜边界关键点
 
 **关键点索引**：
-- 右眼轮廓：0-9
-- 左眼轮廓：10-19
-- 右眼虹膜：20-31
-- 左眼虹膜：32-43
-- 瞳孔中心：通过虹膜中心计算得出
+- 右眼轮廓：33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246
+- 左眼轮廓：362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398
+- 右眼虹膜：468, 469, 470, 471, 472
+- 左眼虹膜：473, 474, 475, 476, 477
+- 瞳孔中心：468（右眼）、473（左眼）
 
 #### `coordinate_converter.py` - 坐标转换器
-**功能**：处理归一化坐标到像素坐标，再到三维坐标的转换
+**功能**：处理像素坐标到三维坐标的转换
 
 **主要方法**：
-- `normalized_to_pixel(norm_coords, image_shape)`：归一化转像素
-- `pixel_to_3d(pixel_coords, depth_map, camera_params)`：像素转三维
-- `batch_convert_landmarks(landmarks, depth_map, camera_params)`：批量转换
+- `pixel_to_3d(pixel_coords, depth_map_meters, camera_params)`：像素转三维
+- `batch_convert_landmarks(landmarks, depth_map_meters, camera_params)`：批量转换
 - `validate_3d_coordinates(coords_3d)`：验证三维坐标有效性
 
 **转换公式**：
-```
-x_pixel = x_norm × W
-y_pixel = y_norm × H
-X = (x_pixel - cx) × Z / fx
-Y = (y_pixel - cy) × Z / fy
-Z = D(x_pixel, y_pixel)
-```
+
+$$X = \frac{(x_{pixel} - c_x) \times Z}{f_x}$$
+
+$$Y = \frac{(y_{pixel} - c_y) \times Z}{f_y}$$
+
+$$Z = D(x_{pixel}, y_{pixel})$$
 
 ### 3.2 核心功能整合
 
@@ -125,9 +127,11 @@ Z = D(x_pixel, y_pixel)
 - `add_frame(frame_id, bgr_image, depth_map)`：添加帧数据到内存
 - `get_image(frame_id)`：获取指定帧的BGR图像
 - `get_depth(frame_id)`：获取指定帧的深度图
+- `get_frame_data(frame_id)`：获取指定帧的完整数据
 - `get_frame_count()`：获取当前帧数量
 - `get_resolution()`：获取图像分辨率
 - `clear_all()`：清空所有数据
+- `remove_frame(frame_id)`：删除指定帧
 
 **数据结构**：
 ```python
@@ -151,11 +155,12 @@ _data_dict = {
 **功能**：处理相机内参的加载、验证和转换
 
 **主要方法**：
-- `load_camera_params(file_path)`：加载相机参数
-- `validate_camera_params(params)`：验证参数有效性
-- `get_intrinsic_matrix()`：获取内参矩阵
-- `save_camera_params(params, file_path)`：保存相机参数
-- `get_camera_info()`：获取相机信息
+- `__init__(file_path, rgb_d)`：初始化相机标定器
+- `get_cap()`：获取摄像头对象
+- `load_camera_params()`：加载相机参数
+- `get_image_resolution()`：获取图像分辨率
+- `get_intrinsics()`：获取内参矩阵
+- `get_depth_scale()`：获取深度缩放因子
 
 **相机参数格式**：
 ```python
@@ -247,14 +252,14 @@ def main():
     
     while True:
         try:
-            # 获取RGB图像和深度图
-            rgb_image, depth_map = get_frame_data()
+            # 获取BGR图像和深度图
+            bgr_image, depth_map = get_frame_data()
             
             # 检测人脸和关键点
-            result = detector.detect_face(rgb_image, depth_map)
+            result = detector.detect_face(bgr_image, depth_map)
             
             # 输出三维坐标
-            eye_centers = detector.get_eye_centers()
+            eye_contours = detector.get_eyes_contours()
             pupil_centers = detector.get_pupil_centers()
             
             # 处理结果...
@@ -270,12 +275,12 @@ def main():
 ## 四、接口设计规范
 
 ### 4.1 输入接口
-- **RGB图像**：numpy数组格式，BGR或RGB通道，形状为(H, W, 3)
-- **深度图**：numpy数组格式，与RGB图像对应，形状为(H, W)
+- **BGR图像**：numpy数组格式，BGR通道，形状为(H, W, 3)
+- **深度图**：numpy数组格式，与BGR图像对应，形状为(H, W)
 - **相机内参**：包含fx, fy, cx, cy的字典或矩阵
 
 ### 4.2 输出接口
-- **眼球中心坐标**：左右眼的三维坐标（相机参考系）
+- **眼球轮廓坐标**：左右眼的三维坐标（相机参考系）
 - **瞳孔中心坐标**：左右眼瞳孔的三维坐标（相机参考系）
 - **置信度**：检测结果的置信度分数
 - **状态信息**：检测是否成功、错误信息等
@@ -294,19 +299,20 @@ def main():
 ### 5.1 基本使用
 ```python
 from recognition.core.detector import FaceDetector
-from recognition.utils.camera_calibration import load_camera_params
+from recognition.utils.camera_calibration import CameraCalibrator
 
 # 加载相机参数
-camera_params = load_camera_params('camera_params.json')
+calibrator = CameraCalibrator("config/camera_params.json", rgb_d=True)
+camera_params = calibrator.load_camera_params()
 
 # 初始化检测器
 detector = FaceDetector(camera_params)
 
 # 检测人脸
-result = detector.detect_face(rgb_image, depth_map)
+result = detector.detect_face(bgr_image, depth_map)
 
 # 获取结果
-eye_centers = detector.get_eye_centers()
+eye_contours = detector.get_eyes_contours()
 pupil_centers = detector.get_pupil_centers()
 ```
 
@@ -356,4 +362,4 @@ if __name__ == "__main__":
 - 标准测试图像集
 - 不同光照条件数据
 - 不同距离范围数据
-- 异常情况数据 
+- 异常情况数据

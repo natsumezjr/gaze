@@ -157,57 +157,7 @@ class CoordinateConverter:
             if not isinstance(value, (int, float)) or value <= 0:
                 raise ValueError(f"相机内参{key}必须是正数，当前值：{value}")
     
-    def normalized_to_pixel(self, norm_coords: Tuple[float, float], 
-                           image_shape: Tuple[int, int]) -> Tuple[int, int]:
-        """
-        归一化坐标转像素坐标
-        
-        理论基础：
-        归一化坐标是MediaPipe输出的相对坐标，范围在[0,1]之间。
-        转换公式：x_pixel = x_norm × W, y_pixel = y_norm × H
-        
-        Args:
-            norm_coords: 归一化坐标 (x_norm, y_norm)，范围[0,1]
-            image_shape: 图像尺寸 (height, width)
-        
-        Returns:
-            pixel_coords: 像素坐标 (x_pixel, y_pixel)
-        
-        Raises:
-            ValueError: 输入参数无效时抛出
-        
-        示例：
-            norm_coords = (0.5, 0.5)  # 图像中心
-            image_shape = (720, 1280)  # 高度720，宽度1280
-            pixel_coords = (640, 360)  # 像素坐标
-        """
-        # 输入验证
-        if not isinstance(norm_coords, tuple) or len(norm_coords) != 2:
-            raise ValueError("norm_coords必须是包含2个元素的元组")
-        
-        if not isinstance(image_shape, tuple) or len(image_shape) != 2:
-            raise ValueError("image_shape必须是包含2个元素的元组")
-        
-        x_norm, y_norm = norm_coords
-        height, width = image_shape
-        
-        # 验证归一化坐标范围
-        if not (0.0 <= x_norm <= 1.0 and 0.0 <= y_norm <= 1.0):
-            raise ValueError(f"归一化坐标必须在[0,1]范围内，当前值：({x_norm}, {y_norm})")
-        
-        # 验证图像尺寸
-        if width <= 0 or height <= 0:
-            raise ValueError(f"图像尺寸必须为正数，当前值：({width}, {height})")
-        
-        # 转换公式：x_pixel = x_norm × W, y_pixel = y_norm × H
-        x_pixel = x_norm * width
-        y_pixel = y_norm * height
-        
-        # 确保像素坐标在有效范围内（保留浮点精度）
-        x_pixel = max(0.0, min(x_pixel, width - 1.0))
-        y_pixel = max(0.0, min(y_pixel, height - 1.0))
-        
-        return (x_pixel, y_pixel)
+
     
     def pixel_to_3d(self, pixel_coords: Tuple[int, int], 
                    depth_map_meters: np.ndarray) -> np.ndarray:
@@ -301,17 +251,15 @@ class CoordinateConverter:
         转换单个关键点到三维坐标
         
         Args:
-            landmark: 关键点 (x_norm, y_norm, z_relative)
+            landmark: 关键点 (x_pixel, y_pixel, z_relative)
             depth_map: 深度图
         
         Returns:
             coord_3d: 三维坐标，转换失败时返回None
         """
         try:
-            # 归一化坐标转像素坐标（现在返回浮点数）
-            norm_coords = (landmark[0], landmark[1])
-            image_shape = (depth_map.shape[0], depth_map.shape[1])
-            pixel_coords = self.normalized_to_pixel(norm_coords, image_shape)
+            # 直接使用像素坐标
+            pixel_coords = (landmark[0], landmark[1])
             
             # 像素坐标转三维坐标（使用插值）
             coord_3d = self.pixel_to_3d(pixel_coords, depth_map)
@@ -514,12 +462,7 @@ class CoordinateConverter:
         }
 
 
-# 兼容性函数（保持向后兼容）
-def normalized_to_pixel(norm_coords: Tuple[float, float], 
-                       image_shape: Tuple[int, int]) -> Tuple[int, int]:
-    """归一化坐标转像素坐标（兼容性函数）"""
-    converter = CoordinateConverter()
-    return converter.normalized_to_pixel(norm_coords, image_shape)
+
 
 
 def pixel_to_3d(pixel_coords: Tuple[int, int], 
@@ -566,35 +509,31 @@ def test_coordinate_converter():
     # 初始化转换器
     converter = CoordinateConverter(test_camera_params)
     
-    # 测试归一化坐标转像素坐标
-    print("\n1. 测试归一化坐标转像素坐标")
-    norm_coords = (0.5, 0.5)  # 图像中心
-    image_shape = (720, 1280)
-    pixel_coords = converter.normalized_to_pixel(norm_coords, image_shape)
-    print(f"归一化坐标 {norm_coords} -> 像素坐标 {pixel_coords}")
-    
     # 测试像素坐标转三维坐标
-    print("\n2. 测试像素坐标转三维坐标")
+    print("\n1. 测试像素坐标转三维坐标")
+    pixel_coords = (640, 360)  # 图像中心
     coord_3d = converter.pixel_to_3d(pixel_coords, depth_map)
     print(f"像素坐标 {pixel_coords} -> 三维坐标 {coord_3d}")
     
+
+    
     # 测试批量转换
-    print("\n3. 测试批量转换")
+    print("\n2. 测试批量转换")
     test_landmarks = [
-        (0.5, 0.5, 0.1),  # 中心点
-        (0.3, 0.7, 0.2),  # 其他点
-        (0.8, 0.2, 0.3)
+        (640, 360, 0.1),  # 中心点
+        (384, 504, 0.2),  # 其他点
+        (1024, 144, 0.3)
     ]
     coords_3d = converter.batch_convert_landmarks(test_landmarks, depth_map)
     print(f"批量转换结果：{len(coords_3d)} 个有效坐标")
     
     # 测试坐标验证
-    print("\n4. 测试坐标验证")
+    print("\n3. 测试坐标验证")
     is_valid = converter.validate_3d_coordinates(coords_3d)
     print(f"坐标验证结果：{'通过' if is_valid else '失败'}")
     
     # 测试质量评估
-    print("\n5. 测试质量评估")
+    print("\n4. 测试质量评估")
     quality_score = converter.calculate_coordinate_quality(coords_3d)
     print(f"质量分数：{quality_score:.2f}")
     
