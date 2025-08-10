@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Dict, List, Union
 
 def main(key_coordinates: dict):
     """

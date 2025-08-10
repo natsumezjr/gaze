@@ -35,39 +35,26 @@ import logging
 from pathlib import Path
 import cv2
 
-# 导入项目配置
+# 导入项目配置（统一使用 project.* 绝对导入；失败时给出回退默认值）
 try:
-    from ..config.constants import (
+    from project.recognition.config.constants import (
         LEFT_PUPIL_INDEX, RIGHT_PUPIL_INDEX,
         LEFT_IRIS_INDICES, RIGHT_IRIS_INDICES,
         STATUS_SUCCESS, STATUS_INVALID_DEPTH
     )
-    from ..config.settings import (
+    from project.recognition.config.settings import (
         DEPTH_VALIDATION_THRESHOLD,
         COORDINATE_QUALITY_THRESHOLD
     )
-except ImportError:
-    try:
-        # 尝试绝对导入
-        from config.constants import (
-            LEFT_PUPIL_INDEX, RIGHT_PUPIL_INDEX,
-            LEFT_IRIS_INDICES, RIGHT_IRIS_INDICES,
-            STATUS_SUCCESS, STATUS_INVALID_DEPTH
-        )
-        from config.settings import (
-            DEPTH_VALIDATION_THRESHOLD,
-            COORDINATE_QUALITY_THRESHOLD
-        )
-    except ImportError:
-        # 如果导入失败，使用默认值
-        LEFT_PUPIL_INDEX = 468
-        RIGHT_PUPIL_INDEX = 473
-        LEFT_IRIS_INDICES = [469, 470, 471, 472]
-        RIGHT_IRIS_INDICES = [474, 475, 476, 477]
-        STATUS_SUCCESS = 0
-        STATUS_INVALID_DEPTH = 3
-        DEPTH_VALIDATION_THRESHOLD = 0.1
-        COORDINATE_QUALITY_THRESHOLD = 0.8
+except Exception:
+    LEFT_PUPIL_INDEX = 468
+    RIGHT_PUPIL_INDEX = 473
+    LEFT_IRIS_INDICES = [469, 470, 471, 472]
+    RIGHT_IRIS_INDICES = [474, 475, 476, 477]
+    STATUS_SUCCESS = 0
+    STATUS_INVALID_DEPTH = 3
+    DEPTH_VALIDATION_THRESHOLD = 0.1
+    COORDINATE_QUALITY_THRESHOLD = 0.8
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)

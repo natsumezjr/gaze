@@ -82,7 +82,7 @@ class FaceDetector:
             self._depth_map_meters = self._convert_depth_to_meters(depth_map)
             
             # 导入landmark_extractor模块
-            from .landmark_extractor import extract_landmarks, validate_landmarks
+            from project.recognition.core.landmark_extractor import extract_landmarks, validate_landmarks
             
             # 提取关键点
             landmarks = extract_landmarks(bgr_image)
@@ -179,8 +179,8 @@ class FaceDetector:
         
         try:
             # 导入所需模块
-            from .landmark_extractor import get_eye_contours_landmarks
-            from .coordinate_converter import batch_convert_landmarks, pixel_to_3d
+            from project.recognition.core.landmark_extractor import get_eye_contours_landmarks
+            from project.recognition.core.coordinate_converter import batch_convert_landmarks, pixel_to_3d
             
             # 获取左右眼轮廓关键点
             eye_contours_landmarks = get_eye_contours_landmarks(self._landmarks)
@@ -309,8 +309,8 @@ class FaceDetector:
         
         try:
             # 导入所需模块
-            from .landmark_extractor import get_pupil_centers_landmarks
-            from .coordinate_converter import pixel_to_3d
+            from project.recognition.core.landmark_extractor import get_pupil_centers_landmarks
+            from project.recognition.core.coordinate_converter import pixel_to_3d
             
             # 获取左右瞳孔中心关键点（像素坐标）
             pupil_landmarks = get_pupil_centers_landmarks(self._landmarks)
@@ -422,8 +422,8 @@ class FaceDetector:
         
         try:
             # 导入所需模块
-            from .landmark_extractor import get_iris_boundaries_landmarks
-            from .coordinate_converter import batch_convert_landmarks, pixel_to_3d
+            from project.recognition.core.landmark_extractor import get_iris_boundaries_landmarks
+            from project.recognition.core.coordinate_converter import batch_convert_landmarks, pixel_to_3d
             
             # 获取左右虹膜边界关键点
             iris_landmarks = get_iris_boundaries_landmarks(self._landmarks)

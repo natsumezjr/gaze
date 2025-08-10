@@ -25,19 +25,20 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # 0=全部, 1=无INFO, 2=无WARNING, 3=无ERROR
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # 禁用GPU以避免CUDA相关警告
 
-# 添加项目根目录到Python路径
+# 添加项目根目录到Python路径（使得可用绝对导入 `project.*`）
 current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+project_dir = os.path.dirname(current_dir)  # .../project
+workspace_root = os.path.dirname(project_dir)  # 父目录，包含 `project/`
+if workspace_root not in sys.path:
+    sys.path.insert(1, workspace_root)
 
 # 导入项目模块
 try:
-    from recognition.core.detector import FaceDetector
-    from recognition.utils.camera_calibration import CameraCalibrator
-    from recognition.utils.data_manager import add_frame, get_image, get_depth
-    from recognition.config.settings import DATA_PATH, CAMERA_PARAMS_PATH
-    from recognition.config.constants import STATUS_SUCCESS, STATUS_NO_FACE_DETECTED
+    from project.recognition.core.detector import FaceDetector
+    from project.recognition.utils.camera_calibration import CameraCalibrator
+    from project.recognition.utils.data_manager import add_frame, get_image, get_depth
+    from project.recognition.config.settings import DATA_PATH, CAMERA_PARAMS_PATH
+    from project.recognition.config.constants import STATUS_SUCCESS, STATUS_NO_FACE_DETECTED
 except ImportError as e:
     print(f"导入错误: {e}")
     print("请确保已安装项目包: pip install -e .")
@@ -104,7 +105,7 @@ def main():
                         'eyes_contours': eyes_contours
                     }
                     
-                    from fitting.main import main as fitting
+                    from project.fitting.main import main as fitting
                     fitting(key_coordinates)
                     
                     # TODO: 添加后续处理逻辑

@@ -3,5 +3,5 @@ Configuration Package
 配置模块
 """
 
-from .settings import DATA_PATH
-from .constants import *
+from project.recognition.config.settings import DATA_PATH
+from project.recognition.config.constants import *

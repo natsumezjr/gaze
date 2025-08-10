@@ -26,7 +26,7 @@ class CameraCalibrator:
         
         # 设置配置文件路径
         if file_path is None:
-            from config.settings import CAMERA_PARAMS_PATH
+            from project.recognition.config.settings import CAMERA_PARAMS_PATH
             self._config_file_path = CAMERA_PARAMS_PATH
         else:
             self._config_file_path = file_path

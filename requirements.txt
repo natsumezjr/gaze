@@ -17,4 +17,7 @@ pytest>=6.0.0
 pytest-cov>=2.0.0
 
 # 系统工具
-psutil>=5.8.0 
+psutil>=5.8.0
+
+# Windows 专用（用于读取物理屏幕尺寸）
+pywin32>=306; platform_system == "Windows"

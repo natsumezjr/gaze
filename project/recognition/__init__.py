@@ -7,5 +7,5 @@ __version__ = "0.1.0"
 __author__ = "Gaze Team"
 
 # 导入主要模块，方便使用
-from .core.detector import *
-from .utils.data_manager import *
+from project.recognition.core.detector import *
+from project.recognition.utils.data_manager import *
