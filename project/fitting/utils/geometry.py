@@ -10,11 +10,10 @@ class EllipsoidParams(TypedDict):
     椭球参数占位类型（仅类型标注用）：
     - axes: 三主轴长度 (a, b, c)，单位 m，np.ndarray(3,)
     - rotation: 世界到椭球主轴坐标的旋转矩阵 R，np.ndarray(3,3)
-    - note: 其它可选元数据（如残差/内点比例等），实现时可扩展
     """
     axes: np.ndarray           # (3,)
     rotation: np.ndarray       # (3, 3)
-    note: str
+    center: np.ndarray        # (3,)
     
     def get_axes(self)->np.ndarray:
         return self["axes"]
@@ -22,8 +21,8 @@ class EllipsoidParams(TypedDict):
     def get_rotation(self)->np.ndarray:
         return self["rotation"]
     
-    def get_note(self)->str:
-        return self["note"]
+    def get_center(self)->np.ndarray:
+        return self["center"]
 
 class Plane(TypedDict, total=False):
     """
@@ -205,17 +204,37 @@ def center_fitter(key_coordinates:KeyCoordinates,threshold:float,trials_times:in
     '''
     return CenterFitter().center_fitter(key_coordinates,threshold,trials_times,max_trials)
 
-def rotate_vector(vector:np.ndarray,axis:np.ndarray,angle:float)->np.ndarray:
+def rotate_vector(vector: np.ndarray, axis: np.ndarray, angle: float) -> np.ndarray:
     '''
-    绕轴旋转向量
+    使用罗德里格斯旋转公式绕轴旋转向量
+    
     Args:
-        vector: 向量
-        axis: 轴
-        angle: 角度
+        vector: 要旋转的向量 (3,)
+        axis: 旋转轴单位向量 (3,)
+        angle: 旋转角度（弧度）
+    
     Returns:
-        旋转后的向量
+        旋转后的向量 (3,)
     '''
-    pass
+    # 确保轴向量是单位向量
+    axis = normalize_vector(axis)
+    
+    # 罗德里格斯旋转公式：v' = v*cos(θ) + (k×v)*sin(θ) + k(k·v)(1-cos(θ))
+    # 其中 k 是旋转轴，θ 是旋转角度
+    
+    cos_angle = np.cos(angle)
+    sin_angle = np.sin(angle)
+    
+    # 计算各个分量
+    v_parallel = np.dot(vector, axis) * axis  # 平行于轴的分量
+    v_perpendicular = vector - v_parallel     # 垂直于轴的分量
+    
+    # 计算旋转后的向量
+    rotated_vector = (v_parallel + 
+                     v_perpendicular * cos_angle + 
+                     np.cross(axis, vector) * sin_angle)
+    
+    return rotated_vector
         
         
 
