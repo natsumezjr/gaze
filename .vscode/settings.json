@@ -22,5 +22,29 @@
         "reportOptionalContextManager": "none",
         "reportOptionalOperand": "none"
     },
-    "python.analysis.useLibraryCodeForTypes": false
+    "python.analysis.useLibraryCodeForTypes": false,
+    "cursorpyright.analysis.autoImportCompletions": true,
+    "cursorpyright.analysis.autoSearchPaths": true,
+    "cursorpyright.analysis.diagnosticMode": "workspace",
+    "cursorpyright.analysis.diagnosticSeverityOverrides": {
+        "reportAttributeAccessIssue": "none",
+        "reportMissingImports": "none",
+        "reportGeneralTypeIssues": "none",
+        "reportOptionalMemberAccess": "none",
+        "reportOptionalSubscript": "none",
+        "reportOptionalIterable": "none",
+        "reportOptionalContextManager": "none",
+        "reportOptionalOperand": "none"
+    },
+    "cursorpyright.analysis.extraPaths": [
+        "./project/recognition"
+    ],
+    "cursorpyright.analysis.ignore": [
+        "**/core/landmark_extractor",
+        "**/mediapipe/**",
+        "**/landmark_extractor.py"
+    ],
+    "cursorpyright.analysis.stubPath": "./typings",
+    "cursorpyright.analysis.typeCheckingMode": "off",
+    "cursorpyright.analysis.useLibraryCodeForTypes": false
 } 
