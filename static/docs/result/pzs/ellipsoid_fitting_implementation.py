@@ -1,8 +1,11 @@
 """
 椭球拟合眼部算法实现
 
-基于RANSAC的鲁棒椭球拟合，用于眼球中心定位和形状建模。
-支持MediaPipe 478个关键点的输入，包含权重优化和先验约束。
+RANSAC + 几何最小二乘（Geometric Least Squares）相结合：
+- RANSAC 进行内点筛选与初值估计
+- 在内点上使用几何残差进行最小二乘精修（可选鲁棒损失）
+
+支持 MediaPipe 478 个关键点的输入，包含权重优化和先验约束。
 
 作者：基于眼球中心拟合算法调研报告
 日期：2024
@@ -11,8 +14,6 @@
 import numpy as np
 from typing import Dict, List, Tuple, Optional, Union
 from scipy.optimize import least_squares
-from sklearn.linear_model import RANSACRegressor
-import cv2
 from dataclasses import dataclass
 
 
@@ -45,6 +46,20 @@ class EllipsoidFitter:
         self.config = config or self._get_default_config()
         self._validate_config()
     
+    @staticmethod
+    def _orthonormalize_rotation(R: np.ndarray) -> np.ndarray:
+        """对 3x3 矩阵进行正交化，保证为合法旋转矩阵（SVD 投影）。"""
+        try:
+            U, _, Vt = np.linalg.svd(R)
+            R_ortho = U @ Vt
+            # 确保右手坐标系
+            if np.linalg.det(R_ortho) < 0:
+                U[:, -1] *= -1
+                R_ortho = U @ Vt
+            return R_ortho
+        except Exception:
+            return np.eye(3)
+    
     def _get_default_config(self) -> Dict:
         """获取默认配置"""
         return {
@@ -55,7 +70,9 @@ class EllipsoidFitter:
             "axes_range_mm": (10.0, 14.0), # 轴长范围（毫米）
             "center_constraint_mm": 8.0,   # 瞳孔中心距离约束（毫米）
             "use_prior": True,             # 是否使用先验约束
-            "weight_strategy": "anatomical" # 权重策略
+            "weight_strategy": "anatomical", # 权重策略
+            "ls_loss": "soft_l1",        # 几何最小二乘鲁棒损失（linear/soft_l1/huber/cauchy/arctan）
+            "ls_f_scale": 1.0             # 鲁棒损失尺度
         }
     
     def _validate_config(self):
@@ -379,8 +396,10 @@ class EllipsoidFitter:
                     self._ellipsoid_residuals, 
                     params_init, 
                     args=(sample_points,),
-                    method='lm',
-                    max_nfev=1000
+                    method='trf',
+                    loss=self.config.get("ls_loss", "soft_l1"),
+                    f_scale=self.config.get("ls_f_scale", 1.0),
+                    max_nfev=2000
                 )
                 
                 if result.success:
@@ -416,7 +435,7 @@ class EllipsoidFitter:
             center_init = np.average(inlier_points, axis=0, weights=inlier_weights)
             
             centered_points = inlier_points - center_init
-            cov_matrix = np.cov(centered_points.T, aweight=inlier_weights)
+            cov_matrix = np.cov(centered_points.T, aweights=inlier_weights)
             
             eigenvals, eigenvecs = np.linalg.eigh(cov_matrix)
             axes_init = np.sqrt(np.abs(eigenvals)) * 2
@@ -426,8 +445,10 @@ class EllipsoidFitter:
                 self._ellipsoid_residuals, 
                 params_init, 
                 args=(inlier_points,),
-                method='lm',
-                max_nfev=1000
+                method='trf',
+                loss=self.config.get("ls_loss", "soft_l1"),
+                f_scale=self.config.get("ls_f_scale", 1.0),
+                max_nfev=2000
             )
             
             if result.success:
@@ -435,6 +456,7 @@ class EllipsoidFitter:
                 center = params[:3]
                 axes = params[3:6]
                 rotation = params[6:].reshape(3, 3)
+                rotation = self._orthonormalize_rotation(rotation)
         
         # 构造椭球参数
         ellipsoid_params = EllipsoidParams(
@@ -462,7 +484,9 @@ class EllipsoidFitter:
         transformed_points = np.dot(centered_points, rotation)
         
         # 计算椭球距离
-        normalized_points = transformed_points / axes
+        # 防止轴长异常或为零
+        safe_axes = np.clip(axes, 1e-6, None)
+        normalized_points = transformed_points / safe_axes
         distances = np.linalg.norm(normalized_points, axis=1)
         
         return distances - 1.0

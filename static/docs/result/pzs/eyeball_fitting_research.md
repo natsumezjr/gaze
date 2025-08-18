@@ -165,6 +165,100 @@ FITTING_CONFIG = {
 "left_eyelid": [388, 387, 386, 385, 384, 398, 362, 382, 381, 380]
 ```
 
+### 4.4 椭球拟合参数建议（结合医学先验）
+
+- **threshold_mm**: 1.5（RANSAC 内点阈值，单位 mm；点云噪声较大可设 2.0–3.0）
+- **max_trials**: 200（点数少或离群多可调至 500–1000）
+- **min_inlier_ratio**: 0.8（数据一般可降至 0.6–0.7）
+- **axes_range_mm**: (10.0, 14.0)（成人眼球三轴物理范围）
+- **flattening_ratio_range**: (0.85, 0.95)（短轴/长轴的扁平率先验）
+- **center_constraint_mm**: 8.0（椭球中心与瞳孔中心的最大距离约束）
+- **use_prior**: True（建议开启解剖学先验，稳定收敛）
+- **ls_loss**: "soft_l1"（全量最小二乘的鲁棒损失，可选 `huber`/`cauchy`）
+- **ls_f_scale**: 1.0（鲁棒损失尺度，残差单位为米；残差偏大可调 2–3）
+- **hybrid_compare_metric**: "inlier_then_mae"（RANSAC 与鲁棒 LS 的择优指标；亦可设 "mae"）
+
+示例配置：
+```python
+ELLIPSOID_FITTING_CONFIG = {
+    "threshold_mm": 1.5,
+    "max_trials": 200,
+    "min_inlier_ratio": 0.8,
+    "axes_range_mm": (10.0, 14.0),
+    "flattening_ratio_range": (0.85, 0.95),
+    "center_constraint_mm": 8.0,
+    "use_prior": True,
+    "ls_loss": "soft_l1",      # 可选: linear/huber/cauchy/arctan
+    "ls_f_scale": 1.0,
+    "hybrid_compare_metric": "inlier_then_mae"
+}
+```
+
+更鲁棒的场景可参考：
+```python
+ELLIPSOID_FITTING_CONFIG = {
+    "threshold_mm": 2.0,
+    "max_trials": 600,
+    "min_inlier_ratio": 0.7,
+    "axes_range_mm": (10.5, 13.5),
+    "flattening_ratio_range": (0.85, 0.97),
+    "center_constraint_mm": 6.0,
+    "use_prior": True,
+    "ls_loss": "huber",
+    "ls_f_scale": 2.0,
+    "hybrid_compare_metric": "inlier_then_mae"
+}
+```
+
+### 4.5 解剖学权重策略（用于点云加权）
+
+- **基础权重（按结构稳定性与几何相关度）**
+  - `corneal_apex`/`glint`: 1.00（角膜顶点/高光）
+  - `pupil_center`: 0.95（光轴强约束；若不稳定可降至 0.8）
+  - `iris_ring`: 0.90（虹膜缘/角膜缘，刚性环）
+  - `sclera_edge`: 0.75（可见巩膜边）
+  - `socket_bone`: 0.60（眶骨边缘，范围约束）
+  - `contour`: 0.60（眼部轮廓）
+  - `eyelid`: 0.45（软组织、遮挡多）
+  - `other`: 0.30
+
+- **调整因子（乘法）**
+  - 置信度 `s_conf`: 0.7 + 0.6·confidence ∈ [0.7, 1.3]
+  - 可见性/遮挡 `s_occ`: 全可见 1.0；部分遮挡 0.7；强遮挡 0.4
+  - 视角/法向一致性 `s_angle`: 0.8 + 0.2·|cosθ|（更正视→更高）
+  - 时序一致性 `s_temp`: 0.8–1.2（与前一帧位置/半径一致性）
+  - 双目一致性 `s_bino`: 0.9–1.1（双眼几何一致时小幅上调）
+
+- **归一化**：`weights = weights / weights.sum() * len(weights)`（平均权重为 1）
+
+实现示例：
+```python
+def anatomical_weight(point_type,
+                      confidence=0.9,
+                      visible=True,
+                      cos_theta=0.9,
+                      temporal_consistency=1.0,
+                      binocular_consistency=1.0):
+    base = {
+        "corneal_apex": 1.00, "glint": 1.00,
+        "pupil_center": 0.95,
+        "iris_ring": 0.90,
+        "sclera_edge": 0.75,
+        "socket_bone": 0.60,
+        "contour": 0.60,
+        "eyelid": 0.45,
+        "other": 0.30,
+    }.get(point_type, 0.30)
+
+    s_conf = 0.7 + 0.6 * float(confidence)    # 0.7~1.3
+    s_occ  = 1.0 if visible else 0.6          # 可细化为 0.4/0.7/1.0
+    s_angle = 0.8 + 0.2 * abs(float(cos_theta))
+    s_temp = float(temporal_consistency)       # 0.8~1.2
+    s_bino = float(binocular_consistency)      # 0.9~1.1
+
+    return base * s_conf * s_occ * s_angle * s_temp * s_bino
+```
+
 ## 5. 技术实现路线
 
 ### 5.1 第一阶段：基础RANSAC实现
