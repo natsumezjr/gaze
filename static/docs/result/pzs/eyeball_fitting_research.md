@@ -276,6 +276,92 @@ def anatomical_weight(point_type,
 - 多模态数据融合
 - 个性化参数学习
 
+### 5.4 时序与多采样参数融合
+
+为提升跨帧稳定性与对偶发异常的鲁棒性，建议对多次采样（多帧或多视角）得到的 `EllipsoidParams` 进行融合。核心思路：对中心、轴长与旋转分别采用合适的加权与几何平均，并结合质量权重与先验约束。
+
+- **权重设计（质量评估）**
+  - 若能获取拟合质量：使用内点比例 `r_i` 与残差 `RMSE/MAE` 组合权重，例如 `w_i ∝ r_i / (RMSE_i + ε)`，归一化后使用。
+  - 若暂不可得质量指标：先用等权；或用关键点检测置信度的均值/中位数近似。
+
+- **融合方法**
+  - **中心（R³）**：加权平均 `c̄ = Σ w_i c_i`。在线应用可使用指数滑动平均 EMA：`c_t = (1-α)·c_{t-1} + α·c_new`，`α≈0.1~0.3`。
+  - **轴长（非负标量）**：分量级加权平均或加权中位数（鲁棒），再做范围裁剪与扁平率先验约束（见第4.4节）。
+  - **旋转（SO(3)）**：采用 chordal mean（矩阵和的SVD投影）：`S = Σ w_i R_i`，SVD 得 `S=UΣVᵀ`，取 `R̄=UVᵀ`；若 `det(R̄)<0`，翻转 `U` 最后一列保持右手系。也可用加权四元数平均（注意符号对齐）。
+  - **异常值抑制**：可在融合前按质量指标做修剪（剔除最差 10–20%）或以权重小化影响。
+  - **先验再约束**：融合后再次应用轴长范围与扁平率约束，以及与瞳孔中心的距离约束，确保生理合理性。
+
+- **接口建议**
+  - 在拟合函数中（例如 RANSAC 结果）同时产出质量指标：`{"inlier_ratio", "rmse", "num_inliers", "num_points"}`，供权重计算使用。
+  - 融合模块输入一组 `EllipsoidParams` 与可选 `weights/metrics`，输出融合后的 `EllipsoidParams`。
+
+- **参考实现（Python）**
+
+```python
+import numpy as np
+from typing import List, Optional, Dict
+
+def _average_rotation_so3(rotations: List[np.ndarray], weights: Optional[np.ndarray] = None) -> np.ndarray:
+    n = len(rotations)
+    if n == 0:
+        return np.eye(3)
+    if weights is None:
+        weights = np.ones(n) / n
+    else:
+        weights = np.asarray(weights, dtype=float)
+        weights = weights / (weights.sum() + 1e-12)
+
+    S = np.zeros((3, 3))
+    for w, R in zip(weights, rotations):
+        S += w * R
+    U, _, Vt = np.linalg.svd(S)
+    R_avg = U @ Vt
+    if np.linalg.det(R_avg) < 0:
+        U[:, -1] *= -1
+        R_avg = U @ Vt
+    return R_avg
+
+def compute_weights_from_metrics(metrics_list: List[Dict], eps: float = 1e-6) -> np.ndarray:
+    r = np.array([m.get("inlier_ratio", 0.0) for m in metrics_list], dtype=float)
+    e = np.array([m.get("rmse", 1.0) for m in metrics_list], dtype=float)
+    w = r / (e + eps)
+    w = np.clip(w, 1e-6, None)
+    w = w / (w.sum() + eps)
+    return w
+
+def fuse_ellipsoid_params(params_list: List[EllipsoidParams], weights: Optional[np.ndarray] = None) -> EllipsoidParams:
+    if len(params_list) == 0:
+        raise ValueError("params_list 为空")
+    if weights is None:
+        weights = np.ones(len(params_list)) / len(params_list)
+    else:
+        weights = np.asarray(weights, dtype=float)
+        weights = weights / (weights.sum() + 1e-12)
+
+    centers = np.stack([p.center for p in params_list], axis=0)
+    axes = np.stack([p.axes for p in params_list], axis=0)
+    rots = [p.rotation for p in params_list]
+
+    center_avg = (centers * weights[:, None]).sum(axis=0)
+    axes_avg = (axes * weights[:, None]).sum(axis=0)
+    rotation_avg = _average_rotation_so3(rots, weights)
+
+    return EllipsoidParams(center=center_avg, axes=axes_avg, rotation=rotation_avg)
+
+def ema_update(prev: EllipsoidParams, new: EllipsoidParams, alpha: float = 0.2) -> EllipsoidParams:
+    a = float(np.clip(alpha, 0.0, 1.0))
+    center = (1.0 - a) * prev.center + a * new.center
+    axes = (1.0 - a) * prev.axes + a * new.axes
+    rotation = _average_rotation_so3([prev.rotation, new.rotation], weights=np.array([1.0 - a, a]))
+    return EllipsoidParams(center=center, axes=axes, rotation=rotation)
+```
+
+- **使用建议**
+  - 离线融合：收集一段时间的 `EllipsoidParams` 与 `metrics`，`weights = compute_weights_from_metrics(metrics)`，再 `fuse_ellipsoid_params(params, weights)`，随后应用先验约束。
+  - 在线平滑：每帧以 `ema_update(prev, cur, α)` 更新；`α` 越小越稳、越大越灵敏。必要时加入质量自适应 `α ← α·sigmoid(rmse)`。
+
+备注：上述实现默认单位为米，若使用毫米请在输入/输出处统一单位换算；旋转融合使用与实现文件中 `_orthonormalize_rotation` 一致的SVD投影保证合法旋转矩阵。
+
 ## 6. 性能评估指标
 
 ### 6.1 精度指标
