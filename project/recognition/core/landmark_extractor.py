@@ -65,17 +65,25 @@ def get_landmark_indices() -> Dict[str, List[int]]:
     :return: 关键点索引字典
     """
     return {
-        # 眼睛轮廓关键点
-        "right_eye_contour": [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246],
-        "left_eye_contour": [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398],
-        
-        # 虹膜关键点（478个关键点模式）
-        "right_iris": [468, 469, 470, 471, 472],
-        "left_iris": [473, 474, 475, 476, 477],
-        
         # 瞳孔中心关键点
         "right_pupil": [468],
         "left_pupil": [473],
+        
+        # 虹膜关键点（478个关键点模式）
+        "right_iris": [469, 470, 471, 472],
+        "left_iris": [474, 475, 476, 477],
+        
+        # 眼睛轮廓关键点（细分：内眼角、上眼睑、外眼角、下眼睑）
+        "right_eye_contour": [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246],
+        "left_eye_contour": [362, 398, 384, 385, 386, 387, 388, 466, 263, 249, 390, 373, 374, 380, 381, 382],
+        
+        # 眼眶骨骼边界关键点（眉毛区域，用于眼球中心拟合的约束）
+        "right_eye_socket": [70, 63, 105, 66, 107, 55, 65, 52, 53, 46],
+        "left_eye_socket": [300, 293, 334, 296, 336, 285, 295, 282, 283, 276],
+        
+        # 眼睑软组织关键点（面颊和太阳穴区域，用于边界精度提升）
+        "right_eyelid": [116, 117, 118, 119, 120, 121, 126, 142, 36, 205],
+        "left_eyelid": [345, 346, 347, 348, 349, 350, 355, 371, 266, 425],
         
         # 其他面部特征
         "nose": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
@@ -175,10 +183,10 @@ def get_pupil_centers_landmarks(landmarks: List[List[float]]) -> Dict[str, Optio
 
 def get_eye_contours_landmarks(landmarks: List[List[float]]) -> Dict[str, List[List[float]]]:
     """
-    提取左右眼睑关键点
+    提取左右眼睛轮廓关键点
     
     :param landmarks: 关键点列表
-    :return: 左右眼睑关键点字典
+    :return: 左右眼睛轮廓关键点字典
     """
     if not landmarks or len(landmarks) != 478:
         return {'left': [], 'right': []}
@@ -225,6 +233,106 @@ def get_iris_boundaries_landmarks(landmarks: List[List[float]]) -> Dict[str, Lis
         'right': right_iris_landmarks
     }
 
+def get_eye_socket_landmarks(landmarks: List[List[float]]) -> Dict[str, List[List[float]]]:
+    """
+    提取左右眼眶关键点（用于眼球中心拟合的约束）
+    
+    :param landmarks: 关键点列表
+    :return: 左右眼眶关键点字典
+    """
+    if not landmarks or len(landmarks) != 478:
+        return {'left': [], 'right': []}
+    
+    # 获取关键点索引
+    indices = get_landmark_indices()
+    
+    # 提取左眼眶关键点
+    left_socket_indices = indices["left_eye_socket"]
+    left_socket_landmarks = [landmarks[i] for i in left_socket_indices if i < len(landmarks)]
+    
+    # 提取右眼眶关键点
+    right_socket_indices = indices["right_eye_socket"]
+    right_socket_landmarks = [landmarks[i] for i in right_socket_indices if i < len(landmarks)]
+    
+    return {
+        'left': left_socket_landmarks,
+        'right': right_socket_landmarks
+    }
+
+def get_eyelid_landmarks(landmarks: List[List[float]]) -> Dict[str, List[List[float]]]:
+    """
+    提取左右眼睑关键点（用于边界精度提升）
+    
+    :param landmarks: 关键点列表
+    :return: 左右眼睑关键点字典
+    """
+    if not landmarks or len(landmarks) != 478:
+        return {'left': [], 'right': []}
+    
+    # 获取关键点索引
+    indices = get_landmark_indices()
+    
+    # 提取左眼睑关键点
+    left_eyelid_indices = indices["left_eyelid"]
+    left_eyelid_landmarks = [landmarks[i] for i in left_eyelid_indices if i < len(landmarks)]
+    
+    # 提取右眼睑关键点
+    right_eyelid_indices = indices["right_eyelid"]
+    right_eyelid_landmarks = [landmarks[i] for i in right_eyelid_indices if i < len(landmarks)]
+    
+    return {
+        'left': left_eyelid_landmarks,
+        'right': right_eyelid_landmarks
+    }
+
+def get_all_eye_landmarks_for_fitting(landmarks: List[List[float]]) -> Dict[str, Dict[str, Union[np.ndarray, List[np.ndarray]]]]:
+    """
+    获取所有眼部关键点，整合为fitting模块所需的格式
+    
+    :param landmarks: 关键点列表
+    :return: 整合后的眼部关键点字典
+    """
+    if not landmarks or len(landmarks) != 478:
+        return {
+            'left': {'pupil': None, 'iris': [], 'contour': [], 'socket': [], 'eyelid': []},
+            'right': {'pupil': None, 'iris': [], 'contour': [], 'socket': [], 'eyelid': []}
+        }
+    
+    try:
+        # 获取各种关键点
+        pupil_centers = get_pupil_centers_landmarks(landmarks)
+        iris_boundaries = get_iris_boundaries_landmarks(landmarks)
+        eye_contours = get_eye_contours_landmarks(landmarks)
+        eye_sockets = get_eye_socket_landmarks(landmarks)
+        eyelid_points = get_eyelid_landmarks(landmarks)
+        
+        # 整合为fitting模块所需的格式
+        result = {
+            'left': {
+                'pupil': np.array(pupil_centers['left']) if pupil_centers['left'] else None,
+                'iris': [np.array(point) for point in iris_boundaries['left']],
+                'contour': [np.array(point) for point in eye_contours['left']],
+                'socket': [np.array(point) for point in eye_sockets['left']],
+                'eyelid': [np.array(point) for point in eyelid_points['left']]
+            },
+            'right': {
+                'pupil': np.array(pupil_centers['right']) if pupil_centers['right'] else None,
+                'iris': [np.array(point) for point in iris_boundaries['right']],
+                'contour': [np.array(point) for point in eye_contours['right']],
+                'socket': [np.array(point) for point in eye_sockets['right']],
+                'eyelid': [np.array(point) for point in eyelid_points['right']]
+            }
+        }
+        
+        return result
+        
+    except Exception as e:
+        print(f"整合眼部关键点失败: {e}")
+        return {
+            'left': {'pupil': None, 'iris': [], 'contour': [], 'socket': [], 'eyelid': []},
+            'right': {'pupil': None, 'iris': [], 'contour': [], 'socket': [], 'eyelid': []}
+        }
+
 if __name__ == "__main__":
     print("�� Landmark Extractor 模块测试")
     print("=" * 50)
@@ -248,11 +356,17 @@ if __name__ == "__main__":
             # 获取瞳孔中心
             pupil_centers = get_pupil_centers_landmarks(landmarks)
             
-            # 获取眼睑
-            eyelids = get_eye_contours_landmarks(landmarks)
+            # 获取眼睛轮廓
+            eye_contours = get_eye_contours_landmarks(landmarks)
             
             # 获取虹膜边界
             iris_boundaries = get_iris_boundaries_landmarks(landmarks)
+            
+            # 获取眼眶关键点
+            eye_sockets = get_eye_socket_landmarks(landmarks)
+            
+            # 获取眼睑关键点
+            eyelid_points = get_eyelid_landmarks(landmarks)
             
             # 绘制瞳孔中心点（左右眼不同颜色）
             if pupil_centers['left']:
@@ -263,14 +377,14 @@ if __name__ == "__main__":
                 x, y = int(pupil_centers['right'][0]), int(pupil_centers['right'][1])
                 cv2.circle(image, (x, y), 4, (0, 0, 255), -1)  # 红色 - 右瞳孔中心
             
-            # 绘制眼睑点（黄色）
-            for point in eyelids['left']:
+            # 绘制眼睛轮廓点（黄色）
+            for point in eye_contours['left']:
                 x, y = int(point[0]), int(point[1])
-                cv2.circle(image, (x, y), 2, (0, 255, 255), -1)  # 黄色 - 左眼睑
+                cv2.circle(image, (x, y), 2, (0, 255, 255), -1)  # 黄色 - 左眼轮廓
             
-            for point in eyelids['right']:
+            for point in eye_contours['right']:
                 x, y = int(point[0]), int(point[1])
-                cv2.circle(image, (x, y), 2, (0, 255, 255), -1)  # 黄色 - 右眼睑
+                cv2.circle(image, (x, y), 2, (0, 255, 255), -1)  # 黄色 - 右眼轮廓
             
             # 绘制虹膜边界点（绿色）
             for point in iris_boundaries['left']:
@@ -280,6 +394,24 @@ if __name__ == "__main__":
             for point in iris_boundaries['right']:
                 x, y = int(point[0]), int(point[1])
                 cv2.circle(image, (x, y), 2, (0, 255, 0), -1)  # 绿色 - 右虹膜边界
+            
+            # 绘制眼眶关键点（紫色）
+            for point in eye_sockets['left']:
+                x, y = int(point[0]), int(point[1])
+                cv2.circle(image, (x, y), 2, (255, 0, 255), -1)  # 紫色 - 左眼眶
+            
+            for point in eye_sockets['right']:
+                x, y = int(point[0]), int(point[1])
+                cv2.circle(image, (x, y), 2, (255, 0, 255), -1)  # 紫色 - 右眼眶
+            
+            # 绘制眼睑关键点（橙色）
+            for point in eyelid_points['left']:
+                x, y = int(point[0]), int(point[1])
+                cv2.circle(image, (x, y), 2, (0, 165, 255), -1)  # 橙色 - 左眼睑关键点
+            
+            for point in eyelid_points['right']:
+                x, y = int(point[0]), int(point[1])
+                cv2.circle(image, (x, y), 2, (0, 165, 255), -1)  # 橙色 - 右眼睑关键点
                     
         except Exception as e:
             print(f"绘制关键点失败: {e}")
@@ -299,11 +431,17 @@ if __name__ == "__main__":
             # 获取瞳孔中心
             pupil_centers = get_pupil_centers_landmarks(landmarks)
             
-            # 获取眼睑
-            eyelids = get_eye_contours_landmarks(landmarks)
+            # 获取眼睛轮廓
+            eye_contours = get_eye_contours_landmarks(landmarks)
             
             # 获取虹膜边界
             iris_boundaries = get_iris_boundaries_landmarks(landmarks)
+            
+            # 获取眼眶关键点
+            eye_sockets = get_eye_socket_landmarks(landmarks)
+            
+            # 获取眼睑关键点
+            eyelid_points = get_eyelid_landmarks(landmarks)
             
             # 计算z值统计信息
             z_values = [point[2] for point in landmarks]
@@ -313,7 +451,8 @@ if __name__ == "__main__":
             
             # 显示结果
             status = "✅ 有效" if is_valid else "❌ 无效"
-            print(f"帧 {frame_count}: {status} | 关键点: {len(landmarks)} | 左眼睑: {len(eyelids['left'])} | 右眼睑: {len(eyelids['right'])} | 虹膜L/R: {len(iris_boundaries['left'])}/{len(iris_boundaries['right'])}")
+            print(f"帧 {frame_count}: {status} | 关键点: {len(landmarks)} | 左眼轮廓: {len(eye_contours['left'])} | 右眼轮廓: {len(eye_contours['right'])} | 虹膜L/R: {len(iris_boundaries['left'])}/{len(iris_boundaries['right'])}")
+            print(f"   眼眶L/R: {len(eye_sockets['left'])}/{len(eye_sockets['right'])} | 眼睑关键点L/R: {len(eyelid_points['left'])}/{len(eyelid_points['right'])}")
             print(f"   Z值范围: {z_min:.3f} ~ {z_max:.3f} (平均: {z_avg:.3f})")
             
             if pupil_centers['left']:

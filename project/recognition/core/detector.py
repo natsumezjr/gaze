@@ -351,6 +351,238 @@ class FaceDetector:
                 'right': np.array([0.0, 0.0, 0.0])
             }
 
+    def get_eye_sockets(self) -> Dict[str, List[np.ndarray]]:
+        """
+        获取左右眼眶关键点三维坐标（用于眼球中心拟合的约束）
+        
+        :return: 左右眼眶关键点的三维坐标字典
+        返回格式：
+        {
+            'left': [
+                np.array([x_0, y_0, z_0]),   # 左眼眶关键点0
+                np.array([x_1, y_1, z_1]),   # 左眼眶关键点1
+                ...,
+                np.array([x_n, y_n, z_n])    # 左眼眶关键点n
+            ],
+            'right': [
+                np.array([x_0, y_0, z_0]),   # 右眼眶关键点0
+                np.array([x_1, y_1, z_1]),   # 右眼眶关键点1
+                ...,
+                np.array([x_n, y_n, z_n])    # 右眼眶关键点n
+            ]
+        }
+        
+        坐标说明（OpenCV标准坐标系）：
+        - x, y, z: 相机坐标系下的三维坐标（米）
+        - x: 水平方向，向右为正（图像宽度方向）
+        - y: 垂直方向，向下为正（图像高度方向）
+        - z: 深度方向，向前为正（相机光轴方向，指向眼眶）
+        
+        处理流程：
+        1. 从已检测的关键点中提取眼眶关键点
+        2. 获取每个眼眶点的像素坐标
+        3. 结合深度图获取各点的深度值
+        4. 使用相机内参转换为三维坐标
+        5. 返回左右眼的眼眶关键点三维坐标列表
+        
+        前置条件：
+        - 必须先调用detect_face()方法进行人脸检测
+        - 检测结果必须成功且置信度足够高
+        - 眼眶关键点必须被正确检测到
+        
+        调用关系：
+        被调用：
+        - main.py 中的主循环调用此函数
+        
+        调用：
+        - get_eye_socket_landmarks() (landmark_extractor.py)
+        - batch_convert_landmarks() (coordinate_converter.py)
+        """
+        # 检查前置条件
+        if not self._detection_success or self._landmarks is None:
+            return {'left': [], 'right': []}
+        
+        try:
+            # 导入所需模块
+            from project.recognition.core.landmark_extractor import get_eye_socket_landmarks
+            from project.recognition.core.coordinate_converter import batch_convert_landmarks
+            
+            # 获取左右眼眶关键点
+            eye_socket_landmarks = get_eye_socket_landmarks(self._landmarks)
+            
+            # 检查是否成功获取眼眶关键点
+            if not eye_socket_landmarks.get('left') or not eye_socket_landmarks.get('right'):
+                return {'left': [], 'right': []}
+            
+            # 尝试使用批量转换
+            try:
+                left_socket_3d = batch_convert_landmarks(
+                    eye_socket_landmarks['left'],
+                    self._depth_map_meters,
+                    self.camera_params
+                )
+                
+                right_socket_3d = batch_convert_landmarks(
+                    eye_socket_landmarks['right'],
+                    self._depth_map_meters,
+                    self.camera_params
+                )
+                
+                # 如果批量转换成功且结果不为空，直接返回
+                if left_socket_3d and right_socket_3d:
+                    return {
+                        'left': left_socket_3d,
+                        'right': right_socket_3d
+                    }
+                    
+            except Exception as e:
+                print(f"批量转换眼眶关键点失败: {e}")
+            
+            # 如果批量转换失败，使用单个转换
+            left_socket_3d = []
+            right_socket_3d = []
+            
+            for point in eye_socket_landmarks['left']:
+                try:
+                    x, y, z = pixel_to_3d(point[0], point[1], self._depth_map_meters, self.camera_params)
+                    left_socket_3d.append(np.array([x, y, z]))
+                except Exception as e:
+                    print(f"转换左眼眶关键点失败: {e}")
+                    continue
+            
+            for point in eye_socket_landmarks['right']:
+                try:
+                    x, y, z = pixel_to_3d(point[0], point[1], self._depth_map_meters, self.camera_params)
+                    right_socket_3d.append(np.array([x, y, z]))
+                except Exception as e:
+                    print(f"转换右眼眶关键点失败: {e}")
+                    continue
+            
+            return {
+                'left': left_socket_3d,
+                'right': right_socket_3d
+            }
+            
+        except Exception as e:
+            print(f"获取眼眶关键点失败: {e}")
+            return {'left': [], 'right': []}
+
+    def get_eyelid_points(self) -> Dict[str, List[np.ndarray]]:
+        """
+        获取左右眼睑关键点三维坐标（用于边界精度提升）
+        
+        :return: 左右眼睑关键点的三维坐标字典
+        返回格式：
+        {
+            'left': [
+                np.array([x_0, y_0, z_0]),   # 左眼睑关键点0
+                np.array([x_1, y_1, z_1]),   # 左眼睑关键点1
+                ...,
+                np.array([x_n, y_n, z_n])    # 左眼睑关键点n
+            ],
+            'right': [
+                np.array([x_0, y_0, z_0]),   # 右眼睑关键点0
+                np.array([x_1, y_1, z_1]),   # 右眼睑关键点1
+                ...,
+                np.array([x_n, y_n, z_n])    # 右眼睑关键点n
+            ]
+        }
+        
+        坐标说明（OpenCV标准坐标系）：
+        - x, y, z: 相机坐标系下的三维坐标（米）
+        - x: 水平方向，向右为正（图像宽度方向）
+        - y: 垂直方向，向下为正（图像高度方向）
+        - z: 深度方向，向前为正（相机光轴方向，指向眼睑）
+        
+        处理流程：
+        1. 从已检测的关键点中提取眼睑关键点
+        2. 获取每个眼睑点的像素坐标
+        3. 结合深度图获取各点的深度值
+        4. 使用相机内参转换为三维坐标
+        5. 返回左右眼的眼睑关键点三维坐标列表
+        
+        前置条件：
+        - 必须先调用detect_face()方法进行人脸检测
+        - 检测结果必须成功且置信度足够高
+        - 眼睑关键点必须被正确检测到
+        
+        调用关系：
+        被调用：
+        - main.py 中的主循环调用此函数
+        
+        调用：
+        - get_eyelid_landmarks() (landmark_extractor.py)
+        - batch_convert_landmarks() (coordinate_converter.py)
+        """
+        # 检查前置条件
+        if not self._detection_success or self._landmarks is None:
+            return {'left': [], 'right': []}
+        
+        try:
+            # 导入所需模块
+            from project.recognition.core.landmark_extractor import get_eyelid_landmarks
+            from project.recognition.core.coordinate_converter import batch_convert_landmarks, pixel_to_3d
+            
+            # 获取左右眼睑关键点
+            eyelid_landmarks = get_eyelid_landmarks(self._landmarks)
+            
+            # 检查是否成功获取眼睑关键点
+            if not eyelid_landmarks.get('left') or not eyelid_landmarks.get('right'):
+                return {'left': [], 'right': []}
+            
+            # 尝试使用批量转换
+            try:
+                left_eyelid_3d = batch_convert_landmarks(
+                    eyelid_landmarks['left'],
+                    self._depth_map_meters,
+                    self.camera_params
+                )
+                
+                right_eyelid_3d = batch_convert_landmarks(
+                    eyelid_landmarks['right'],
+                    self._depth_map_meters,
+                    self.camera_params
+                )
+                
+                # 如果批量转换成功且结果不为空，直接返回
+                if left_eyelid_3d and right_eyelid_3d:
+                    return {
+                        'left': left_eyelid_3d,
+                        'right': right_eyelid_3d
+                    }
+                    
+            except Exception as e:
+                print(f"批量转换眼睑关键点失败: {e}")
+            
+            # 如果批量转换失败，使用单个转换
+            left_eyelid_3d = []
+            right_eyelid_3d = []
+            
+            for point in eyelid_landmarks['left']:
+                try:
+                    x, y, z = pixel_to_3d(point[0], point[1], self._depth_map_meters, self.camera_params)
+                    left_eyelid_3d.append(np.array([x, y, z]))
+                except Exception as e:
+                    print(f"转换左眼睑关键点失败: {e}")
+                    continue
+            
+            for point in eyelid_landmarks['right']:
+                try:
+                    x, y, z = pixel_to_3d(point[0], point[1], self._depth_map_meters, self.camera_params)
+                    right_eyelid_3d.append(np.array([x, y, z]))
+                except Exception as e:
+                    print(f"转换右眼睑关键点失败: {e}")
+                    continue
+            
+            return {
+                'left': left_eyelid_3d,
+                'right': right_eyelid_3d
+            }
+            
+        except Exception as e:
+            print(f"获取眼睑关键点失败: {e}")
+            return {'left': [], 'right': []}
+
     def get_iris_boundaries(self) -> Dict[str, List[np.ndarray]]:
         """
         获取左右虹膜边界点三维坐标

@@ -105,6 +105,33 @@ SCREEN_WITH_RGBD = {
 }
 
 
+# 拟合算法参数配置
+FITTING_ALGORITHM_CONFIG = {
+    # RANSAC参数
+    "max_trials": 100,                    # 最大采样次数
+    "ransac_threshold": 0.0015,          # 初始RANSAC距离阈值(m)
+    "min_inlier_ratio": 0.7,              # 最小内点比例
+    "min_samples": 4,  
+    "ransac_max_iterations": 50,         # 最大迭代次数
+    
+    # 牛顿-高斯算法参数
+    "convergence_tol": 1e-6,              # 参数收敛容差
+    "residual_tol": 1e-8,                 # 残差收敛容差
+    "newton_max_iterations": 50,         # 牛顿-高斯最大迭代次数
+    
+    # 自适应阈值参数
+    "threshold_adjustment_factor": 1.5,   # 阈值调整因子
+    "geometric_residual_threshold": 0.0008, # 几何残差阈值(m)
+    
+    # 采样策略参数
+    "points_per_eye": 4,                  # 每只眼睛采样点数
+    "sampling_interval_ms": 33,           # 采样间隔(ms)
+    
+    # 参数融合参数
+    "fusion_weight_sigma": 0.5,           # 融合权重标准差
+    "outlier_rejection_ratio": 0.2,       # 异常值剔除比例
+}
+
 def main() -> None:
     print("SCREEN_WITH_RGBD:", SCREEN_WITH_RGBD)
 

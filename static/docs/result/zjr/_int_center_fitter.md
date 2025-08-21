@@ -85,29 +85,60 @@ $$
 
 ### 1. 先验权重：拟合点与眼球表面距离权重在医学解剖学的量化
 
-#### 瞳孔中心点权重
-- **解剖偏移范围**：$0.1\text{--}0.3$ mm → 中值 $d_i = 0.2$ mm
-- **距离球面标准差**：$\sigma = 1.5$ mm
-- **先验权重计算**：$w_{\text{anatomy}} = \exp\left(-\frac{d_i^2}{2\sigma^2}\right) = \exp\left(-\frac{0.2^2}{2 \times 1.5^2}\right) = 0.991$
+#### 解剖学先验权重表
+基于医学解剖学研究的可靠数据，各解剖结构到眼球表面的距离权重如下：
 
-#### 虹膜边界点曲率补偿
-- **自然偏移范围**：$0.5\text{--}1.2$ mm → 中值 $d_i = 0.85$ mm
-- **距离球面标准差**：$\sigma = 1.5$ mm
-- **先验权重计算**：$w_{\text{anatomy}} = \exp\left(-\frac{0.85^2}{2 \times 1.5^2}\right) = 0.839$
+| 解剖结构 | 偏移范围(mm) | 中值d_i(mm) | σ(mm) | w_anatomy |
+|----------|-------------|-------------|-------|-----------|
+| 瞳孔中心 | 0.1-0.3 | 0.2 | 1.5 | 0.991 |
+| 虹膜边界 | 0.5-1.2 | 0.85 | 1.5 | 0.839 |
+| 眼睛轮廓 | 1.0-2.0 | 1.5 | 1.5 | 0.607 |
+| 眼眶边缘 | 2.5-4.0 | 3.25 | 1.5 | 0.118 |
+| 眼睑软组织 | 2.0-4.0 | 3.0 | 1.5 | 0.135 |
 
-#### 眼睑点排除机制
-- **到眼球表面距离**：$2.0\text{--}4.0$ mm → 中值 $d_i = 3.0$ mm
-- **距离球面标准差**：$\sigma = 1.5$ mm
-- **先验权重计算**：$w_{\text{anatomy}} = \exp\left(-\frac{3.0^2}{2 \times 1.5^2}\right) = 0.135$
+#### 权重计算公式
+对于第i个关键点，其解剖学先验权重为：
+$$w_{\text{anatomy}}^{(i)} = \exp\left(-\frac{d_i^2}{2\sigma^2}\right)$$
+
+其中：
+- $d_i$：该解剖结构到眼球表面的**解剖偏移中值**
+- $\sigma = 1.5$ mm：**距离球面标准差**（统一设定）
+
+#### 各结构权重计算示例
+
+**瞳孔中心点权重**：
+$$w_{\text{anatomy}} = \exp\left(-\frac{0.2^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{0.04}{4.5}\right) = 0.991$$
+
+**虹膜边界点权重**：
+$$w_{\text{anatomy}} = \exp\left(-\frac{0.85^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{0.7225}{4.5}\right) = 0.839$$
+
+**眼睛轮廓点权重**：
+$$w_{\text{anatomy}} = \exp\left(-\frac{1.5^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{2.25}{4.5}\right) = 0.607$$
+
+**眼眶边缘点权重**：
+$$w_{\text{anatomy}} = \exp\left(-\frac{3.25^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{10.5625}{4.5}\right) = 0.118$$
+
+**眼睑软组织点权重**：
+$$w_{\text{anatomy}} = \exp\left(-\frac{3.0^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{9.0}{4.5}\right) = 0.135$$
 
 ### 2. 几何残差权重（动态变化）
 - **初始化标准差**：$\sigma = d_i$（各偏移范围的中值）
   - 瞳孔中心点：$\sigma = 0.2$ mm
   - 虹膜边界点：$\sigma = 0.85$ mm  
-  - 眼睑点：$\sigma = 3.0$ mm
+  - 眼睛轮廓点：$\sigma = 1.5$ mm
+  - 眼眶边缘点：$\sigma = 3.25$ mm
+  - 眼睑软组织点：$\sigma = 3.0$ mm
 - **实时计算**：$w_{\text{geom}} = \exp\left(-\frac{d_i^2}{2\sigma^2}\right)$
 - **$d_i$为实时测量值**：点到拟合球面的实际距离
 - **动态调整**：$\sigma$根据拟合质量自适应调整（待量化）
+
+#### 几何残差权重计算示例
+对于第i个关键点，其几何残差权重为：
+$$w_{\text{geom}}^{(i)} = \exp\left(-\frac{(d_i^{(measured)})^2}{2\sigma_i^2}\right)$$
+
+其中：
+- $d_i^{(measured)}$：第i个关键点到拟合球面的**实时测量距离**
+- $\sigma_i$：该解剖结构对应的**初始化标准差**
 
 ### 3. 权重融合公式
 $$w_i = w_{\text{anatomy}} \times w_{\text{geom}} \times w_{\text{SNR}}$$
@@ -117,6 +148,18 @@ $$w_i = w_{\text{anatomy}} \times w_{\text{geom}} \times w_{\text{SNR}}$$
 - $w_{\text{geom}}$：基于实时测量距离的动态几何权重
 - $w_{\text{SNR}}$：图像质量权重（先设置为常数，后期可量化）
 
+#### 完整权重计算流程
+1. **解剖学先验权重**：基于解剖结构到眼球表面的距离中值
+2. **几何残差权重**：基于实时测量到拟合球面的距离
+3. **信号质量权重**：基于检测置信度和图像质量
+4. **权重归一化**：确保平均权重为1，保持数值稳定性
+
+#### 权重下限保护机制
+为防止某些关键点权重过低，设置权重下限：
+$$w_i^{(final)} = \max(w_i, w_{min})$$
+
+其中 $w_{min} = 0.1$，确保每个关键点都有最小贡献。
+
 ## 三、阈值参数的自适应调整
 
 ### 1. 核心阈值类型与初始值
@@ -125,6 +168,21 @@ $$w_i = w_{\text{anatomy}} \times w_{\text{geom}} \times w_{\text{SNR}}$$
 - 初始值 $\tau_{\text{init}} = 1.5$ mm  
   *覆盖虹膜点最大解剖偏移*
 
+#### (2) 新增解剖结构的阈值设定
+基于新增的眼眶边缘和眼睑软组织点，调整阈值策略：
+
+**眼眶边缘点阈值**：
+- 距离阈值：$\tau_{socket} = 3.5$ mm（覆盖眼眶点最大解剖偏移4.0mm）
+- 权重阈值：$w_{socket,min} = 0.1$（防止权重过低）
+
+**眼睑软组织点阈值**：
+- 距离阈值：$\tau_{eyelid} = 4.0$ mm（覆盖眼睑点最大解剖偏移4.0mm）
+- 权重阈值：$w_{eyelid,min} = 0.1$（防止权重过低）
+
+**眼睛轮廓点阈值**：
+- 距离阈值：$\tau_{contour} = 2.0$ mm（覆盖轮廓点最大解剖偏移2.0mm）
+- 权重阈值：$w_{contour,min} = 0.2$（中等权重保护）
+
 
 ### 2. 残差驱动的调整机制
 
@@ -132,12 +190,140 @@ $$w_i = w_{\text{anatomy}} \times w_{\text{geom}} \times w_{\text{SNR}}$$
 - 要求 $e_{\text{geom}} < 0.8$ mm  
   *角膜平滑性约束*
 - 若连续3帧$e_{\text{geom}} > 1.0$ mm，触发$\tau \rightarrow 1.5\tau$并启用椭球补偿
-  eg：
-  $$
-  \tau_{\text{new}} = 
-  \begin{cases} 
-  0.8\tau & \text{if } e_{\text{geom}} < 0.8 \text{ and } \rho > 0.8 \\
-  1.5\tau & \text{if } e_{\text{geom}} > 1.0 \text{ or } \rho < 0.5
-  \end{cases}
-  $$
-  其中$\rho$为内点比例，$e_{\text{geom}}$为几何残差
+
+#### 自适应阈值调整策略
+$$
+\tau_{\text{new}} = 
+\begin{cases} 
+0.8\tau & \text{if } e_{\text{geom}} < 0.8 \text{ and } \rho > 0.8 \\
+1.5\tau & \text{if } e_{\text{geom}} > 1.0 \text{ or } \rho < 0.5
+\end{cases}
+$$
+其中$\rho$为内点比例，$e_{\text{geom}}$为几何残差
+
+## 3. 最小二乘法的收敛算法：牛顿-高斯算法
+
+### 3.1 核心思想
+- 对残差函数 $f(\theta)$ 线性化：  
+  $$ f(\theta + \Delta) \approx f(\theta) + J \Delta $$
+- 目标函数：  
+  $$ \Phi(\theta) = \tfrac{1}{2} f(\theta)^T W f(\theta) $$
+- 梯度：  
+  $$ \nabla \Phi(\theta) = J^T W f(\theta) $$
+- 正规方程（更新公式）：  
+  $$ (J^T W J)\Delta = -J^T W f(\theta) $$
+
+### 3.2 参数定义与计算方法
+
+#### 3.2.1 参数向量定义
+$$ \theta = [c_x, c_y, c_z, r]^T $$
+其中：
+- $(c_x, c_y, c_z)$：球心坐标
+- $r$：球半径
+
+#### 3.2.2 残差函数计算
+对于第 $i$ 个关键点 $(x_i, y_i, z_i)$：
+$$ f_i(\theta) = \sqrt{(x_i - c_x)^2 + (y_i - c_y)^2 + (z_i - c_z)^2} - r $$
+
+#### 3.2.3 雅可比矩阵 $J$ 的计算
+$$ J_{i,:} = \left[\frac{\partial f_i}{\partial c_x}, \frac{\partial f_i}{\partial c_y}, \frac{\partial f_i}{\partial c_z}, \frac{\partial f_i}{\partial r}\right] $$
+
+具体计算：
+$$ \frac{\partial f_i}{\partial c_x} = -\frac{x_i - c_x}{d_i}, \quad \frac{\partial f_i}{\partial c_y} = -\frac{y_i - c_y}{d_i}, \quad \frac{\partial f_i}{\partial c_z} = -\frac{z_i - c_z}{d_i}, \quad \frac{\partial f_i}{\partial r} = -1 $$
+
+其中 $d_i = \sqrt{(x_i - c_x)^2 + (y_i - c_y)^2 + (z_i - c_z)^2}$
+
+因此：
+$$ J_{i,:} = \left[-\frac{x_i - c_x}{d_i}, -\frac{y_i - c_y}{d_i}, -\frac{z_i - c_z}{d_i}, -1\right] $$
+
+#### 3.2.4 权重矩阵 $W$ 的构造
+$$ W = \text{diag}(w_1, w_2, \ldots, w_n) $$
+
+其中 $w_i$ 为第 $i$ 个点的三层权重：
+$$ w_i = w_{\text{anatomy}}^{(i)} \times w_{\text{geom}}^{(i)} \times w_{\text{SNR}}^{(i)} $$
+
+### 3.3 每只眼睛采样策略
+
+#### 3.3.1 三层初始权重计算
+1. **解剖学权重**：基于预设的解剖结构权重
+   - 瞳孔中心：$w_{\text{anatomy}} = 0.991$
+   - 虹膜边界：$w_{\text{anatomy}} = 0.839$
+   - 眼睛轮廓：$w_{\text{anatomy}} = 0.607$
+
+2. **几何权重**：基于点到当前球面的距离
+   $$ w_{\text{geom}}^{(i)} = \exp\left(-\frac{(d_i - r)^2}{2\sigma_i^2}\right) $$
+   其中 $\sigma_i$ 为各解剖结构的初始化标准差
+
+3. **SNR权重**：基于检测置信度（默认1.0）
+
+#### 3.3.2 采样策略
+- **瞳孔中心**：权重最高，必选
+- **虹膜边界**：选择权重最高的2个点
+- **眼睛轮廓**：选择权重最高的1个点
+- **总计**：每只眼睛选择4个权重最高的点
+
+### 3.4 定量计算示例
+
+#### 3.4.1 初始参数估计
+假设初始球心估计：$\theta_0 = [0.05, 0.065, 0.6, 0.012]^T$
+
+#### 3.4.2 残差计算示例
+对于左眼瞳孔点 $(0.0866, 0.0650, 0.6)$：
+$$ d_1 = \sqrt{(0.0866-0.05)^2 + (0.0650-0.065)^2 + (0.6-0.6)^2} = 0.0366 $$
+$$ f_1(\theta_0) = 0.0366 - 0.012 = 0.0246 $$
+
+对于左眼虹膜点 $(0.0965, 0.0655, 0.6)$：
+$$ d_2 = \sqrt{(0.0965-0.05)^2 + (0.0655-0.065)^2 + (0.6-0.6)^2} = 0.0465 $$
+$$ f_2(\theta_0) = 0.0465 - 0.012 = 0.0345 $$
+
+#### 3.4.3 雅可比矩阵计算示例
+对于左眼瞳孔点：
+$$ J_{1,:} = \left[-\frac{0.0866-0.05}{0.0366}, -\frac{0.0650-0.065}{0.0366}, -\frac{0.6-0.6}{0.0366}, -1\right] = [-1.0, 0.0, 0.0, -1] $$
+
+对于左眼虹膜点：
+$$ J_{2,:} = \left[-\frac{0.0965-0.05}{0.0465}, -\frac{0.0655-0.065}{0.0465}, -\frac{0.6-0.6}{0.0465}, -1\right] = [-1.0, -0.0108, 0.0, -1] $$
+
+#### 3.4.4 权重计算示例
+假设左眼瞳孔点的三层权重：
+$$ w_{\text{anatomy}}^{(1)} = 0.991, \quad w_{\text{geom}}^{(1)} = 0.95, \quad w_{\text{SNR}}^{(1)} = 1.0 $$
+$$ w_1 = 0.991 \times 0.95 \times 1.0 = 0.941 $$
+
+#### 3.4.5 正规方程求解示例
+对于4个点的系统：
+$$ J^T W J = \begin{bmatrix}
+\sum w_i J_{i,1}^2 & \sum w_i J_{i,1} J_{i,2} & \sum w_i J_{i,1} J_{i,3} & \sum w_i J_{i,1} J_{i,4} \\
+\sum w_i J_{i,2} J_{i,1} & \sum w_i J_{i,2}^2 & \sum w_i J_{i,2} J_{i,3} & \sum w_i J_{i,2} J_{i,4} \\
+\sum w_i J_{i,3} J_{i,1} & \sum w_i J_{i,3} J_{i,2} & \sum w_i J_{i,3}^2 & \sum w_i J_{i,3} J_{i,4} \\
+\sum w_i J_{i,4} J_{i,1} & \sum w_i J_{i,4} J_{i,2} & \sum w_i J_{i,4} J_{i,3} & \sum w_i J_{i,4}^2
+\end{bmatrix} $$
+
+$$ -J^T W f(\theta) = \begin{bmatrix}
+-\sum w_i J_{i,1} f_i \\
+-\sum w_i J_{i,2} f_i \\
+-\sum w_i J_{i,3} f_i \\
+-\sum w_i J_{i,4} f_i
+\end{bmatrix} $$
+
+#### 3.4.6 参数更新示例
+解方程 $(J^T W J)\Delta = -J^T W f(\theta)$ 得到：
+$$ \Delta = [0.002, 0.001, 0.0, 0.001]^T $$
+
+更新参数：
+$$ \theta_1 = \theta_0 + \Delta = [0.052, 0.066, 0.6, 0.013]^T $$
+
+#### 3.4.7 收敛判据
+- **参数收敛**：$\|\Delta\| < 10^{-6}$
+- **残差收敛**：$|\Phi(\theta_{k+1}) - \Phi(\theta_k)| < 10^{-8}$
+- **最大迭代次数**：50次，若超出迭代次数不收敛，则返回的球心为(0,0,0),半径为 0。
+
+### 3.5 算法流程总结
+
+1. **RANSAC初始化**：采样点集 → 拟合球模型 → 判断内点 → 保留最优内点集合
+2. **权重计算**：计算每个点的三层权重
+3. **采样选择**：选择每只眼睛权重最高的4个点
+4. **迭代优化**：
+   - 构造 $J, W, f(\theta)$
+   - 解正规方程 $(J^T W J)\Delta = -J^T W f(\theta)$
+   - 更新 $\theta \leftarrow \theta + \Delta$
+5. **收敛检测**：检查收敛判据
+6. **输出结果**：收敛的球心与半径

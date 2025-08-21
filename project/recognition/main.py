@@ -98,11 +98,19 @@ def main():
                     # 获取眼轮廓
                     eyes_contours = face_detector.get_eyes_contours()
                     
+                    # 获取眼眶关键点（新增）
+                    eye_sockets = face_detector.get_eye_sockets()
+                    
+                    # 获取眼睑关键点（新增）
+                    eyelid_points = face_detector.get_eyelid_points()
+                    
                     # 处理关键点坐标
                     key_coordinates = {
                         'pupil_centers': pupil_centers,
                         'iris_boundaries': iris_boundaries,
-                        'eyes_contours': eyes_contours
+                        'eyes_contours': eyes_contours,
+                        'eye_sockets': eye_sockets,
+                        'eyelid_points': eyelid_points
                     }
                     
                     from project.fitting.main import main as fitting
