@@ -132,7 +132,10 @@ class CenterFitter:
             return self._int_center_fitter(key_coordinates,threshold)
         
     def _int_center_fitter(self,key_coordinates:KeyCoordinates,threshold:float)->Tuple[EllipsoidParams, np.ndarray]:
-        
+        '''
+        函数功能：对于传入的key_coordinates，进行椭球或者球体拟合，返回（椭）球心坐标
+        算法：目前采用的算法RANSAC与加权最小二乘法结合
+        '''
         pass
     
 def vector_of_2_points(point1:np.ndarray,point2:np.ndarray)->np.ndarray:
