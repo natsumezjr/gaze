@@ -232,9 +232,9 @@ if landmarks and validate_landmarks(landmarks):
     print(f"右眼关键点数量: {len(right_eye)}")
     
     # 获取瞳孔中心
-    pupil_centers = get_pupil_landmarks(landmarks)
-    left_pupil = pupil_centers['left']
-    right_pupil = pupil_centers['right']
+    pupil_center = get_pupil_landmarks(landmarks)
+    left_pupil = pupil_center['left']
+    right_pupil = pupil_center['right']
     
     print(f"左瞳孔中心: {left_pupil}")
     print(f"右瞳孔中心: {right_pupil}")
@@ -279,12 +279,12 @@ def visualize_landmarks(image, landmarks):
         cv2.circle(result_image, (int(x), int(y)), 3, (0, 0, 255), -1)
     
     # 绘制瞳孔中心（黄色大点）
-    pupil_centers = get_pupil_landmarks(landmarks)
-    if pupil_centers['left']:
-        x, y, z = pupil_centers['left']
+    pupil_center = get_pupil_landmarks(landmarks)
+    if pupil_center['left']:
+        x, y, z = pupil_center['left']
         cv2.circle(result_image, (int(x), int(y)), 5, (0, 255, 255), -1)
-    if pupil_centers['right']:
-        x, y, z = pupil_centers['right']
+    if pupil_center['right']:
+        x, y, z = pupil_center['right']
         cv2.circle(result_image, (int(x), int(y)), 5, (0, 255, 255), -1)
     
     # 绘制虹膜边界（青色）

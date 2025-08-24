@@ -19,6 +19,35 @@ import time
 import logging
 import json
 from typing import Optional, Dict, Tuple
+from datetime import datetime
+
+# 配置日志
+def setup_logging():
+    """配置日志系统"""
+    # 创建logs目录
+    log_dir = "logs"
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    
+    # 生成日志文件名（包含时间戳）
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = os.path.join(log_dir, f"recognition_{timestamp}.log")
+    
+    # 配置日志格式
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file, encoding='utf-8'),
+            logging.StreamHandler()  # 同时输出到控制台
+        ]
+    )
+    
+    logging.info(f"日志文件创建: {log_file}")
+    return log_file
+
+# 设置日志
+log_file = setup_logging()
 
 # 抑制TensorFlow警告 - 必须在导入其他模块之前设置
 import os
@@ -40,16 +69,16 @@ try:
     from project.recognition.config.settings import DATA_PATH, CAMERA_PARAMS_PATH
     from project.recognition.config.constants import STATUS_SUCCESS, STATUS_NO_FACE_DETECTED
 except ImportError as e:
-    print(f"导入错误: {e}")
-    print("请确保已安装项目包: pip install -e .")
+    logging.error(f"导入错误: {e}")
+    logging.error("请确保已安装项目包: pip install -e .")
     sys.exit(1)
 
 # 配置日志
-logging.basicConfig(
-    level=logging.ERROR,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# logging.basicConfig(
+#     level=logging.ERROR,
+#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+# )
+# logger = logging.getLogger(__name__)
 
 
 def main():
@@ -59,7 +88,7 @@ def main():
     cap = camera_calibrator.get_cap()
     
     if cap is None:
-        logger.error("无法初始化摄像头")
+        logging.error("无法初始化摄像头")
         return
     
     camera_params = camera_calibrator.load_camera_params()
@@ -72,7 +101,7 @@ def main():
         while True:
             ret, frame = cap.read()
             if not ret:
-                logger.error("无法读取摄像头数据")
+                logging.error("无法读取摄像头数据")
                 break
                 
             cv2.imshow("frame", frame)
@@ -90,7 +119,7 @@ def main():
             if image is not None and depth is not None:
                 if face_detector.detect_face(image, depth):
                     # 获取瞳孔中心
-                    pupil_centers = face_detector.get_pupil_centers()
+                    pupil_center = face_detector.get_pupil_center()
                     
                     # 获取虹膜边界
                     iris_boundaries = face_detector.get_iris_boundaries()
@@ -106,7 +135,7 @@ def main():
                     
                     # 处理关键点坐标
                     key_coordinates = {
-                        'pupil_centers': pupil_centers,
+                        'pupil_center': pupil_center,
                         'iris_boundaries': iris_boundaries,
                         'eyes_contours': eyes_contours,
                         'eye_sockets': eye_sockets,
@@ -115,27 +144,28 @@ def main():
                     
                     from project.fitting.main import main as fitting
                     fitting(key_coordinates)
-                    
+                    break # 用于测试一帧拟合
                     # TODO: 添加后续处理逻辑
                     
+                    
                 else:
-                    logger.warning(f"id:{frame_id}，未检测到人脸")
+                    logging.warning(f"id:{frame_id}，未检测到人脸")
                     # 继续循环，不退出
             else:
-                logger.error(f"id:{frame_id}，图像或深度图获取失败")
+                logging.error(f"id:{frame_id}，图像或深度图获取失败")
                 break
 
             frame_id += 1
             
             # 检查退出键
             if cv2.waitKey(1) & 0xFF == ord('q'):
-                logger.info("用户按q退出")
+                logging.info("用户按q退出")
                 break
                 
     except KeyboardInterrupt:
-        logger.info("用户中断")
+        logging.info("用户中断")
     except Exception as e:
-        logger.error(f"发生错误: {e}")
+        logging.error(f"发生错误: {e}")
     finally:
         cap.release()
         cv2.destroyAllWindows()

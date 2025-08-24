@@ -7,12 +7,53 @@
 """
 
 from __future__ import annotations
-
+from dataclasses import dataclass, field
+from typing import List, Optional, Dict, Any
 import numpy as np
 
 
 DEFAULT_SCREEN_WIDTH_M: float = 0.60
 DEFAULT_SCREEN_HEIGHT_M: float = 0.34
+
+
+@dataclass
+class ScreenConfig:
+    """屏幕配置类"""
+    normal: np.ndarray = field(default_factory=lambda: np.array([0.0, 0.0, 1.0]))
+    point: np.ndarray = field(default_factory=lambda: np.array([0.0, 0.0, 0.0]))
+    x_axis: np.ndarray = field(default_factory=lambda: np.array([1.0, 0.0, 0.0]))
+    y_axis: np.ndarray = field(default_factory=lambda: np.array([0.0, 1.0, 0.0]))
+    width_m: float = 0.60
+    height_m: float = 0.34
+    resolution_px: tuple[int, int] = (0, 0)
+    
+    def __post_init__(self):
+        """初始化后计算屏幕四角坐标"""
+        half_w = self.width_m / 2.0
+        half_h = self.height_m / 2.0
+        cap_x_offset = 0.0
+        cap_y_offset = 0.005
+        
+        self.top_left = np.array([-half_w + cap_x_offset, -half_h + cap_y_offset, 0.0])
+        self.top_right = np.array([half_w + cap_x_offset, -half_h + cap_y_offset, 0.0])
+        self.bottom_left = np.array([-half_w + cap_x_offset, half_h + cap_y_offset, 0.0])
+        self.bottom_right = np.array([half_w + cap_x_offset, half_h + cap_y_offset, 0.0])
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """转换为字典格式以保持向后兼容"""
+        return {
+            "normal": self.normal,
+            "point": self.point,
+            "x_axis": self.x_axis,
+            "y_axis": self.y_axis,
+            "top_left": self.top_left,
+            "top_right": self.top_right,
+            "bottom_left": self.bottom_left,
+            "bottom_right": self.bottom_right,
+            "width_m": self.width_m,
+            "height_m": self.height_m,
+            "resolution_px": self.resolution_px,
+        }
 
 
 def _get_primary_screen_physical_size_m() -> tuple[float, float]:
@@ -78,66 +119,27 @@ def _get_current_resolution_px() -> tuple[int, int]:
     return (0, 0)
 
 
+# 获取屏幕配置
 _SCREEN_WIDTH_M, _SCREEN_HEIGHT_M = _get_primary_screen_physical_size_m()
-_HALF_W = _SCREEN_WIDTH_M / 2.0
-_HALF_H = _SCREEN_HEIGHT_M / 2.0
-
-# 可选：通过“米”为单位对屏幕平面整体进行平移
-_CAP_X_OFFSET_M = 0.0
-_CAP_Y_OFFSET_M = 0.005
-
-# 当前分辨率（像素）
 _CURRENT_RES_W, _CURRENT_RES_H = _get_current_resolution_px()
 
-# 屏幕几何（中心为原点、屏幕平面 z=0）
-SCREEN_WITH_RGBD = {
-    "normal": np.array([0.0, 0.0, 1.0]),
-    "point": np.array([0.0, 0.0, 0.0]),
-    "x_axis": np.array([1.0, 0.0, 0.0]),
-    "y_axis": np.array([0.0, 1.0, 0.0]),
-    "top_left": np.array([-_HALF_W + _CAP_X_OFFSET_M, -_HALF_H + _CAP_Y_OFFSET_M, 0.0]),
-    "top_right": np.array([_HALF_W + _CAP_X_OFFSET_M, -_HALF_H + _CAP_Y_OFFSET_M, 0.0]),
-    "bottom_left": np.array([-_HALF_W + _CAP_X_OFFSET_M, _HALF_H + _CAP_Y_OFFSET_M, 0.0]),
-    "bottom_right": np.array([_HALF_W + _CAP_X_OFFSET_M, _HALF_H + _CAP_Y_OFFSET_M, 0.0]),
-    "width_m": float(_SCREEN_WIDTH_M),
-    "height_m": float(_SCREEN_HEIGHT_M),
-    "resolution_px": (_CURRENT_RES_W, _CURRENT_RES_H),
-}
+# 创建屏幕配置实例
+SCREEN_CONFIG = ScreenConfig(
+    width_m=_SCREEN_WIDTH_M,
+    height_m=_SCREEN_HEIGHT_M,
+    resolution_px=(_CURRENT_RES_W, _CURRENT_RES_H)
+)
 
 
-# 拟合算法参数配置
-FITTING_ALGORITHM_CONFIG = {
-    # RANSAC参数
-    "max_trials": 100,                    # 最大采样次数
-    "ransac_threshold": 0.0015,          # 初始RANSAC距离阈值(m)
-    "min_inlier_ratio": 0.7,              # 最小内点比例
-    "min_samples": 4,  
-    "ransac_max_iterations": 50,         # 最大迭代次数
-    
-    # 牛顿-高斯算法参数
-    "convergence_tol": 1e-6,              # 参数收敛容差
-    "residual_tol": 1e-8,                 # 残差收敛容差
-    "newton_max_iterations": 50,         # 牛顿-高斯最大迭代次数
-    
-    # 自适应阈值参数
-    "threshold_adjustment_factor": 1.5,   # 阈值调整因子
-    "geometric_residual_threshold": 0.0008, # 几何残差阈值(m)
-    
-    # 采样策略参数
-    "points_per_eye": 4,                  # 每只眼睛采样点数
-    "sampling_interval_ms": 33,           # 采样间隔(ms)
-    
-    # 参数融合参数
-    "fusion_weight_sigma": 0.5,           # 融合权重标准差
-    "outlier_rejection_ratio": 0.2,       # 异常值剔除比例
-}
+
+# 向后兼容的字典格式
+SCREEN_WITH_RGBD = SCREEN_CONFIG.to_dict()
+
 
 def main() -> None:
-    print("SCREEN_WITH_RGBD:", SCREEN_WITH_RGBD)
+    print("SCREEN_CONFIG:", SCREEN_CONFIG)
+
 
 
 if __name__ == "__main__":
     main()
-
-
-

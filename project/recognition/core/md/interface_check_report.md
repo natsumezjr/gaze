@@ -37,7 +37,7 @@ def detect_face(self, bgr_image: np.ndarray, depth_map: np.ndarray) -> bool:
 
 **其他方法：**
 - `get_eye_centers()` - 无参数，返回三维坐标
-- `get_pupil_centers()` - 无参数，返回三维坐标
+- `get_pupil_center()` - 无参数，返回三维坐标
 - `get_iris_boundaries()` - 无参数，返回三维坐标列表
 - `get_detection_confidence()` - 无参数
 - `get_detection_status()` - 无参数

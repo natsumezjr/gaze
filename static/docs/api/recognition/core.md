@@ -137,10 +137,10 @@ landmarks = [[100.0, 200.0, 0.1], [150.0, 250.0, 0.2], [200.0, 300.0, 0.3]]
 is_valid = validate_landmarks(landmarks)
 # 返回：True 或 False
 
-def get_pupil_centers_landmarks(landmarks: List[List[float]]) -> Dict[str, Optional[List[float]]]
+def get_pupil_center_landmarks(landmarks: List[List[float]]) -> Dict[str, Optional[List[float]]]
 # 示例：
 landmarks = [[100.0, 200.0, 0.1], [150.0, 250.0, 0.2], [200.0, 300.0, 0.3]]
-pupils = get_pupil_centers_landmarks(landmarks)
+pupils = get_pupil_center_landmarks(landmarks)
 # 返回：{"left": [120.5, 180.3, 0.15], "right": [280.7, 180.1, 0.16]}
 
 def get_eye_contours_landmarks(landmarks: List[List[float]]) -> Dict[str, List[List[float]]]
@@ -175,9 +175,9 @@ def get_eyes_contours(self) -> Dict[str, List[np.ndarray]]
 eye_contours = detector.get_eyes_contours()
 # 返回：{"left": [np.array([x1, y1, z1]), ...], "right": [np.array([x1, y1, z1]), ...]}
 
-def get_pupil_centers(self) -> Dict[str, np.ndarray]
+def get_pupil_center(self) -> Dict[str, np.ndarray]
 # 示例：
-pupil_centers = detector.get_pupil_centers()
+pupil_center = detector.get_pupil_center()
 # 返回：{"left": np.array([0.12, 0.06, 0.82], dtype=np.float32), "right": np.array([0.18, 0.06, 0.82], dtype=np.float32)}
 
 def get_iris_boundaries(self) -> Dict[str, List[np.ndarray]]

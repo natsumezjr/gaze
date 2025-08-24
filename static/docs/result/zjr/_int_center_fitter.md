@@ -1,329 +1,473 @@
-# 眼球中心拟合算法优化方案
-## 一、拟合体选择：前期优先选择球体，保留椭球体接口，后期可使用椭球体进行优化
-
-### 1. 屏幕投影误差公式
-$$
-E_{\text{screen}} = \delta_{\text{eye}} \times \frac{L_{\text{screen}}}{D_{\text{eye}}}
-$$
-
-**参数定义与科学依据**：
-- $\delta_{\text{eye}}$：眼球中心定位误差（mm）
-- $L_{\text{screen}}$：屏幕宽度（340mm，15.6英寸标准屏）
-- $D_{\text{eye}}$：眼球到屏幕距离（700mm）
-- **几何光学原理**：眼球定位误差在屏幕平面被放大，放大比例由$\frac{L_{\text{screen}}}{D_{\text{eye}}}$决定
-- **解剖学依据**：人眼光学中心与角膜曲率中心的解剖偏移（0.3-0.8mm）是主要误差源
-
-### 2. 眼球定位误差分解
-$$
-\delta_{\text{eye}} = \sqrt{e_{\text{geom}}^2 + \delta_{\text{sys}}^2}
-$$
-
-**参数定义**：
-| 参数 | 球体模型 | 椭球模型 | 医学依据 |
-|------|----------|----------|----------|
-| $e_{\text{geom}}$ | 0.8 mm | 0.5 mm | 球体忽略角膜扁率(0.95)，椭球补偿曲率(半径7.8mm) |
-| $\delta_{\text{sys}}$ | 0.5 mm | 0.1 mm | 球心与角膜曲率中心不重合，椭球残余巩膜非对称性 |
-
-### 3、定量计算过程
-
-#### (1) 眼球定位误差计算
-**球体模型**：
-$$
-\delta_{\text{eye}}^{\text{sphere}} = \sqrt{0.8^2 + 0.5^2} = \sqrt{0.64 + 0.25} = \sqrt{0.89} = 0.94 \text{ mm}
-$$
-
-**椭球模型**：
-$$
-\delta_{\text{eye}}^{\text{ellipsoid}} = \sqrt{0.5^2 + 0.1^2} = \sqrt{0.25 + 0.01} = \sqrt{0.26} = 0.51 \text{ mm}
-$$
-
-#### (2) 屏幕投影误差计算
-**球体模型**：
-$$
-E_{\text{screen}}^{\text{sphere}} = 0.94 \times \frac{340}{700} = 0.94 \times 0.4857 = 0.456 \text{ mm}
-$$
-
-**椭球模型**：
-$$
-E_{\text{screen}}^{\text{ellipsoid}} = 0.51 \times \frac{340}{700} = 0.51 \times 0.4857 = 0.248 \text{ mm}
-$$
-
-#### (3) 多源误差叠加计算
-**总误差模型**：
-$$
-E_{\text{total}} = \sqrt{E_{\text{fit}}^2 + E_{\text{kappa}}^2 + E_{\text{calib}}^2}
-$$
-
-**误差分量**：
-| 误差源 | 球体模型 | 椭球模型 | 来源 |
-|--------|----------|----------|------|
-| $E_{\text{fit}}$ | 0.46 mm | 0.25 mm | 眼球中心定位 |
-| $E_{\text{kappa}}$ | ±0.3 mm | ±0.1 mm | 光学轴-视觉轴偏差(5°均值) |
-| $E_{\text{calib}}$ | ±0.2 mm | ±0.1 mm | 相机标定分辨率(0.1mm/像素) |
-
-**总误差计算**：
-**球体模型**：
-$$
-E_{\text{total}}^{\text{sphere}} = \sqrt{0.46^2 + 0.3^2 + 0.2^2} = \sqrt{0.3116} = 0.558 \text{ mm}
-$$
-
-**椭球模型**：
-$$
-E_{\text{total}}^{\text{ellipsoid}} = \sqrt{0.25^2 + 0.1^2 + 0.1^2} = \sqrt{0.0825} = 0.287 \text{ mm}
-$$
-
-
-## 结论
-1. **球体模型**：屏幕投影误差0.456mm（纯拟合）→0.558mm（总误差），适用于消费级场景
-2. **椭球模型**：屏幕投影误差0.248mm（纯拟合）→0.287mm（总误差），满足医疗级精度需求
-3. **优化建议**：前期优先使用球体模型，保留椭球拟合参数接口用于后期优化。
-4. **具体代码优化**：
-
-
-
-## 二、权重 $w_i$ 的设定：三层权限构成
-
-### 1. 先验权重：拟合点与眼球表面距离权重在医学解剖学的量化
-
-#### 解剖学先验权重表
-基于医学解剖学研究的可靠数据，各解剖结构到眼球表面的距离权重如下：
-
-| 解剖结构 | 偏移范围(mm) | 中值d_i(mm) | σ(mm) | w_anatomy |
-|----------|-------------|-------------|-------|-----------|
-| 瞳孔中心 | 0.1-0.3 | 0.2 | 1.5 | 0.991 |
-| 虹膜边界 | 0.5-1.2 | 0.85 | 1.5 | 0.839 |
-| 眼睛轮廓 | 1.0-2.0 | 1.5 | 1.5 | 0.607 |
-| 眼眶边缘 | 2.5-4.0 | 3.25 | 1.5 | 0.118 |
-| 眼睑软组织 | 2.0-4.0 | 3.0 | 1.5 | 0.135 |
-
-#### 权重计算公式
-对于第i个关键点，其解剖学先验权重为：
-$$w_{\text{anatomy}}^{(i)} = \exp\left(-\frac{d_i^2}{2\sigma^2}\right)$$
-
-其中：
-- $d_i$：该解剖结构到眼球表面的**解剖偏移中值**
-- $\sigma = 1.5$ mm：**距离球面标准差**（统一设定）
-
-#### 各结构权重计算示例
-
-**瞳孔中心点权重**：
-$$w_{\text{anatomy}} = \exp\left(-\frac{0.2^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{0.04}{4.5}\right) = 0.991$$
-
-**虹膜边界点权重**：
-$$w_{\text{anatomy}} = \exp\left(-\frac{0.85^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{0.7225}{4.5}\right) = 0.839$$
-
-**眼睛轮廓点权重**：
-$$w_{\text{anatomy}} = \exp\left(-\frac{1.5^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{2.25}{4.5}\right) = 0.607$$
-
-**眼眶边缘点权重**：
-$$w_{\text{anatomy}} = \exp\left(-\frac{3.25^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{10.5625}{4.5}\right) = 0.118$$
-
-**眼睑软组织点权重**：
-$$w_{\text{anatomy}} = \exp\left(-\frac{3.0^2}{2 \times 1.5^2}\right) = \exp\left(-\frac{9.0}{4.5}\right) = 0.135$$
-
-### 2. 几何残差权重（动态变化）
-- **初始化标准差**：$\sigma = d_i$（各偏移范围的中值）
-  - 瞳孔中心点：$\sigma = 0.2$ mm
-  - 虹膜边界点：$\sigma = 0.85$ mm  
-  - 眼睛轮廓点：$\sigma = 1.5$ mm
-  - 眼眶边缘点：$\sigma = 3.25$ mm
-  - 眼睑软组织点：$\sigma = 3.0$ mm
-- **实时计算**：$w_{\text{geom}} = \exp\left(-\frac{d_i^2}{2\sigma^2}\right)$
-- **$d_i$为实时测量值**：点到拟合球面的实际距离
-- **动态调整**：$\sigma$根据拟合质量自适应调整（待量化）
-
-#### 几何残差权重计算示例
-对于第i个关键点，其几何残差权重为：
-$$w_{\text{geom}}^{(i)} = \exp\left(-\frac{(d_i^{(measured)})^2}{2\sigma_i^2}\right)$$
-
-其中：
-- $d_i^{(measured)}$：第i个关键点到拟合球面的**实时测量距离**
-- $\sigma_i$：该解剖结构对应的**初始化标准差**
-
-### 3. 权重融合公式
-$$w_i = w_{\text{anatomy}} \times w_{\text{geom}} \times w_{\text{SNR}}$$
-
-其中：
-- $w_{\text{anatomy}}$：基于解剖偏移中值的固定先验权重
-- $w_{\text{geom}}$：基于实时测量距离的动态几何权重
-- $w_{\text{SNR}}$：图像质量权重（先设置为常数，后期可量化）
-
-#### 完整权重计算流程
-1. **解剖学先验权重**：基于解剖结构到眼球表面的距离中值
-2. **几何残差权重**：基于实时测量到拟合球面的距离
-3. **信号质量权重**：基于检测置信度和图像质量
-4. **权重归一化**：确保平均权重为1，保持数值稳定性
-
-#### 权重下限保护机制
-为防止某些关键点权重过低，设置权重下限：
-$$w_i^{(final)} = \max(w_i, w_{min})$$
-
-其中 $w_{min} = 0.1$，确保每个关键点都有最小贡献。
-
-## 三、阈值参数的自适应调整
-
-### 1. 核心阈值类型与初始值
-
-#### (1) RANSAC距离阈值$\tau$
-- 初始值 $\tau_{\text{init}} = 1.5$ mm  
-  *覆盖虹膜点最大解剖偏移*
-
-#### (2) 新增解剖结构的阈值设定
-基于新增的眼眶边缘和眼睑软组织点，调整阈值策略：
-
-**眼眶边缘点阈值**：
-- 距离阈值：$\tau_{socket} = 3.5$ mm（覆盖眼眶点最大解剖偏移4.0mm）
-- 权重阈值：$w_{socket,min} = 0.1$（防止权重过低）
-
-**眼睑软组织点阈值**：
-- 距离阈值：$\tau_{eyelid} = 4.0$ mm（覆盖眼睑点最大解剖偏移4.0mm）
-- 权重阈值：$w_{eyelid,min} = 0.1$（防止权重过低）
-
-**眼睛轮廓点阈值**：
-- 距离阈值：$\tau_{contour} = 2.0$ mm（覆盖轮廓点最大解剖偏移2.0mm）
-- 权重阈值：$w_{contour,min} = 0.2$（中等权重保护）
-
-
-### 2. 残差驱动的调整机制
-
-#### 几何拟合残差$e_{\text{geom}}$
-- 要求 $e_{\text{geom}} < 0.8$ mm  
-  *角膜平滑性约束*
-- 若连续3帧$e_{\text{geom}} > 1.0$ mm，触发$\tau \rightarrow 1.5\tau$并启用椭球补偿
-
-#### 自适应阈值调整策略
-$$
-\tau_{\text{new}} = 
-\begin{cases} 
-0.8\tau & \text{if } e_{\text{geom}} < 0.8 \text{ and } \rho > 0.8 \\
-1.5\tau & \text{if } e_{\text{geom}} > 1.0 \text{ or } \rho < 0.5
-\end{cases}
-$$
-其中$\rho$为内点比例，$e_{\text{geom}}$为几何残差
-
-## 3. 最小二乘法的收敛算法：牛顿-高斯算法
-
-### 3.1 核心思想
-- 对残差函数 $f(\theta)$ 线性化：  
-  $$ f(\theta + \Delta) \approx f(\theta) + J \Delta $$
-- 目标函数：  
-  $$ \Phi(\theta) = \tfrac{1}{2} f(\theta)^T W f(\theta) $$
-- 梯度：  
-  $$ \nabla \Phi(\theta) = J^T W f(\theta) $$
-- 正规方程（更新公式）：  
-  $$ (J^T W J)\Delta = -J^T W f(\theta) $$
-
-### 3.2 参数定义与计算方法
-
-#### 3.2.1 参数向量定义
-$$ \theta = [c_x, c_y, c_z, r]^T $$
-其中：
-- $(c_x, c_y, c_z)$：球心坐标
-- $r$：球半径
-
-#### 3.2.2 残差函数计算
-对于第 $i$ 个关键点 $(x_i, y_i, z_i)$：
-$$ f_i(\theta) = \sqrt{(x_i - c_x)^2 + (y_i - c_y)^2 + (z_i - c_z)^2} - r $$
-
-#### 3.2.3 雅可比矩阵 $J$ 的计算
-$$ J_{i,:} = \left[\frac{\partial f_i}{\partial c_x}, \frac{\partial f_i}{\partial c_y}, \frac{\partial f_i}{\partial c_z}, \frac{\partial f_i}{\partial r}\right] $$
-
-具体计算：
-$$ \frac{\partial f_i}{\partial c_x} = -\frac{x_i - c_x}{d_i}, \quad \frac{\partial f_i}{\partial c_y} = -\frac{y_i - c_y}{d_i}, \quad \frac{\partial f_i}{\partial c_z} = -\frac{z_i - c_z}{d_i}, \quad \frac{\partial f_i}{\partial r} = -1 $$
-
-其中 $d_i = \sqrt{(x_i - c_x)^2 + (y_i - c_y)^2 + (z_i - c_z)^2}$
-
-因此：
-$$ J_{i,:} = \left[-\frac{x_i - c_x}{d_i}, -\frac{y_i - c_y}{d_i}, -\frac{z_i - c_z}{d_i}, -1\right] $$
-
-#### 3.2.4 权重矩阵 $W$ 的构造
-$$ W = \text{diag}(w_1, w_2, \ldots, w_n) $$
-
-其中 $w_i$ 为第 $i$ 个点的三层权重：
-$$ w_i = w_{\text{anatomy}}^{(i)} \times w_{\text{geom}}^{(i)} \times w_{\text{SNR}}^{(i)} $$
-
-### 3.3 每只眼睛采样策略
-
-#### 3.3.1 三层初始权重计算
-1. **解剖学权重**：基于预设的解剖结构权重
-   - 瞳孔中心：$w_{\text{anatomy}} = 0.991$
-   - 虹膜边界：$w_{\text{anatomy}} = 0.839$
-   - 眼睛轮廓：$w_{\text{anatomy}} = 0.607$
-
-2. **几何权重**：基于点到当前球面的距离
-   $$ w_{\text{geom}}^{(i)} = \exp\left(-\frac{(d_i - r)^2}{2\sigma_i^2}\right) $$
-   其中 $\sigma_i$ 为各解剖结构的初始化标准差
-
-3. **SNR权重**：基于检测置信度（默认1.0）
-
-#### 3.3.2 采样策略
-- **瞳孔中心**：权重最高，必选
-- **虹膜边界**：选择权重最高的2个点
-- **眼睛轮廓**：选择权重最高的1个点
-- **总计**：每只眼睛选择4个权重最高的点
-
-### 3.4 定量计算示例
-
-#### 3.4.1 初始参数估计
-假设初始球心估计：$\theta_0 = [0.05, 0.065, 0.6, 0.012]^T$
-
-#### 3.4.2 残差计算示例
-对于左眼瞳孔点 $(0.0866, 0.0650, 0.6)$：
-$$ d_1 = \sqrt{(0.0866-0.05)^2 + (0.0650-0.065)^2 + (0.6-0.6)^2} = 0.0366 $$
-$$ f_1(\theta_0) = 0.0366 - 0.012 = 0.0246 $$
-
-对于左眼虹膜点 $(0.0965, 0.0655, 0.6)$：
-$$ d_2 = \sqrt{(0.0965-0.05)^2 + (0.0655-0.065)^2 + (0.6-0.6)^2} = 0.0465 $$
-$$ f_2(\theta_0) = 0.0465 - 0.012 = 0.0345 $$
-
-#### 3.4.3 雅可比矩阵计算示例
-对于左眼瞳孔点：
-$$ J_{1,:} = \left[-\frac{0.0866-0.05}{0.0366}, -\frac{0.0650-0.065}{0.0366}, -\frac{0.6-0.6}{0.0366}, -1\right] = [-1.0, 0.0, 0.0, -1] $$
-
-对于左眼虹膜点：
-$$ J_{2,:} = \left[-\frac{0.0965-0.05}{0.0465}, -\frac{0.0655-0.065}{0.0465}, -\frac{0.6-0.6}{0.0465}, -1\right] = [-1.0, -0.0108, 0.0, -1] $$
-
-#### 3.4.4 权重计算示例
-假设左眼瞳孔点的三层权重：
-$$ w_{\text{anatomy}}^{(1)} = 0.991, \quad w_{\text{geom}}^{(1)} = 0.95, \quad w_{\text{SNR}}^{(1)} = 1.0 $$
-$$ w_1 = 0.991 \times 0.95 \times 1.0 = 0.941 $$
-
-#### 3.4.5 正规方程求解示例
-对于4个点的系统：
-$$ J^T W J = \begin{bmatrix}
-\sum w_i J_{i,1}^2 & \sum w_i J_{i,1} J_{i,2} & \sum w_i J_{i,1} J_{i,3} & \sum w_i J_{i,1} J_{i,4} \\
-\sum w_i J_{i,2} J_{i,1} & \sum w_i J_{i,2}^2 & \sum w_i J_{i,2} J_{i,3} & \sum w_i J_{i,2} J_{i,4} \\
-\sum w_i J_{i,3} J_{i,1} & \sum w_i J_{i,3} J_{i,2} & \sum w_i J_{i,3}^2 & \sum w_i J_{i,3} J_{i,4} \\
-\sum w_i J_{i,4} J_{i,1} & \sum w_i J_{i,4} J_{i,2} & \sum w_i J_{i,4} J_{i,3} & \sum w_i J_{i,4}^2
-\end{bmatrix} $$
-
-$$ -J^T W f(\theta) = \begin{bmatrix}
--\sum w_i J_{i,1} f_i \\
--\sum w_i J_{i,2} f_i \\
--\sum w_i J_{i,3} f_i \\
--\sum w_i J_{i,4} f_i
-\end{bmatrix} $$
-
-#### 3.4.6 参数更新示例
-解方程 $(J^T W J)\Delta = -J^T W f(\theta)$ 得到：
-$$ \Delta = [0.002, 0.001, 0.0, 0.001]^T $$
-
-更新参数：
-$$ \theta_1 = \theta_0 + \Delta = [0.052, 0.066, 0.6, 0.013]^T $$
-
-#### 3.4.7 收敛判据
-- **参数收敛**：$\|\Delta\| < 10^{-6}$
-- **残差收敛**：$|\Phi(\theta_{k+1}) - \Phi(\theta_k)| < 10^{-8}$
-- **最大迭代次数**：50次，若超出迭代次数不收敛，则返回的球心为(0,0,0),半径为 0。
-
-### 3.5 算法流程总结
-
-1. **RANSAC初始化**：采样点集 → 拟合球模型 → 判断内点 → 保留最优内点集合
-2. **权重计算**：计算每个点的三层权重
-3. **采样选择**：选择每只眼睛权重最高的4个点
-4. **迭代优化**：
-   - 构造 $J, W, f(\theta)$
-   - 解正规方程 $(J^T W J)\Delta = -J^T W f(\theta)$
-   - 更新 $\theta \leftarrow \theta + \Delta$
-5. **收敛检测**：检查收敛判据
-6. **输出结果**：收敛的球心与半径
+# 眼球中心拟合算法实现文档
+
+## 一、算法概述
+
+### 1.1 核心思想
+基于现有`geometry.py`中的几何计算函数，实现分层拟合的眼球中心定位算法。该算法采用RANSAC采样 + Levenberg-Marquardt优化的策略，确保所有关键点都在眼球外部，符合解剖学关系。
+
+### 1.2 算法流程
+1. **数据预处理**：置信度过滤 → 数据质量检查 → 权重计算
+2. **初值估计**：2D圆拟合XY → 解剖先验Z/R → 初始参数
+3. **RANSAC几何判定**：采样点集 → 几何判定 → 内点统计
+4. **LM精化优化**：构造雅可比矩阵 → 求解LM方程 → 参数更新 → 收敛检测
+
+## 二、核心算法实现
+
+### 2.1 几何计算基础函数
+
+#### 2.1.1 向量操作
+```python
+def vector_of_2_points(point1: np.ndarray, point2: np.ndarray) -> np.ndarray:
+    """计算两点间向量"""
+    return point2 - point1
+
+def normalize_vector(vector: np.ndarray) -> np.ndarray:
+    """向量归一化"""
+    return vector / np.linalg.norm(vector)
+
+def angle_between_vectors(vector1: np.ndarray, vector2: np.ndarray) -> float:
+    """计算两向量夹角（弧度）"""
+    return np.arccos(np.dot(vector1, vector2) / 
+                    (np.linalg.norm(vector1) * np.linalg.norm(vector2)))
+```
+
+#### 2.1.2 屏幕投影计算
+```python
+def intersect_pixel_on_screen(vector: np.ndarray, rgb_d=False) -> np.ndarray:
+    """计算向量与屏幕的交点（像素坐标）"""
+    screen = Plane(rgb_d)
+    point_2d = screen.intersection_on_plane(vector)
+    if point_2d is None:
+        return np.array([np.nan, np.nan])
+    
+    # 转换到屏幕像素坐标
+    top_left_2d = screen._point_3d_to_2d(screen.top_left)
+    point_2d = point_2d - top_left_2d
+    
+    x, y = point_2d
+    screen_width, screen_height = screen.width_m, screen.height_m
+    w, h = SCREEN_WITH_RGBD["resolution_px"]
+    
+    return np.array([w * x / screen_width, h * y / screen_height])
+```
+
+#### 2.1.3 向量旋转
+```python
+def rotate_vector(vector: np.ndarray, axis: np.ndarray, angle: float) -> np.ndarray:
+    """使用罗德里格斯旋转公式绕轴旋转向量"""
+    axis = normalize_vector(axis)
+    cos_angle = np.cos(angle)
+    sin_angle = np.sin(angle)
+    
+    v_parallel = np.dot(vector, axis) * axis
+    v_perpendicular = vector - v_parallel
+    
+    rotated_vector = (v_parallel + 
+                     v_perpendicular * cos_angle + 
+                     np.cross(axis, vector) * sin_angle)
+    
+    return rotated_vector
+```
+
+### 2.2 权重计算系统
+
+#### 2.2.1 两层权重架构
+```python
+def _calculate_weights(self, points: List[np.ndarray], structure_types: List[str], center_only: bool = False) -> WeightResult:
+    """
+    两层权重计算：权重 = 解剖学权重 × 几何权重
+    
+    解剖学权重（固定值）：
+    - 瞳孔中心：w_anat = 0.991
+    - 虹膜边界：w_anat = 0.839  
+    - 眼睛轮廓：w_anat = 0.607
+    
+    几何权重（动态计算）：
+    - w_geom = exp(-d²/(2σ²))
+    - d为距离偏差，σ为初始化标准差
+    """
+```
+
+#### 2.2.2 残差驱动权重调整
+```python
+def _calculate_final_weight(self, w_anat: float, w_geom: float) -> float:
+    """
+    残差驱动权重调整策略
+    
+    权重策略：
+    1. 残差范数 > 截止阈值×10：只使用解剖学权重
+    2. 残差范数 > 截止阈值：解剖学权重 × min(几何权重, 0.8)
+    3. 残差范数 ≤ 截止阈值：解剖学权重 × 几何权重
+    """
+```
+
+### 2.3 采样策略
+
+#### 2.3.1 RANSAC采样
+```python
+def _ransac_sampling(self, points: List[np.ndarray], structure_types: List[str], 
+                     confidence_scores: List[float]) -> SamplingResult:
+    """
+    分层采样策略：
+    1. 瞳孔中心：随机选1个
+    2. 虹膜边界：随机选3个
+    3. 眼睛轮廓：随机选4-10个
+    4. 补充点：随机选择其他点
+    """
+```
+
+#### 2.3.2 置信度过滤
+```python
+def _filter_low_confidence_points(self, points: List[np.ndarray], 
+                                 structure_types: List[str], 
+                                 confidence_scores: List[float]) -> Tuple[List, List, List]:
+    """过滤置信度低于阈值的点"""
+    threshold = self._fitting_config.confidence_threshold
+    filtered_indices = [i for i, conf in enumerate(confidence_scores) if conf >= threshold]
+    
+    filtered_points = [points[i] for i in filtered_indices]
+    filtered_types = [structure_types[i] for i in filtered_indices]
+    filtered_confidences = [confidence_scores[i] for i in filtered_indices]
+    
+    return filtered_points, filtered_types, filtered_confidences
+```
+
+### 2.4 初值估计
+
+#### 2.4.1 2D圆拟合
+```python
+def _estimate_initial_params(self, points: List[np.ndarray], structure_types: List[str], center_only: bool = False) -> np.ndarray:
+    """
+    最精简的眼球中心初始估计
+    
+    策略：
+    1. 使用虹膜边界点进行2D圆拟合
+    2. 瞳孔Z坐标 + 1.2mm解剖偏移作为球心Z
+    3. 使用解剖学先验半径12mm
+    """
+    # 提取虹膜边界点
+    iris_points = [p for p, t in zip(points, structure_types) if t == "iris_boundary"]
+    
+    if iris_points:
+        iris_array = np.array(iris_points)
+        # 使用质心作为初始中心
+        center = np.mean(iris_array, axis=0)
+    else:
+        points_array = np.array(points)
+        center = np.mean(points_array, axis=0)
+    
+    self._current_fit_center = center
+    
+    if center_only:
+        self._estimated_initial_params = center
+    else:
+        radius = EYEBALL_RADIUS  # 12mm
+        self._current_fit_radius = radius
+        self._estimated_initial_params = np.array([center[0], center[1], center[2], radius])
+    
+    self._initial_params_estimated = True
+    return self._estimated_initial_params
+```
+
+### 2.5 Levenberg-Marquardt优化
+
+#### 2.5.1 核心算法
+```python
+def _levenberg_marquardt_optimization(self, initial_params: np.ndarray, points: List[np.ndarray], 
+                                    structure_types: List[str], center_only: bool = False) -> Tuple[np.ndarray, bool]:
+    """
+    LM优化算法实现
+    
+    数学公式：
+    - 目标函数：Φ(θ) = ½ * f(θ)ᵀ * W * f(θ)
+    - LM更新方程：(Jᵀ * W * J + λ * I) * Δ = -Jᵀ * W * f(θ)
+    - 参数更新：θ_new = θ_old - Δ
+    
+    收敛判据：
+    - 参数收敛：||Δ|| < param_tolerance
+    - 残差收敛：|residual_norm_new - residual_norm_old| < residual_tolerance
+    """
+```
+
+#### 2.5.2 雅可比矩阵计算
+```python
+def _compute_jacobian(self, params: np.ndarray, points: List[np.ndarray], center_only: bool = False) -> np.ndarray:
+    """
+    计算雅可比矩阵 J = ∂f/∂θ
+    
+    对于球体拟合：
+    - f_i(θ) = ||p_i - c|| - r
+    - ∂f_i/∂c_x = -(x_i - c_x)/d_i
+    - ∂f_i/∂c_y = -(y_i - c_y)/d_i  
+    - ∂f_i/∂c_z = -(z_i - c_z)/d_i
+    - ∂f_i/∂r = -1
+    
+    其中 d_i = ||p_i - c||
+    """
+```
+
+#### 2.5.3 残差计算
+```python
+def _compute_residuals(self, params: np.ndarray, points: List[np.ndarray], center_only: bool = False) -> np.ndarray:
+    """
+    计算残差向量 f(θ) = [f₁, f₂, ..., fₙ]ᵀ
+    
+    其中 f_i = ||p_i - c|| - r
+    """
+```
+
+### 2.6 内点判定
+
+#### 2.6.1 几何判定
+```python
+def _calculate_inlier_ratio(self, points: List[np.ndarray], center: np.ndarray, 
+                           radius: float, threshold: float) -> Tuple[int, float]:
+    """
+    计算内点比例
+    
+    内点判定条件：|d_i - r| ≤ threshold
+    其中 d_i = ||p_i - c|| 是点到球心的距离
+    """
+    inlier_count = 0
+    total_points = len(points)
+    
+    for point in points:
+        distance = np.linalg.norm(point - center)
+        if abs(distance - radius) <= threshold:
+            inlier_count += 1
+    
+    inlier_ratio = inlier_count / total_points if total_points > 0 else 0.0
+    return inlier_count, inlier_ratio
+```
+
+## 三、配置参数
+
+### 3.1 拟合配置
+```python
+@dataclass
+class FittingConfig:
+    # 优化参数
+    max_iterations: int = 50
+    param_tolerance: float = 1e-6        # 参数收敛阈值
+    residual_tolerance: float = 1e-8     # 残差收敛阈值
+    
+    # 残差驱动权重调整参数
+    residual_cutoff_threshold: float = 0.01      # 残差截止阈值
+    residual_protection_factor: float = 5.0      # 残差保护因子
+    geometric_weight_cap: float = 0.8            # 几何权重上限
+    
+    # 采样参数
+    min_iris_points: int = 3             # 最小虹膜点数
+    min_contour_points: int = 4          # 最小轮廓点数
+    max_contour_points: int = 10         # 最大轮廓点数
+    
+    # RANSAC参数
+    ransac_threshold: float = 0.002     # 内点判定阈值（2mm）
+    max_trials: int = 100               # 最大RANSAC试验次数
+    min_inlier_ratio: float = 0.4       # 最小内点比例
+```
+
+### 3.2 权重配置
+```python
+# 解剖学权重参数
+ANATOMICAL_WEIGHT_PARAMS = {
+    "pupil_center": 0.991,      # 瞳孔中心权重
+    "iris_boundary": 0.839,     # 虹膜边界权重
+    "eye_contour": 0.607        # 眼睛轮廓权重
+}
+
+# 几何权重参数
+GEOMETRIC_WEIGHT_PARAMS = {
+    "pupil_center": {"initial_sigma": 0.2},      # 瞳孔中心标准差
+    "iris_boundary": {"initial_sigma": 0.85},    # 虹膜边界标准差
+    "eye_contour": {"initial_sigma": 1.5}        # 眼睛轮廓标准差
+}
+
+# 全局权重配置
+GLOBAL_WEIGHT_CONFIG = {
+    "min_weight": 0.1,          # 最小权重保护
+    "normalization": True        # 权重归一化
+}
+```
+
+## 四、算法流程
+
+### 4.1 主拟合流程
+```python
+def center_fitter(self, key_coordinates: SingleEyeKeyCoordinates, 
+                 trials_times: int, config: Optional[FittingConfig] = None) -> Tuple[EllipsoidParams, np.ndarray, FittingResult]:
+    """
+    主拟合接口
+    
+    流程：
+    1. 更新配置
+    2. 判断是否超过最大试验次数
+    3. 执行拟合（中心拟合或完整拟合）
+    4. 返回结果
+    """
+```
+
+### 4.2 完整拟合流程
+```python
+def _fit_ellipsoid(self, key_coordinates: SingleEyeKeyCoordinates, center_only: bool = False) -> Tuple[EllipsoidParams, np.ndarray, FittingResult]:
+    """
+    椭球体拟合主流程
+    
+    步骤：
+    1. 数据预处理和权重计算
+    2. RANSAC采样和几何判定
+    3. Levenberg-Marquardt精化优化
+    4. 结果验证和输出
+    """
+```
+
+### 4.3 单次RANSAC迭代
+```python
+def _run_single_ransac_iteration(self, points: List[np.ndarray], structure_types: List[str]) -> Tuple[np.ndarray, int, float]:
+    """
+    单次RANSAC迭代
+    
+    步骤：
+    1. 随机采样点集
+    2. 估计初始参数
+    3. LM优化
+    4. 计算内点比例
+    5. 返回最佳参数
+    """
+```
+
+## 五、性能优化
+
+### 5.1 数值稳定性
+- **步长限制**：限制参数更新步长，防止数值不稳定
+- **阻尼调整**：自适应LM阻尼因子调整
+- **奇异矩阵处理**：使用伪逆求解奇异矩阵问题
+
+### 5.2 收敛控制
+- **双重收敛判据**：参数收敛 + 残差收敛
+- **最大迭代限制**：防止无限循环
+- **残差回退**：残差增加时自动回退
+
+### 5.3 权重保护
+- **权重下限**：防止权重过低导致数值不稳定
+- **权重归一化**：保持权重系统平衡
+- **动态调整**：根据拟合质量动态调整权重策略
+
+## 六、质量评估
+
+### 6.1 拟合质量指标
+```python
+def _calculate_quality_metrics(self) -> QualityMetrics:
+    """
+    计算拟合质量指标
+    
+    指标包括：
+    1. 内点比例：ρ = inlier_count / total_points
+    2. 参数稳定性：参数变化的平滑程度
+    3. 收敛速度：单位迭代次数的残差改善程度
+    4. 最终残差：拟合精度
+    """
+```
+
+### 6.2 质量等级
+- **优秀**：内点比例 ≥ 90%，残差 < 0.001
+- **良好**：内点比例 ≥ 80%，残差 < 0.005  
+- **一般**：内点比例 ≥ 70%，残差 < 0.01
+- **较差**：内点比例 < 70% 或残差 ≥ 0.01
+
+## 七、错误处理
+
+### 7.1 异常情况处理
+- **点数不足**：虹膜点数 < 3时发出警告
+- **置信度过低**：所有点置信度都低于阈值时返回默认值
+- **收敛失败**：达到最大迭代次数仍未收敛时返回当前最佳结果
+
+### 7.2 默认值策略
+```python
+def _get_default_params(self) -> EllipsoidParams:
+    """返回默认参数"""
+    return EllipsoidParams(
+        center=np.array([0.0, 0.0, 0.6]),  # 默认Z坐标0.6m
+        axes=np.array([EYEBALL_RADIUS, EYEBALL_RADIUS, EYEBALL_RADIUS]),
+        rotation=np.eye(3)
+    )
+```
+
+## 八、待办优化项目
+
+### 8.1 核心问题修复：约束拟合算法（最高优先级）
+
+#### 8.1.1 问题描述
+当前算法存在严重错误：**眼球中心位置错误，所有关键点都在眼球内部**，这完全违背解剖学原理。
+
+**正确的解剖关系**：
+- 瞳孔中心：在眼球前方，距离眼球表面约0.1-0.3mm
+- 虹膜边界：围绕眼球，距离眼球表面约0.5-1.2mm  
+- 眼睛轮廓：在眼球外部，距离眼球表面约1-2mm
+- 半径：应该在 10-14mm范围内
+
+#### 8.1.2 解决方案：约束拟合算法
+
+**核心思想**：强制约束所有关键点都在拟合球体外部，通过几何约束确保眼球位置正确。
+
+**数学约束**：对于每个关键点 $p_i$，必须满足 $||p_i - c|| \geq r$
+
+**算法流程**：
+1. **约束初始估计**：瞳孔Z + 8mm偏移作为球心Z，虹膜质心作为XY
+2. **约束目标函数**：点在球内时添加大惩罚项
+3. **约束雅可比矩阵**：包含约束惩罚的导数项
+4. **约束验证**：每次迭代后验证所有点都在球外
+
+#### 8.1.3 关键接口设计
+
+```python
+def _compute_constrained_residuals(self, params: np.ndarray, points: List[np.ndarray], 
+                                  structure_types: List[str], center_only: bool = False) -> np.ndarray:
+    """
+    计算带约束的残差向量
+    约束条件：所有关键点必须在眼球外部
+    惩罚函数：如果点在球内，添加大的惩罚项
+    """
+
+def _compute_constrained_jacobian(self, params: np.ndarray, points: List[np.ndarray], 
+                                 structure_types: List[str], center_only: bool = False) -> np.ndarray:
+    """
+    计算带约束的雅可比矩阵
+    包含约束惩罚的导数项
+    """
+
+def _estimate_constrained_initial_params(self, points: List[np.ndarray], 
+                                       structure_types: List[str], center_only: bool = False) -> np.ndarray:
+    """
+    约束初始参数估计
+    策略：瞳孔Z + 8mm偏移，虹膜质心XY，确保所有点在球外
+    """
+
+def _levenberg_marquardt_constrained_optimization(self, initial_params: np.ndarray, 
+                                                points: List[np.ndarray], 
+                                                structure_types: List[str], 
+                                                center_only: bool = False) -> Tuple[np.ndarray, bool]:
+    """
+    约束LM优化算法
+    确保每次迭代后所有点都在球外
+    """
+```
+
+#### 8.1.4 实施步骤
+1. **第1步**：实现约束残差和雅可比矩阵计算
+2. **第2步**：修改初始参数估计，确保解剖学正确
+3. **第3步**：集成到LM优化流程中
+4. **第4步**：添加约束验证和调试输出
+
+
+### 8.2 测试验证重点
+
+#### 8.2.1 约束验证测试
+1. **解剖关系验证**：确保所有关键点都在眼球外部
+2. **距离合理性**：验证点到眼球表面的距离符合解剖学范围
+3. **收敛稳定性**：约束条件下的算法收敛性测试
+
+#### 8.2.2 性能测试
+1. **精度提升**：对比约束前后的拟合精度
+2. **鲁棒性增强**：异常值和噪声情况下的表现
+3. **计算效率**：约束算法的计算复杂度分析

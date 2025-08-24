@@ -257,26 +257,27 @@ class CoordinateConverter:
             logger.warning(f"关键点转换失败：{e}")
             return None
     
-    def batch_convert_landmarks(self, landmarks: List[Tuple[float, float, float]], 
+    def batch_convert_landmarks(self, landmarks: List[Union[Tuple[float, float, float], Tuple[float, float, float, float]]], 
                                depth_map: np.ndarray) -> List[np.ndarray]:
         """
-        批量转换关键点为三维坐标
+        批量转换关键点为三维坐标，支持4D数据（包含visibility）
         
         理论基础：
         对多个关键点进行批量转换，提高处理效率。
         每个关键点都经过归一化坐标→像素坐标→三维坐标的转换流程。
+        支持4D数据格式：[x, y, z, visibility]，其中visibility是MediaPipe的可见性置信度
         
         Args:
-            landmarks: 关键点列表，每个元素为(x_norm, y_norm, z_relative)
+            landmarks: 关键点列表，每个元素为(x_norm, y_norm, z_relative) 或 (x_norm, y_norm, z_relative, visibility)
             depth_map: 深度图，numpy数组
         
         Returns:
-            coords_3d: 三维坐标列表，每个元素为[X, Y, Z]
+            coords_3d: 三维坐标列表，每个元素为[X, Y, Z] 或 [X, Y, Z, visibility]
         
         示例：
-            landmarks = [(0.5, 0.5, 0.1), (0.3, 0.7, 0.2)]  # 归一化坐标
+            landmarks = [(0.5, 0.5, 0.1), (0.3, 0.7, 0.2, 0.8)]  # 归一化坐标
             depth_map = np.array([[0.5, 0.6], [0.7, 0.8]])  # 深度图
-            coords_3d = [[0.0, 0.0, 0.5], [-0.1, 0.1, 0.7]]  # 三维坐标
+            coords_3d = [[0.0, 0.0, 0.5], [-0.1, 0.1, 0.7, 0.8]]  # 三维坐标
         """
         if not isinstance(landmarks, list):
             raise ValueError("landmarks必须是列表类型")
@@ -288,13 +289,24 @@ class CoordinateConverter:
         success_count = 0
         
         for i, landmark in enumerate(landmarks):
-            if not isinstance(landmark, tuple) or len(landmark) != 3:
+            # 检查关键点格式：支持3D和4D
+            if not isinstance(landmark, (tuple, list)) or len(landmark) not in [3, 4]:
                 logger.warning(f"跳过无效的关键点 {i}：{landmark}")
                 continue
             
-            coord_3d = self.convert_landmark_to_3d(landmark, depth_map)
+            # 提取坐标部分（前3维）
+            coord_part = landmark[:3]
+            visibility = landmark[3] if len(landmark) == 4 else 1.0
+            
+            # 转换为3D坐标
+            coord_3d = self.convert_landmark_to_3d(coord_part, depth_map)
             if coord_3d is not None:
-                coords_3d.append(coord_3d)
+                # 如果有visibility信息，添加到3D坐标
+                if len(landmark) == 4:
+                    coord_4d = np.append(coord_3d, visibility)
+                    coords_3d.append(coord_4d)
+                else:
+                    coords_3d.append(coord_3d)
                 success_count += 1
             else:
                 logger.warning(f"关键点 {i} 转换失败")
@@ -460,10 +472,10 @@ def pixel_to_3d(pixel_coords: Tuple[int, int],
     return converter.pixel_to_3d(pixel_coords, depth_map_meters)
 
 
-def batch_convert_landmarks(landmarks: List[Tuple[float, float, float]], 
+def batch_convert_landmarks(landmarks: List[Union[Tuple[float, float, float], Tuple[float, float, float, float]]], 
                            depth_map_meters: np.ndarray, 
                            camera_params: dict) -> List[np.ndarray]:
-    """批量转换关键点（兼容性函数）"""
+    """批量转换关键点（兼容性函数），支持4D数据（包含visibility）"""
     converter = CoordinateConverter(camera_params)
     return converter.batch_convert_landmarks(landmarks, depth_map_meters)
 

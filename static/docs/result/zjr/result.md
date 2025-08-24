@@ -90,7 +90,7 @@
 ```python
 # 识别模块输出格式
 key_coordinates = {
-    'pupil_centers': {'left': np.ndarray(3,), 'right': np.ndarray(3,)},
+    'pupil_center': {'left': np.ndarray(3,), 'right': np.ndarray(3,)},
     'iris_boundaries': {'left': List[np.ndarray(3,)], 'right': List[np.ndarray(3,)]},
     'eyes_contours': {'left': List[np.ndarray(3,)], 'right': List[np.ndarray(3,)]}
 }

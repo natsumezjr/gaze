@@ -73,7 +73,7 @@ python utils/data_manager.py
 from utils.data_manager import add_frame, get_image, get_depth
 
 # 导入核心功能
-from core.landmark_extractor import extract_landmarks, get_pupil_centers_landmarks
+from core.landmark_extractor import extract_landmarks, get_pupil_center_landmarks
 from core.detector import FaceDetector
 ```
 
@@ -111,7 +111,7 @@ result = detector.detect_face(bgr_image, depth_map)
 
 # 获取结果
 eye_contours = detector.get_eyes_contours()
-pupil_centers = detector.get_pupil_centers()
+pupil_center = detector.get_pupil_center()
 iris_boundaries = detector.get_iris_boundaries()
 ```
 

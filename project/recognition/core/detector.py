@@ -88,8 +88,8 @@ class FaceDetector:
             landmarks = extract_landmarks(bgr_image)
             
             if landmarks and validate_landmarks(landmarks):
-                # 将List[List[float]]转换为List[Tuple[float, float, float]]格式以便内部使用
-                self._landmarks = [(point[0], point[1], point[2]) for point in landmarks]
+                # 保留完整的4D数据格式，包括visibility信息
+                self._landmarks = landmarks  # 直接保存原始4D数据
                 self._detection_success = True
                 self._detection_confidence = self._calculate_detection_confidence()
                 self._error_message = ""
@@ -220,30 +220,34 @@ class FaceDetector:
             # 转换左眼轮廓点
             for point in eye_contours_landmarks['left']:
                 try:
-                    x, y, _ = point
+                    x, y, z, visibility = point  # 保留visibility信息
                     point_3d = pixel_to_3d(
                         (int(x), int(y)),
                         self._depth_map_meters,
                         self.camera_params
                     )
-                    left_eye_3d.append(point_3d)
+                    # 将visibility作为第4维添加到3D坐标
+                    point_4d = np.append(point_3d, visibility)
+                    left_eye_3d.append(point_4d)
                 except Exception:
-                    # 如果转换失败，添加零向量
-                    left_eye_3d.append(np.array([0.0, 0.0, 0.0]))
+                    # 如果转换失败，添加零向量和默认visibility
+                    left_eye_3d.append(np.array([0.0, 0.0, 0.0, 0.0]))
             
             # 转换右眼轮廓点
             for point in eye_contours_landmarks['right']:
                 try:
-                    x, y, _ = point
+                    x, y, z, visibility = point  # 保留visibility信息
                     point_3d = pixel_to_3d(
                         (int(x), int(y)),
                         self._depth_map_meters,
                         self.camera_params
                     )
-                    right_eye_3d.append(point_3d)
+                    # 将visibility作为第4维添加到3D坐标
+                    point_4d = np.append(point_3d, visibility)
+                    right_eye_3d.append(point_4d)
                 except Exception:
-                    # 如果转换失败，添加零向量
-                    right_eye_3d.append(np.array([0.0, 0.0, 0.0]))
+                    # 如果转换失败，添加零向量和默认visibility
+                    right_eye_3d.append(np.array([0.0, 0.0, 0.0, 0.0]))
             
             return {
                 'left': left_eye_3d,
@@ -255,7 +259,7 @@ class FaceDetector:
             print(f"眼轮廓点转换异常: {e}")
             return {'left': [], 'right': []}
     
-    def get_pupil_centers(self) -> Dict[str, np.ndarray]:
+    def get_pupil_center(self) -> Dict[str, np.ndarray]:
         """
         获取左右瞳孔中心三维坐标
         
@@ -295,7 +299,7 @@ class FaceDetector:
         - main.py 中的主循环调用此函数
         
         调用：
-        - get_pupil_centers_landmarks() (landmark_extractor.py)
+        - get_pupil_center_landmarks() (landmark_extractor.py)
         - pixel_to_3d() (coordinate_converter.py)
         
         可能用到的库函数：numpy
@@ -309,11 +313,11 @@ class FaceDetector:
         
         try:
             # 导入所需模块
-            from project.recognition.core.landmark_extractor import get_pupil_centers_landmarks
+            from project.recognition.core.landmark_extractor import get_pupil_center_landmarks
             from project.recognition.core.coordinate_converter import pixel_to_3d
             
             # 获取左右瞳孔中心关键点（像素坐标）
-            pupil_landmarks = get_pupil_centers_landmarks(self._landmarks)
+            pupil_landmarks = get_pupil_center_landmarks(self._landmarks)
             
             # 检查是否成功获取瞳孔关键点
             if not pupil_landmarks.get('left') or not pupil_landmarks.get('right'):
@@ -322,9 +326,9 @@ class FaceDetector:
                     'right': np.array([0.0, 0.0, 0.0])
                 }
             
-            # 转换为三维坐标
-            left_x, left_y, _ = pupil_landmarks['left']
-            right_x, right_y, _ = pupil_landmarks['right']
+            # 转换为三维坐标，保留visibility信息
+            left_x, left_y, left_z, left_visibility = pupil_landmarks['left']
+            right_x, right_y, right_z, right_visibility = pupil_landmarks['right']
             
             left_pupil_3d = pixel_to_3d(
                 (int(left_x), int(left_y)),
@@ -338,9 +342,13 @@ class FaceDetector:
                 self.camera_params
             )
             
+            # 将visibility作为第4维添加到3D坐标
+            left_pupil_4d = np.append(left_pupil_3d, left_visibility)
+            right_pupil_4d = np.append(right_pupil_3d, right_visibility)
+            
             return {
-                'left': left_pupil_3d,
-                'right': right_pupil_3d
+                'left': left_pupil_4d,
+                'right': right_pupil_4d
             }
             
         except Exception as e:
@@ -444,16 +452,30 @@ class FaceDetector:
             
             for point in eye_socket_landmarks['left']:
                 try:
-                    x, y, z = pixel_to_3d(point[0], point[1], self._depth_map_meters, self.camera_params)
-                    left_socket_3d.append(np.array([x, y, z]))
+                    x, y, z, visibility = point  # 保留visibility信息
+                    point_3d = pixel_to_3d(
+                        (int(x), int(y)),
+                        self._depth_map_meters,
+                        self.camera_params
+                    )
+                    # 将visibility作为第4维添加到3D坐标
+                    point_4d = np.append(point_3d, visibility)
+                    left_socket_3d.append(point_4d)
                 except Exception as e:
                     print(f"转换左眼眶关键点失败: {e}")
                     continue
             
             for point in eye_socket_landmarks['right']:
                 try:
-                    x, y, z = pixel_to_3d(point[0], point[1], self._depth_map_meters, self.camera_params)
-                    right_socket_3d.append(np.array([x, y, z]))
+                    x, y, z, visibility = point  # 保留visibility信息
+                    point_3d = pixel_to_3d(
+                        (int(x), int(y)),
+                        self._depth_map_meters,
+                        self.camera_params
+                    )
+                    # 将visibility作为第4维添加到3D坐标
+                    point_4d = np.append(point_3d, visibility)
+                    right_socket_3d.append(point_4d)
                 except Exception as e:
                     print(f"转换右眼眶关键点失败: {e}")
                     continue
@@ -560,16 +582,30 @@ class FaceDetector:
             
             for point in eyelid_landmarks['left']:
                 try:
-                    x, y, z = pixel_to_3d(point[0], point[1], self._depth_map_meters, self.camera_params)
-                    left_eyelid_3d.append(np.array([x, y, z]))
+                    x, y, z, visibility = point  # 保留visibility信息
+                    point_3d = pixel_to_3d(
+                        (int(x), int(y)),
+                        self._depth_map_meters,
+                        self.camera_params
+                    )
+                    # 将visibility作为第4维添加到3D坐标
+                    point_4d = np.append(point_3d, visibility)
+                    left_eyelid_3d.append(point_4d)
                 except Exception as e:
                     print(f"转换左眼睑关键点失败: {e}")
                     continue
             
             for point in eyelid_landmarks['right']:
                 try:
-                    x, y, z = pixel_to_3d(point[0], point[1], self._depth_map_meters, self.camera_params)
-                    right_eyelid_3d.append(np.array([x, y, z]))
+                    x, y, z, visibility = point  # 保留visibility信息
+                    point_3d = pixel_to_3d(
+                        (int(x), int(y)),
+                        self._depth_map_meters,
+                        self.camera_params
+                    )
+                    # 将visibility作为第4维添加到3D坐标
+                    point_4d = np.append(point_3d, visibility)
+                    right_eyelid_3d.append(point_4d)
                 except Exception as e:
                     print(f"转换右眼睑关键点失败: {e}")
                     continue
@@ -695,30 +731,34 @@ class FaceDetector:
             # 转换左虹膜边界点
             for point in iris_landmarks['left']:
                 try:
-                    x, y, _ = point
+                    x, y, z, visibility = point  # 保留visibility信息
                     point_3d = pixel_to_3d(
                         (int(x), int(y)),
                         self._depth_map_meters,
                         self.camera_params
                     )
-                    left_iris_3d.append(point_3d)
+                    # 将visibility作为第4维添加到3D坐标
+                    point_4d = np.append(point_3d, visibility)
+                    left_iris_3d.append(point_4d)
                 except Exception:
-                    # 如果转换失败，添加零向量
-                    left_iris_3d.append(np.array([0.0, 0.0, 0.0]))
+                    # 如果转换失败，添加零向量和默认visibility
+                    left_iris_3d.append(np.array([0.0, 0.0, 0.0, 0.0]))
             
             # 转换右虹膜边界点
             for point in iris_landmarks['right']:
                 try:
-                    x, y, _ = point
+                    x, y, z, visibility = point  # 保留visibility信息
                     point_3d = pixel_to_3d(
                         (int(x), int(y)),
                         self._depth_map_meters,
                         self.camera_params
                     )
-                    right_iris_3d.append(point_3d)
+                    # 将visibility作为第4维添加到3D坐标
+                    point_4d = np.append(point_3d, visibility)
+                    right_iris_3d.append(point_4d)
                 except Exception:
-                    # 如果转换失败，添加零向量
-                    right_iris_3d.append(np.array([0.0, 0.0, 0.0]))
+                    # 如果转换失败，添加零向量和默认visibility
+                    right_iris_3d.append(np.array([0.0, 0.0, 0.0, 0.0]))
             
             return {
                 'left': left_iris_3d,
@@ -856,10 +896,11 @@ class FaceDetector:
             return 0.0
         
         try:
-            # 转换为numpy数组进行计算
+            # 转换为numpy数组进行计算（支持4D数据）
             landmarks_array = np.array(self._landmarks)
             
             # 计算关键点的分布标准差，标准差越大，说明关键点分布越广，质量越好
+            # 只使用前3维（x, y, z）进行计算，忽略visibility
             x_std = np.std(landmarks_array[:, 0])
             y_std = np.std(landmarks_array[:, 1])
             z_std = np.std(landmarks_array[:, 2])
