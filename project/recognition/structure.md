@@ -67,7 +67,7 @@ detector.py (核心检测器)
 **主要方法**：
 - `__init__(camera_params)`：初始化，接收相机内参
 - `detect_face(bgr_image, depth_map)`：主检测方法
-- `get_eyes_contours()`：获取眼球轮廓三维坐标
+- `get_eye_contours()`：获取眼球轮廓三维坐标
 - `get_pupil_center()`：获取瞳孔中心三维坐标
 - `get_iris_boundaries()`：获取虹膜边界点三维坐标
 - `get_detection_confidence()`：获取检测置信度
@@ -259,7 +259,7 @@ def main():
             result = detector.detect_face(bgr_image, depth_map)
             
             # 输出三维坐标
-            eye_contours = detector.get_eyes_contours()
+            eye_contours = detector.get_eye_contours()
             pupil_center = detector.get_pupil_center()
             
             # 处理结果...
@@ -312,7 +312,7 @@ detector = FaceDetector(camera_params)
 result = detector.detect_face(bgr_image, depth_map)
 
 # 获取结果
-eye_contours = detector.get_eyes_contours()
+eye_contours = detector.get_eye_contours()
 pupil_center = detector.get_pupil_center()
 ```
 

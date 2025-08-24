@@ -170,9 +170,9 @@ depth_map = np.ndarray(data=[[0.5, 0.6], [0.4, 0.5]], shape=(2, 2), dtype=np.flo
 success = detector.detect_face(bgr_image, depth_map)
 # 返回：True 或 False
 
-def get_eyes_contours(self) -> Dict[str, List[np.ndarray]]
+def get_eye_contours(self) -> Dict[str, List[np.ndarray]]
 # 示例：
-eye_contours = detector.get_eyes_contours()
+eye_contours = detector.get_eye_contours()
 # 返回：{"left": [np.array([x1, y1, z1]), ...], "right": [np.array([x1, y1, z1]), ...]}
 
 def get_pupil_center(self) -> Dict[str, np.ndarray]

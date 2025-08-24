@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 from typing import List, Dict, Tuple, Optional
+import logging
 
 class FaceDetector:
     """
@@ -22,7 +23,7 @@ class FaceDetector:
             cls._instance = super(FaceDetector, cls).__new__(cls)
         return cls._instance
     
-    def __init__(self, camera_params: dict):
+    def __init__(self, camera_params: dict, rgb_d: bool = False):
         """
         初始化检测器
         
@@ -60,6 +61,7 @@ class FaceDetector:
         self._detection_success = False
         self._detection_confidence = 0.0
         self._error_message = ""
+        self._rgb_d = rgb_d
 
     def detect_face(self, bgr_image: np.ndarray, depth_map: np.ndarray) -> bool:
         """
@@ -79,7 +81,8 @@ class FaceDetector:
             
             # 保存输入数据
             self._bgr_image = bgr_image
-            self._depth_map_meters = self._convert_depth_to_meters(depth_map)
+            
+
             
             # 导入landmark_extractor模块
             from project.recognition.core.landmark_extractor import extract_landmarks, validate_landmarks
@@ -93,13 +96,31 @@ class FaceDetector:
                 self._detection_success = True
                 self._detection_confidence = self._calculate_detection_confidence()
                 self._error_message = ""
+                
+                # 调试信息：打印RGB-D状态和关键点数量
+                logging.info(f"DEBUG: self._rgb_d = {self._rgb_d}")
+                logging.info(f"DEBUG: 检测到 {len(landmarks)} 个关键点")
+                
+                if not self._rgb_d:
+                    logging.info(f"DEBUG: 不使用RGB-D相机，开始修改深度图")
+                    # 修改深度图：为每个关键点设置深度值 depth_value + lm.z
+                    modified_depth_map = self._set_depth_map_without_rgb_d(depth_map)
+                    logging.info(f"DEBUG: 深度图修改完成，原始深度图形状: {depth_map.shape}, 修改后深度图形状: {modified_depth_map.shape}")
+                    # 使用修改后的深度图
+                    self._depth_map_meters = self._convert_depth_to_meters(modified_depth_map)
+                else:
+                    logging.info(f"DEBUG: 使用RGB-D相机，直接使用原始深度图")
+                    self._depth_map_meters = self._convert_depth_to_meters(depth_map)
+                
                 return True
             else:
                 self._detection_success = False
                 self._landmarks = None
                 self._detection_confidence = 0.0
                 self._error_message = "关键点提取失败或质量不佳"
+                self._depth_map_meters = None
                 return False
+            
                 
         except Exception as e:
             self._detection_success = False
@@ -108,7 +129,7 @@ class FaceDetector:
             self._error_message = f"检测过程中发生错误: {str(e)}"
             return False
 
-    def get_eyes_contours(self) -> Dict[str, List[np.ndarray]]:
+    def get_eye_contours(self) -> Dict[str, List[np.ndarray]]:
         """
         获取左右眼轮廓点三维坐标
         
@@ -190,7 +211,7 @@ class FaceDetector:
                 return {'left': [], 'right': []}
             
             # 尝试使用批量转换
-            try:
+            try:    
                 left_eye_3d = batch_convert_landmarks(
                     eye_contours_landmarks['left'],
                     self._depth_map_meters,
@@ -202,6 +223,7 @@ class FaceDetector:
                     self._depth_map_meters,
                     self.camera_params
                 )
+                
                 
                 # 如果批量转换成功且结果不为空，直接返回
                 if left_eye_3d and right_eye_3d:
@@ -256,7 +278,7 @@ class FaceDetector:
             
         except Exception as e:
             # 如果转换过程中出现异常，返回空列表
-            print(f"眼轮廓点转换异常: {e}")
+            logging.info(f"眼轮廓点转换异常: {e}")
             return {'left': [], 'right': []}
     
     def get_pupil_center(self) -> Dict[str, np.ndarray]:
@@ -353,7 +375,7 @@ class FaceDetector:
             
         except Exception as e:
             # 如果转换失败，返回零向量
-            print(f"瞳孔中心坐标转换失败: {e}")
+            logging.info(f"瞳孔中心坐标转换失败: {e}")
             return {
                 'left': np.array([0.0, 0.0, 0.0]), 
                 'right': np.array([0.0, 0.0, 0.0])
@@ -444,7 +466,7 @@ class FaceDetector:
                     }
                     
             except Exception as e:
-                print(f"批量转换眼眶关键点失败: {e}")
+                logging.info(f"批量转换眼眶关键点失败: {e}")
             
             # 如果批量转换失败，使用单个转换
             left_socket_3d = []
@@ -462,7 +484,7 @@ class FaceDetector:
                     point_4d = np.append(point_3d, visibility)
                     left_socket_3d.append(point_4d)
                 except Exception as e:
-                    print(f"转换左眼眶关键点失败: {e}")
+                    logging.info(f"转换左眼眶关键点失败: {e}")
                     continue
             
             for point in eye_socket_landmarks['right']:
@@ -477,7 +499,7 @@ class FaceDetector:
                     point_4d = np.append(point_3d, visibility)
                     right_socket_3d.append(point_4d)
                 except Exception as e:
-                    print(f"转换右眼眶关键点失败: {e}")
+                    logging.info(f"转换右眼眶关键点失败: {e}")
                     continue
             
             return {
@@ -486,7 +508,7 @@ class FaceDetector:
             }
             
         except Exception as e:
-            print(f"获取眼眶关键点失败: {e}")
+            logging.info(f"获取眼眶关键点失败: {e}")
             return {'left': [], 'right': []}
 
     def get_eyelid_points(self) -> Dict[str, List[np.ndarray]]:
@@ -574,7 +596,7 @@ class FaceDetector:
                     }
                     
             except Exception as e:
-                print(f"批量转换眼睑关键点失败: {e}")
+                logging.info(f"批量转换眼睑关键点失败: {e}")
             
             # 如果批量转换失败，使用单个转换
             left_eyelid_3d = []
@@ -592,7 +614,7 @@ class FaceDetector:
                     point_4d = np.append(point_3d, visibility)
                     left_eyelid_3d.append(point_4d)
                 except Exception as e:
-                    print(f"转换左眼睑关键点失败: {e}")
+                    logging.info(f"转换左眼睑关键点失败: {e}")
                     continue
             
             for point in eyelid_landmarks['right']:
@@ -607,7 +629,7 @@ class FaceDetector:
                     point_4d = np.append(point_3d, visibility)
                     right_eyelid_3d.append(point_4d)
                 except Exception as e:
-                    print(f"转换右眼睑关键点失败: {e}")
+                    logging.info(f"转换右眼睑关键点失败: {e}")
                     continue
             
             return {
@@ -616,7 +638,7 @@ class FaceDetector:
             }
             
         except Exception as e:
-            print(f"获取眼睑关键点失败: {e}")
+            logging.info(f"获取眼睑关键点失败: {e}")
             return {'left': [], 'right': []}
 
     def get_iris_boundaries(self) -> Dict[str, List[np.ndarray]]:
@@ -767,7 +789,7 @@ class FaceDetector:
             
         except Exception as e:
             # 如果转换过程中出现异常，返回空列表
-            print(f"虹膜边界点转换异常: {e}")
+            logging.info(f"虹膜边界点转换异常: {e}")
             return {'left': [], 'right': []}
 
     def get_detection_confidence(self) -> float:
@@ -790,6 +812,84 @@ class FaceDetector:
             return f"检测失败: {self._error_message}"
     
     # ==================== 私有方法 ====================
+    
+    def _set_depth_map_without_rgb_d(self, depth_map: np.ndarray) -> np.ndarray:
+        """
+        当不使用RGB-D相机时，为所有关键点设置深度值
+        
+        该方法的作用是：
+        1. 接收原始深度图
+        2. 为每个关键点的位置设置深度值为 depth_value + lm.z
+        3. 返回修改后的深度图
+        
+        Args:
+            depth_map: 原始深度图，numpy数组格式，形状为(H, W)
+            
+        Returns:
+            np.ndarray: 修改后的深度图，每个关键点位置的深度值为 depth_value + lm.z
+            
+        处理流程：
+        1. 检查是否有有效的关键点数据
+        2. 为每个关键点计算新的深度值：depth_value + lm.z
+        3. 在深度图的对应位置设置新的深度值
+        4. 返回修改后的深度图
+        """
+        logging.info(f"DEBUG: _set_depth_map_without_rgb_d 开始执行")
+        logging.info(f"DEBUG: 输入深度图形状: {depth_map.shape}")
+        logging.info(f"DEBUG: 输入深度图数据类型: {depth_map.dtype}")
+        logging.info(f"DEBUG: 输入深度图值范围: {depth_map.min():.6f} ~ {depth_map.max():.6f}")
+        
+        if self._landmarks is None or not self._landmarks:
+            logging.info(f"DEBUG: 没有关键点数据，返回原始深度图")
+            return depth_map
+        
+        logging.info(f"DEBUG: 关键点数量: {len(self._landmarks)}")
+        logging.info(f"DEBUG: 第一个关键点示例: {self._landmarks[0]}")
+        
+        # 创建深度图的副本，避免修改原始数据
+        modified_depth_map = depth_map.copy().astype(np.float32)
+        logging.info(f"DEBUG: 创建深度图副本，形状: {modified_depth_map.shape}")
+        
+        modified_count = 0
+        try:
+            # 遍历所有关键点
+            for i, landmark in enumerate(self._landmarks):
+                if len(landmark) >= 3:  # 确保关键点至少有x, y, z三个坐标
+                    x, y, z = landmark[0], landmark[1], landmark[2]
+                    
+                    # 将浮点坐标转换为整数索引
+                    x_idx = int(round(x))
+                    y_idx = int(round(y))
+                    
+                    # 检查索引是否在有效范围内
+                    if (0 <= x_idx < depth_map.shape[1] and 
+                        0 <= y_idx < depth_map.shape[0]):
+                        
+                        # 获取该位置的原始深度值
+                        original_depth = depth_map[y_idx, x_idx]
+                        
+                        # 计算新的深度值：depth_value + lm.z
+                        # 注意：lm.z是MediaPipe的相对深度值，需要与绝对深度值相加
+                        # 乘以500是因为MediaPipe的z值是相对值，需要转换为毫米
+                        new_depth = original_depth + z * 100
+                        
+                        # 设置新的深度值
+                        modified_depth_map[y_idx, x_idx] = new_depth
+                        modified_count += 1
+                        
+                        # 打印前几个修改的点的详细信息
+                        if modified_count <= 5:
+                            logging.info(f"DEBUG: 关键点 {i}: 位置({x_idx}, {y_idx}), 原始深度: {original_depth:.6f}, z值: {z:.6f}, 新深度: {new_depth:.6f}")
+                        
+        except Exception as e:
+            logging.info(f"设置关键点深度值时发生错误: {e}")
+            # 如果发生错误，返回原始深度图
+            return depth_map
+        
+        logging.info(f"DEBUG: 成功修改了 {modified_count} 个关键点位置的深度值")
+        logging.info(f"DEBUG: 修改后深度图值范围: {modified_depth_map.min():.6f} ~ {modified_depth_map.max():.6f}")
+        
+        return modified_depth_map
     
     def _validate_camera_params(self, camera_params: dict) -> None:
         """
@@ -860,7 +960,13 @@ class FaceDetector:
             np.ndarray: 米单位的深度图
         """
         depth_scale = self.camera_params.get("depth_scale", 1.0)
-        return depth_map.astype(np.float32) * depth_scale
+        logging.info(f"DEBUG: _convert_depth_to_meters: depth_scale = {depth_scale}")
+        logging.info(f"DEBUG: _convert_depth_to_meters: 输入深度图值范围: {depth_map.min():.6f} ~ {depth_map.max():.6f}")
+        
+        converted_depth_map = depth_map.astype(np.float32) * depth_scale
+        logging.info(f"DEBUG: _convert_depth_to_meters: 转换后深度图值范围: {converted_depth_map.min():.6f} ~ {converted_depth_map.max():.6f}")
+        
+        return converted_depth_map
     
     def _get_camera_intrinsics(self) -> Tuple[float, float, float, float]:
         """

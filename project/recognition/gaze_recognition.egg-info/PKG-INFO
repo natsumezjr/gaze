@@ -151,7 +151,7 @@ detector = FaceDetector(camera_params)
 result = detector.detect_face(bgr_image, depth_map)
 
 # 获取结果
-eye_contours = detector.get_eyes_contours()
+eye_contours = detector.get_eye_contours()
 pupil_center = detector.get_pupil_center()
 iris_boundaries = detector.get_iris_boundaries()
 ```

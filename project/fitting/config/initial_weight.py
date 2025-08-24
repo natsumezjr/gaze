@@ -45,8 +45,8 @@ ANATOMICAL_WEIGHT_PARAMS = {
         w_anatomy=0.851670507229441
     ),
     "eye_contour": AnatomicalWeightParams(
-        offset_range=(0.001, 0.002),
-        median_distance=0.0015,
+        offset_range=(0.001, 0.004),
+        median_distance=0.0025,
         sigma=0.0015,
         w_anatomy=0.607
     )
@@ -55,12 +55,12 @@ ANATOMICAL_WEIGHT_PARAMS = {
 # 几何残差权重的初始化标准差（基于各解剖结构的中值距离）
 GEOMETRIC_WEIGHT_PARAMS = {
     "pupil_center": GeometricWeightParams(
-        initial_sigma=0.0002,
+        initial_sigma=0.0001,
         threshold=0.0010,
         min_weight=0.3
     ),
     "iris_boundary": GeometricWeightParams(
-        initial_sigma=0.00085,
+        initial_sigma=0.00035,
         threshold=0.0010,
         min_weight=0.2
     ),

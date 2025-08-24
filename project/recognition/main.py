@@ -83,8 +83,8 @@ except ImportError as e:
 
 def main():
     frame_id = 0
-    
-    camera_calibrator = CameraCalibrator(rgb_d=True)
+    rgb_d = False
+    camera_calibrator = CameraCalibrator(rgb_d=rgb_d)
     cap = camera_calibrator.get_cap()
     
     if cap is None:
@@ -95,7 +95,7 @@ def main():
     
 
     # 初始化人脸检测器（使用调整后的相机参数）
-    face_detector = FaceDetector(camera_params)
+    face_detector = FaceDetector(camera_params, rgb_d=rgb_d)
     
     try:
         while True:
@@ -125,7 +125,7 @@ def main():
                     iris_boundaries = face_detector.get_iris_boundaries()
                     
                     # 获取眼轮廓
-                    eyes_contours = face_detector.get_eyes_contours()
+                    eye_contours = face_detector.get_eye_contours()
                     
                     # 获取眼眶关键点（新增）
                     eye_sockets = face_detector.get_eye_sockets()
@@ -137,7 +137,7 @@ def main():
                     key_coordinates = {
                         'pupil_center': pupil_center,
                         'iris_boundaries': iris_boundaries,
-                        'eyes_contours': eyes_contours,
+                        'eye_contours': eye_contours,
                         'eye_sockets': eye_sockets,
                         'eyelid_points': eyelid_points
                     }

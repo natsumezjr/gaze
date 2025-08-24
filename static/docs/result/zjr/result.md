@@ -92,7 +92,7 @@
 key_coordinates = {
     'pupil_center': {'left': np.ndarray(3,), 'right': np.ndarray(3,)},
     'iris_boundaries': {'left': List[np.ndarray(3,)], 'right': List[np.ndarray(3,)]},
-    'eyes_contours': {'left': List[np.ndarray(3,)], 'right': List[np.ndarray(3,)]}
+    'eye_contours': {'left': List[np.ndarray(3,)], 'right': List[np.ndarray(3,)]}
 }
 
 # 拟合模块调用

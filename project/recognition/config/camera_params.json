@@ -2,8 +2,8 @@
     "camera_name": "HD Camera",
     "camera_type": "RGB",
     "intrinsic_params": {
-        "fx": 554.26,
-        "fy": 554.26,
+        "fx": 450.0,
+        "fy": 450.0,
         "cx": 320.0,
         "cy": 240.0
     },
@@ -21,7 +21,7 @@
         "p2": 0.0,
         "k3": 0.0
     },
-    "calibration_date": "2025-08-08",
-    "calibration_method": "Manual Fake Parameters for Code Testing",
-    "notes": "测试用假定内参，无真实标定"
+    "calibration_date": "2024-01-15",
+    "calibration_method": "PowerShell Auto Detection",
+    "notes": "通过PowerShell自动检测获得，制造商: Microsoft"
 }

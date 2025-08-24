@@ -18,7 +18,7 @@ import logging
 
 
 # 识别模块输出的 key_coordinates 的宽松结构：
-# 顶层键：'pupil_center' | 'iris_boundaries' | 'eyes_contours'
+# 顶层键：'pupil_center' | 'iris_boundaries' | 'eye_contours'
 # 次层键：'left' | 'right'
 # 值：np.ndarray(3,) 或 List[np.ndarray(3,)]，并兼容 None
 
@@ -37,7 +37,7 @@ class _EyeCenterFitter:
       约定包含：
         - 'pupil_center': {'left': np.ndarray(3,), 'right': np.ndarray(3,)} 或 None/零向量
         - 'iris_boundaries': {'left': List[np.ndarray(3,)], 'right': List[np.ndarray(3,)]} 或 []
-        - 'eyes_contours': {'left': List[np.ndarray(3,)], 'right': List[np.ndarray(3,)]} 或 []
+        - 'eye_contours': {'left': List[np.ndarray(3,)], 'right': List[np.ndarray(3,)]} 或 []
       注：上游识别模块需保证这些键名与结构一致。
 
     - center_fitter: 可选自定义拟合器，签名统一为：
@@ -208,7 +208,7 @@ class _EyeCenterFitter:
         eye_key_coordinates = {
             "pupil_center": None,
             "iris_boundaries": [],
-            "eyes_contours": []
+            "eye_contours": []
         }
         
         # 提取瞳孔中心 - 修复：明确检查是否为None
@@ -246,11 +246,11 @@ class _EyeCenterFitter:
         
         # 提取眼睛轮廓 - 修复：明确检查列表是否为空
         logging.debug(f"提取眼睛轮廓")
-        eyes_contours = self._key_coordinates.get("eyes_contours")
-        logging.debug(f"eyes_contours: {eyes_contours}")
-        if eyes_contours is not None:
-            logging.debug(f"eyes_contours类型: {type(eyes_contours)}")
-            eye_contour = eyes_contours.get(eye_key)
+        eye_contours = self._key_coordinates.get("eye_contours")
+        logging.debug(f"eye_contours: {eye_contours}")
+        if eye_contours is not None:
+            logging.debug(f"eye_contours类型: {type(eye_contours)}")
+            eye_contour = eye_contours.get(eye_key)
             logging.debug(f"eye_contour: {eye_contour}")
             if eye_contour is not None:
                 logging.debug(f"eye_contour类型: {type(eye_contour)}")
@@ -261,7 +261,7 @@ class _EyeCenterFitter:
                         if isinstance(eye_contour[0], np.ndarray):
                             logging.debug(f"第一个元素形状: {eye_contour[0].shape}")
                 if len(eye_contour) > 0:
-                    eye_key_coordinates["eyes_contours"] = eye_contour
+                    eye_key_coordinates["eye_contours"] = eye_contour
         
         logging.debug(f"_extract_eye_key_coordinates完成: {eye_key_coordinates}")
         return eye_key_coordinates
@@ -288,7 +288,7 @@ def ransac_sphere_eyeball(
           "left":  [np.array([x, y, z]), ...],   # N 个点
           "right": [np.array([x, y, z]), ...],
         },
-        "eyes_contours": {
+        "eye_contours": {
           "left":  [np.array([x, y, z]), ...],   # M 个点（可选使用）
           "right": [np.array([x, y, z]), ...],
         },
