@@ -25,7 +25,7 @@
 
 好的，我将根据现有文件中的函数定义为您提供更新后的文档内容。
 1. core.md 更新内容
-摄像头数据 → DataManager内存存储 → core模块处理 → 结果输出
+摄像头数据 → RecgFitDataManager内存存储 → core模块处理 → 结果输出
 2. structure.md 更新内容
 recognition/
 ├── init.py # 模块初始化

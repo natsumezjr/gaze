@@ -3,14 +3,6 @@ from typing import Dict, List, Union, Optional
 from dataclasses import dataclass
 import numpy as np
 
-# 类型定义
-KeyCoordinates = Dict[str, Dict[str, Union[np.ndarray, List[np.ndarray], None]]]
-
-# 单眼关键点坐标类型（给CenterFitter使用）
-SingleEyeKeyCoordinates = Dict[str, Union[np.ndarray, List[np.ndarray], None]]
-
-# 常量
-EYEBALL_RADIUS = 0.012
 
 # 数据模型定义
 class EllipsoidParams:
@@ -21,7 +13,7 @@ class EllipsoidParams:
     - center: 椭球中心坐标，np.ndarray(3,)
     """
     def __init__(self):
-        self.axes = np.array([EYEBALL_RADIUS, EYEBALL_RADIUS, EYEBALL_RADIUS])
+        self.axes = np.array([0.012, 0.012, 0.012])
         self.rotation = np.eye(3)
         self.center = np.array([0.0, 0.0, 0.0])
     

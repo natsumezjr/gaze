@@ -14,7 +14,7 @@
 - 统一使用绝对导入，前缀一律为 `project.*`
   - 例如：
     - `from project.recognition.core.detector import FaceDetector`
-    - `from project.fitting.core.ransac_sphere_fitter import ransac_sphere_eyeball`
+    - `from project.fitting.core.ransac_sphere_fitter import fitting_eyeballs`
 - 运行时从仓库根目录启动，使解释器能找到顶层包 `project`。
 - 不建议在系统层面配置环境变量；也不在包的 `__init__.py` 中“注册路径”。如需临时修改导入路径，只在“入口脚本”最顶部注入父目录到 `sys.path`。
 

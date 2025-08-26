@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Dict, Optional, Tuple
 
 
-class DataManager:
+class CameraDataManager:
     """
     数据管理器单例类
     负责管理BGR图像和深度图数据
@@ -165,7 +165,7 @@ class DataManager:
 
 
 # 全局单例实例
-data_manager = DataManager()
+data_manager = CameraDataManager()
 
 
 # 便捷函数接口
@@ -196,7 +196,7 @@ def get_frame_count() -> int:
 
 # 接口测试
 def main():
-    """示例：使用DataManager类并进行严格的数据检查"""
+    """示例：使用RecgFitDataManager类并进行严格的数据检查"""
     cap = cv2.VideoCapture(0)
     frame_id = 0
     

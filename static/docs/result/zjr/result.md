@@ -96,7 +96,7 @@ key_coordinates = {
 }
 
 # 拟合模块调用
-ransac_sphere_eyeball(key_coordinates, center_fitter=center_fitter)
+fitting_eyeballs(key_coordinates, center_fitter=center_fitter)
 
 # 几何计算在utils/geometry.py中实现
 # Kappa标定在kappa_calibrator.py中设计

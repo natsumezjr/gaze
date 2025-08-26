@@ -8,4 +8,4 @@ __author__ = "Gaze Team"
 
 # 导入主要模块，方便使用
 from project.recognition.core.detector import *
-from project.recognition.utils.data_manager import *
+from project.recognition.utils.camera_data_manager import *

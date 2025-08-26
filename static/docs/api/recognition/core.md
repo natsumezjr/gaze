@@ -225,8 +225,8 @@ is_valid = validate_3d_coordinates(coords_3d)
 
 #### 1. data_manager.py
 ```python
-# DataManager单例类
-class DataManager:
+# RecgFitDataManager单例类
+class RecgFitDataManager:
     def __init__(self) -> None
     # 单例模式初始化
     

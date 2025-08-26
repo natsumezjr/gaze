@@ -4,4 +4,4 @@ Configuration Package
 """
 
 from project.recognition.config.settings import DATA_PATH
-from project.recognition.config.constants import *
+
