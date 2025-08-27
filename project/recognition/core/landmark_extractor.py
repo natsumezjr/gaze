@@ -11,7 +11,7 @@ from project.recognition.config.settings import *
 
 def calculate_visibility(landmark: List[float], image: np.ndarray, landmark_index: int) -> float:
     """计算关键点的可见性分数"""
-    return 1.0
+    return 0.92
 
 def extract_landmarks(bgr_image: np.ndarray) -> List[List[float]]:
     """
@@ -98,8 +98,8 @@ def get_fitting_landmarks(landmarks: List[List[float]]) -> KeyCoordinates:
     except Exception as e:
         print(f"整合眼部关键点失败: {e}")
         return {
-            'left': {'pupil': None, 'iris': [], 'inner_canthus': [], 'upper_eyelid': [], 'lower_eyelid': [], 'outer_canthus': []},
-            'right': {'pupil': None, 'iris': [], 'inner_canthus': [], 'upper_eyelid': [], 'lower_eyelid': [], 'outer_canthus': []}
+            'left': {'pupil': [], 'iris': [], 'inner_canthus': [], 'upper_eyelid': [], 'lower_eyelid': [], 'outer_canthus': []},
+            'right': {'pupil': [], 'iris': [], 'inner_canthus': [], 'upper_eyelid': [], 'lower_eyelid': [], 'outer_canthus': []}
         }
 
 def validate_landmarks(landmarks: List[List[float]]) -> bool:
@@ -160,8 +160,10 @@ if __name__ == "__main__":
             
             # 绘制瞳孔中心点
             for eye in EYE_TYPE:
-                if fitting_data[eye]['pupil'] is not None:
-                    x, y = int(fitting_data[eye]['pupil'][0]), int(fitting_data[eye]['pupil'][1])
+                pupil = fitting_data[eye]['pupil']
+                if pupil and len(pupil) > 0:
+                    pupil_point = pupil[0]  # 瞳孔是列表的第一个元素
+                    x, y = int(pupil_point[0]), int(pupil_point[1])
                     color = colors['pupil'][eye]
                     cv2.circle(image, (x, y), 4, color, -1)
                 
@@ -207,8 +209,9 @@ if __name__ == "__main__":
                     print(f"帧 {frame_count}: ✅ 检测到 {len(landmarks)} 个关键点")
                     for eye in EYE_TYPE:
                         pupil = fitting_data[eye]['pupil']
-                        if pupil is not None:
-                            print(f"   {eye}眼瞳孔: ({pupil[0]:.1f}, {pupil[1]:.1f})")
+                        if pupil and len(pupil) > 0:
+                            pupil_point = pupil[0]  # 瞳孔是列表的第一个元素
+                            print(f"   {eye}眼瞳孔: ({float(pupil_point[0]):.1f}, {float(pupil_point[1]):.1f})")
                     
                     # 绘制关键点
                     frame = draw_landmarks_on_image(frame, landmarks)

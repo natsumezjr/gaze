@@ -8,10 +8,8 @@ import sys
 import os
 import cv2
 import numpy as np
-import time
 import logging
-import json
-from typing import Optional, Dict, Tuple
+
 from datetime import datetime
 
 # 配置日志
@@ -63,7 +61,7 @@ except ImportError as e:
 
 def main():
     frame_id = 0
-    rgb_d = False
+    rgb_d = True
     camera_calibrator = CameraCalibrator(rgb_d=rgb_d)
     cap = camera_calibrator.get_cap()
     
@@ -108,7 +106,8 @@ def main():
                         fitting()
                     except Exception as e:
                         logging.error(f"拟合失败: {e}")
-                    break  # 用于测试一帧拟合
+                    break
+                    # 用于测试一帧拟合
                         
                 else:
                     logging.warning(f"帧 {frame_id}: 未检测到人脸")

@@ -11,8 +11,8 @@
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Callable, List, Tuple, Dict, Optional
+from dataclasses import dataclass
+from typing import List, Tuple, Dict, Union, Callable
 from project.recg_fit_data.data_manager import EYE_TYPE, RECG_FIT_DATA_MANAGER, RecgFitDataManager
 import numpy as np
 import logging
@@ -20,27 +20,27 @@ import logging
 # ==================== 解剖学约束参数 ====================
 ANATOMICAL_CONSTRAINTS = {
     "TO_SURFACE": {
-        "pupil": (-4.05, -3.5),
-        "iris": (-1.2, -0.6),
-        "inner_canthus": (0.0, 0.5),
-        "upper_eyelid": (1.0, 2.0),
-        "lower_eyelid": (0.5, 1.5),
-        "outer_canthus": (3.5, 5.0),
+        "pupil": (-4.5, -2.5),
+        "iris": (-1.8, -0.4),
+        "inner_canthus": (4.0, 8.0),
+        "upper_eyelid": (0.0, 2.0),
+        "lower_eyelid": (0.2, 1.6),
+        "outer_canthus": (2.5, 6.7),
     },
     "TO_CENTER": {
-        "pupil": (7.95, 8.95),
-        "iris": (10.3, 11.8),
-        "inner_canthus": (12.0, 13.0),
-        "upper_eyelid": (13.5, 14.5),
-        "lower_eyelid": (13.0, 14.0),
-        "outer_canthus": (15.0, 17.5),
+        "pupil": (7.95, 9.95),
+        "iris": (10.40, 12.04),
+        "inner_canthus": (16.0, 20.0),
+        "upper_eyelid": (11.3, 13.3),
+        "lower_eyelid": (12.0, 14.0),
+        "outer_canthus": (14.9, 18.9),
     },
-    "EYEBALL_RADIUS": (8.0, 20.0),
+    "EYEBALL_RADIUS": (11.0, 13.0),
     "EYEBALL_RADIUS_DEFAULT": 12.0,
 }
 
-FITTING_ENABLE = ["pupil", "iris", "inner_canthus"]
-OUTSIDE_EYEBALL = ["upper_eyelid", "lower_eyelid", "outer_canthus"]
+FITTING_ENABLE = ["pupil", "iris"]
+OUTSIDE_EYEBALL = ["inner_canthus", "upper_eyelid", "lower_eyelid", "outer_canthus"]
 RESIDUAL_TYPE = ["TO_SURFACE", "TO_CENTER"]
 
 # ==================== 核心数据类（无依赖）====================
@@ -58,6 +58,9 @@ class FittingParameters:
             radius=self.radius,
             sphere_fitting=self.sphere_fitting
         )
+    
+    def __len__(self):
+        return len(self.center) + len([self.radius])
     
     def to_theta(self) -> np.ndarray:
         """转换为参数向量"""
@@ -298,40 +301,31 @@ class ResidualCalculator:
 
 
 # ==================== 目标函数 ====================
-def target_function(surface_residual: np.ndarray, center_residual: np.ndarray, 
-                   depth_residual: float, alpha: float = 0.5, huber_kappa: float = 0.6, depth_lambda: float = 1.0) -> float:
-    """目标函数：Φ(θ) = (1/2) * [α * Σ ρ1(f1,i) + (1-α) * Σρ2(f2,i) + λ * d^2]"""
+def target_function(all_residuals: np.ndarray, alpha: float = 0.5, huber_kappa: float = 0.6) -> float:
+    """目标函数：Φ(θ) = (1/2) * Σ r_i^2，其中 r_i 是各个残差项"""
     
-    def huber_loss(f):
-        if abs(f) <= huber_kappa:
-            return 0.5 * f**2
-        else:
-            return huber_kappa * (abs(f) - 0.5 * huber_kappa)
+    # 简化为平方和形式，因为残差已经在各自的函数中进行了适当的缩放
+    total_value = 0.5 * np.sum(all_residuals**2)
     
-    # 计算Huber损失
-    surface_loss = sum(huber_loss(f) for f in surface_residual) if len(surface_residual) > 0 else 0.0
-    center_loss = sum(huber_loss(f) for f in center_residual) if len(center_residual) > 0 else 0.0
-    depth_loss = depth_residual**2
-    
-    # 计算总目标函数值
-    total_value = (1/2) * (alpha * surface_loss + (1-alpha) * center_loss + depth_lambda * depth_loss)
-    
-    return total_value
-
-# ==================== 置信度类 ====================
+    return total_value 
 
 # ==================== 置信度计算类 ====================
 class ConfidenceCalculator:
     """置信度计算器 - 基于几何约束和正态分布"""
     
-    def __init__(self, anatomical_constraints: Dict = ANATOMICAL_CONSTRAINTS):
+    def __init__(self, anatomical_constraints: Dict = ANATOMICAL_CONSTRAINTS, fitting_only: bool = True):
         self.constraints = anatomical_constraints
+        self.fitting_only = fitting_only
         self.residual_calculator = ResidualCalculator(anatomical_constraints)
+        self.sigma_dict = {}
+        self.sigma_dict_computed = False  
         self._precompute_sigma_dict()
+        
     
     def _precompute_sigma_dict(self):
         """预计算所有类型点的sigma字典"""
-        self.sigma_dict = {}
+        if self.sigma_dict_computed:
+            return
         
         for residual_type in RESIDUAL_TYPE:
             self.sigma_dict[residual_type] = {}
@@ -344,7 +338,7 @@ class ConfidenceCalculator:
                 constraints = constraints_dict[point_type]
                 
                 # 计算最大偏移
-                max_offset = max(abs(constraints[0] - mu), abs(constraints[1] - mu))
+                max_offset = (constraints[1] - constraints[0]) / 2
                 
                 # 解方程计算sigma平方
                 sigma_squared = self._solve_sigma_squared(max_offset, 0.9)  # 使用0.9作为优秀阈值
@@ -355,6 +349,9 @@ class ConfidenceCalculator:
                     "sigma": sigma,
                     "mu": mu
                 }
+                #logging.debug(f"预计算sigma字典，残差类型：\n{residual_type}\n 点类型：\n{point_type}\n sigma：{sigma} mu：{mu} 最大偏差：{max_offset}")
+                #logging.debug(f"最大偏差置信度：{self.normal_distribution_vector(max_offset, 0, sigma)}")
+        self.sigma_dict_computed = True
     
     def _solve_sigma_squared(self, max_offset: float, confidence: float) -> float:
         """
@@ -395,12 +392,12 @@ class ConfidenceCalculator:
         for i, point_type in enumerate(point_types):
             if point_type in self.sigma_dict[residual_type]:
                 sigma_info = self.sigma_dict[residual_type][point_type]
-                mu = sigma_info["mu"]
                 sigma = sigma_info["sigma"]
                 
                 confidence_vector[i] = self.normal_distribution_vector(
-                    residual_vector[i], mu, sigma
+                    residual_vector[i], 0, sigma
                 )
+                #logging.debug(f"计算置信度向量，残差类型：\n{residual_type}\n 点类型：\n{point_type}\n 置信度：\n{confidence_vector[i]}")
             else:
                 # 如果点类型不在预计算字典中，使用默认值
                 confidence_vector[i] = 0.0
@@ -437,7 +434,10 @@ class ConfidenceCalculator:
             几何置信度均值
         """
         # 合并所有点
-        all_points = fitting_points + constraint_points
+        if self.fitting_only:
+            all_points = fitting_points
+        else:
+            all_points = fitting_points + constraint_points
         
         if not all_points:
             return 0.0
@@ -496,7 +496,7 @@ class ConfidenceCalculator:
     def calculate_weighted_confidence(self, parameters: FittingParameters, 
                                     fitting_points: List[Tuple[np.ndarray, str]],
                                     constraint_points: List[Tuple[np.ndarray, str]],
-                                    fitting_weight: float = 0.7, constraint_weight: float = 0.3) -> float:
+                                    fitting_weight: float = 0.9, constraint_weight: float = 0.1) -> float:
         """
         计算加权置信度
         Args:
@@ -562,19 +562,21 @@ class Optimizer(ABC):
 
 
 class LevenbergMarquardtOptimizer(Optimizer):
-    """Levenberg-Marquardt优化器"""
-    
+    """Levenberg-Marquardt优化器（重构版本）"""
+
     def __init__(self, max_iterations: int = 30, lambda_init: float = 0.01, 
                  lambda_factor: float = 10.0, delta_convergence_threshold: float = 1,
-                 max_lambda: float = 1e8, min_lambda: float = 1e-8, alpha: float = 0.5,
+                 max_lambda: float = 1e8, min_lambda: float = 1e-8, alpha: float = 0.1,
                  residual_convergence_threshold: float = 0.01,
-                 residual_convergence_threshold_factor: float = 10.0,
-                 max_step_size: float = 1,
-                 huber_kappa: float = 0.6,
+                 max_step_size: float = 4,
+                 huber_kappa: float = 1.5,
                  depth_epsilon: float = 5.0,
-                 depth_sigma: float = 1.0,
-                 depth_lambda: float = 1.0,
+                 depth_sigma: float = 100.0,
+                 depth_lambda: float = 0.01,
+                 outside_eyeball_sigma: float = 1.0,
+                 outside_eyeball_lambda: float = 0.1,
                  ):
+        # 原有参数保持不变
         self.max_iterations = max_iterations
         self.lambda_init = lambda_init
         self.lambda_factor = lambda_factor
@@ -582,16 +584,314 @@ class LevenbergMarquardtOptimizer(Optimizer):
         self.min_lambda = min_lambda
         self.delta_convergence_threshold = delta_convergence_threshold
         self.residual_convergence_threshold = residual_convergence_threshold
-        self.residual_calculator = ResidualCalculator()
-        self.confidence_calculator = ConfidenceCalculator()
         self.max_step_size = max_step_size
         self.last_target_value = float('inf')
+
+        # 残差权重相关
         self.alpha = alpha
         self.huber_kappa = huber_kappa
         self.depth_epsilon = depth_epsilon
         self.depth_sigma = depth_sigma
         self.depth_lambda = depth_lambda
+        self.outside_eyeball_sigma = outside_eyeball_sigma
+        self.outside_eyeball_lambda = outside_eyeball_lambda
+
+        # 保持原有计算器
+        self.residual_calculator = ResidualCalculator()
+        self.confidence_calculator = ConfidenceCalculator()
+
+        # 新增：残差项注册表
+        self.residual_terms: List[Callable] = []
+        self.register_default_residuals()
+
+    # ================== 残差注册 ==================
+    def register_residual(self, func: Callable):
+        """注册残差计算函数: func(params, fitting_points, constraint_points) -> (residual, jacobian)"""
+        self.residual_terms.append(func)
+
+    def register_default_residuals(self):
+        """注册默认残差项（表面、中心、深度、眼球外）"""
+        self.register_residual(self._surface_residual)
+        self.register_residual(self._center_residual)
+        self.register_residual(self._depth_residual)
+        self.register_residual(self._outside_eyeball_residual)
+
+
+    # ================== 残差项实现 ==================
+    def _surface_residual(self, params, fitting_points, constraint_points):
+        """
+        表面残差 - 使用原有的ResidualCalculator逻辑
         
+        数学公式：
+        对于每个拟合点 p_i，表面残差定义为：
+        f_surface,i = √α * (||p_i - c|| - r - bias_surface,i) * w_huber,i
+        
+        其中：
+        - p_i: 第i个拟合点的3D坐标
+        - c: 球心坐标 [x, y, z]
+        - r: 球体半径
+        - bias_surface,i: 第i个点的表面生理偏差（从ANATOMICAL_CONSTRAINTS获取）
+        - α: 表面残差权重参数
+        - w_huber,i: Huber权重，w_huber,i = min(1, κ/|f_raw,i|)，其中κ是Huber阈值
+        
+        雅可比矩阵：
+        ∂f_surface,i/∂c = -√α * w_huber,i * (p_i - c) / ||p_i - c||
+        ∂f_surface,i/∂r = -√α * w_huber,i
+        """
+        if not fitting_points:
+            return np.zeros(0), np.zeros((0, 4))
+        
+        # 使用原有的残差计算器
+        surface_residual, _ = self.residual_calculator.calculate_residuals(params, fitting_points)
+        
+        # 计算雅可比矩阵
+        N = len(fitting_points)
+        jacobians = []
+        for i, (point, _) in enumerate(fitting_points):
+            diff = point - params.center
+            dist = np.linalg.norm(diff)
+            J = np.zeros(4)
+            if dist > 1e-8:
+                J[:3] = -np.sqrt(self.alpha) * (diff / dist)
+                J[3] = -np.sqrt(self.alpha)
+            jacobians.append(J)
+        
+        # 应用Huber权重
+        weighted_residuals = []
+        for i, f in enumerate(surface_residual):
+            if abs(f) > self.huber_kappa:
+                weight = self.huber_kappa / abs(f)
+            else:
+                weight = 1.0
+            weighted_residuals.append(np.sqrt(self.alpha) * f * weight)
+            jacobians[i] *= weight
+        
+        return np.array(weighted_residuals), np.array(jacobians)
+
+    def _surface_residual(self, params, fitting_points, constraint_points):
+        """
+        表面残差 - 使用 ResidualCalculator 计算原始残差，然后应用 Huber 权重和 √α 缩放
+        
+        数学公式：
+        f_surface,i = √α * (||p_i - c|| - r - bias_surface,i) * w_huber,i
+        
+        其中：
+        - bias_surface,i: 从 ANATOMICAL_CONSTRAINTS["TO_SURFACE"] 获取的中值偏差
+        - w_huber,i: Huber权重，w_huber,i = min(1, κ/|f_raw,i|)
+        """
+        if not fitting_points:
+            return np.zeros(0), np.zeros((0, 4))
+        
+        # 使用 ResidualCalculator 计算原始残差
+        surface_residual, _ = self.residual_calculator.calculate_residuals(params, fitting_points)
+        
+        residuals = []
+        jacobians = []
+        for i, (point, _) in enumerate(fitting_points):
+            diff = point - params.center
+            dist = np.linalg.norm(diff)
+            
+            # 获取原始残差
+            f_raw = surface_residual[i]
+            
+            # Huber weight（IRLS 风格）
+            if abs(f_raw) > self.huber_kappa:
+                w = self.huber_kappa / (abs(f_raw) + 1e-12)
+            else:
+                w = 1.0
+            
+            # 最终残差与 jacobian
+            r = np.sqrt(self.alpha) * f_raw * w
+            residuals.append(r)
+            
+            J = np.zeros(4)
+            if dist > 1e-12:
+                # ∂dist/∂c = -(p - c)/dist  => ∂f/∂c = -(p-c)/dist
+                J[:3] = -np.sqrt(self.alpha) * w * (diff / dist)
+                J[3]  = -np.sqrt(self.alpha) * w
+            jacobians.append(J)
+        logging.debug(f"表面残差: {residuals}")
+        return np.array(residuals), np.vstack(jacobians)
+
+    def _center_residual(self, params, fitting_points, constraint_points):
+        """
+        中心残差 - 使用 ResidualCalculator 计算原始残差，然后应用 Huber 权重和 √(1-α) 缩放
+        
+        数学公式：
+        f_center,i = √(1-α) * (||p_i - c|| - bias_center,i) * w_huber,i
+        
+        其中：
+        - bias_center,i: 从 ANATOMICAL_CONSTRAINTS["TO_CENTER"] 获取的中值偏差
+        - w_huber,i: Huber权重，w_huber,i = min(1, κ/|f_raw,i|)
+        """
+        if not fitting_points:
+            return np.zeros(0), np.zeros((0, 4))
+        
+        # 使用 ResidualCalculator 计算原始残差
+        _, center_residual = self.residual_calculator.calculate_residuals(params, fitting_points)
+        
+        residuals = []
+        jacobians = []
+        for i, (point, _) in enumerate(fitting_points):
+            diff = point - params.center
+            dist = np.linalg.norm(diff)
+            
+            # 获取原始残差
+            f_raw = center_residual[i]
+            
+            # Huber weight（IRLS 风格）
+            if abs(f_raw) > self.huber_kappa:
+                w = self.huber_kappa / (abs(f_raw) + 1e-12)
+            else:
+                w = 1.0
+            
+            # 最终残差与 jacobian
+            r = np.sqrt(1.0 - self.alpha) * f_raw * w
+            residuals.append(r)
+            
+            J = np.zeros(4)
+            if dist > 1e-12:
+                J[:3] = -np.sqrt(1.0 - self.alpha) * w * (diff / dist)
+                # J[3] = 0（中心残差不依赖于半径）
+            jacobians.append(J)
+        
+        logging.debug(f"中心残差: {residuals}")
+        return np.array(residuals), np.vstack(jacobians)
+
+    def _depth_residual(self, params, fitting_points, constraint_points):
+        """
+        深度残差（Softplus），并正确缩放 √depth_lambda
+        
+        数学公式：
+        f_depth = √λ_depth * σ * ln(1 + exp(u/σ))
+        
+        其中：
+        - u = max(0, max_z + ε - c_z)
+        - max_z: 所有拟合点中的最大z坐标（最小深度）
+        - c_z: 球心的z坐标
+        - ε: 深度容差参数（depth_epsilon）
+        - σ: 深度平滑参数（depth_sigma）
+        - λ_depth: 深度约束权重参数
+        """
+        if not fitting_points:
+            return np.zeros(0), np.zeros((0, 4))
+
+        max_z = max(p[0][2] for p in fitting_points)
+        u = max(0.0, max_z + self.depth_epsilon - params.center[2])
+        exp_term = np.exp(u / self.depth_sigma)
+        f_raw = self.depth_sigma * np.log1p(exp_term)   # sigma * ln(1+exp(u/sigma))
+        # scale by sqrt(depth_lambda)
+        r = np.sqrt(self.depth_lambda) * f_raw
+
+        # df/du = exp(u/σ)/(1+exp(u/σ)) = sigmoid(u/σ)
+        df_du = exp_term / (1.0 + exp_term)
+        # du/dcz = -1 (when u>0), so df/dcz = -df_du
+        J = np.zeros((1, 4))
+        J[0, 2] = np.sqrt(self.depth_lambda) * (- df_du)
+
+        logging.debug(f"深度残差: {r}")
+        return np.array([r]), J
+
+    def _outside_eyeball_residual(self, params, fitting_points, constraint_points):
+        """
+        眼球外约束残差 - 使用与深度约束相同的控制方式
+        
+        数学公式：
+        对于每个约束点 p_i，眼球外约束残差定义为：
+        f_outside,i = √λ_outside * σ_outside * ln(1 + exp(u_i/σ_outside))
+        
+        其中：
+        - u_i = max(0, r - ||p_i - c||)
+        - p_i: 第i个约束点的3D坐标
+        - c: 球心坐标 [x, y, z]
+        - r: 球体半径
+        - λ_outside: 眼球外约束权重参数（outside_eyeball_lambda）
+        - σ_outside: 眼球外约束平滑参数（outside_eyeball_sigma）
+        
+        物理意义：
+        - 当 r > ||p_i - c|| 时，u_i > 0，表示约束点位于球体内部，残差增加（惩罚）
+        - 当 r ≤ ||p_i - c|| 时，u_i = 0，表示约束点位于球体外部或表面，残差为0（无惩罚）
+        
+        雅可比矩阵：
+        ∂f_outside,i/∂c = √λ_outside * (-exp(u_i/σ_outside)/(1+exp(u_i/σ_outside))) * (p_i - c) / ||p_i - c||
+        ∂f_outside,i/∂r = √λ_outside * (exp(u_i/σ_outside)/(1+exp(u_i/σ_outside)))
+        """
+        if not constraint_points:
+            return np.zeros(0), np.zeros((0, 4))
+
+        residuals, jacobians = [], []
+        
+        lambda_outside = self.outside_eyeball_lambda
+        
+        for point, _ in constraint_points:
+            diff = point - params.center
+            dist = np.linalg.norm(diff)
+
+            # u = max(0, r - d) - 确保约束点在球体外部
+            u = max(0.0, params.radius - dist)
+
+            # 使用与深度约束相同的Softplus形式
+            exp_term = np.exp(u / self.outside_eyeball_sigma)
+            f_raw = self.outside_eyeball_sigma * np.log1p(exp_term)  # sigma * ln(1+exp(u/sigma))
+            # scale by sqrt(outside_eyeball_lambda)
+            lambda_outside /= len(constraint_points)
+            r = np.sqrt(lambda_outside) * f_raw
+            residuals.append(r)
+
+            # 雅可比
+            J = np.zeros(4)
+            if u > 1e-8 and dist > 1e-8:
+                # df/du = exp(u/σ)/(1+exp(u/σ)) = sigmoid(u/σ)
+                df_du = exp_term / (1.0 + exp_term)
+                # ∂u/∂c = -∂dist/∂c = (p-c)/dist, ∂u/∂r = 1
+                J[:3] = np.sqrt(lambda_outside) * (-df_du) * (diff / dist)  # ∂f/∂c
+                J[3] = np.sqrt(lambda_outside) * df_du                      # ∂f/∂r
+            jacobians.append(J)
+        logging.debug(f"眼球外残差: {residuals}")
+        return np.array(residuals), np.array(jacobians)
+    # ================== 工具函数 ==================
+    def _softplus(self, x, beta=1.0):
+        """
+        Softplus函数
+        
+        数学公式：
+        Softplus(x, β) = ln(1 + exp(β * x)) / β
+        
+        性质：
+        - 当 x > 0 时，Softplus(x) ≈ x
+        - 当 x < 0 时，Softplus(x) ≈ 0
+        - 在 x = 0 处平滑过渡
+        - β 控制过渡的陡峭程度
+        """
+        return np.log(1 + np.exp(beta * x)) / beta
+
+    def _sigmoid(self, x):
+        """
+        Sigmoid函数
+        
+        数学公式：
+        Sigmoid(x) = 1 / (1 + exp(-x))
+        
+        性质：
+        - 输出范围：[0, 1]
+        - 在 x = 0 处值为 0.5
+        - 是 Softplus 函数的导数
+        """
+        return 1 / (1 + np.exp(-x))
+
+    # ================== 重构残差拼接 ==================
+    def _compute_all_residuals_and_jacobians(self, params, fitting_points, constraint_points):
+        all_residuals, all_jacobians = [], []
+        dim_params = len(params)
+        for func in self.residual_terms:
+            r, J = func(params, fitting_points, constraint_points)
+            if r.size > 0:
+                all_residuals.append(r)
+                all_jacobians.append(J)
+        if not all_residuals:
+            return np.zeros(0), np.zeros((0, dim_params))
+        return np.concatenate(all_residuals), np.vstack(all_jacobians)
+
     def optimize(self, initial_params: FittingParameters, 
                 fitting_points: List[Tuple[np.ndarray, str]],
                 constraint_points: List[Tuple[np.ndarray, str]]) -> FittingResult:
@@ -618,22 +918,15 @@ class LevenbergMarquardtOptimizer(Optimizer):
         
         for iteration in range(self.max_iterations):
             logging.debug(f"------------------------------------------------------------------------------------------------------")
-            # 只使用拟合点计算残差和雅可比矩阵
-            surface_residual, center_residual = self.residual_calculator.calculate_residuals(
-                current_params, fitting_points)
             
-            logging.debug(f"第{iteration}次LM优化，\n计算表面残差：\n{surface_residual}\n 中心残差：\n{center_residual}")
+            logging.debug(f"第{iteration}次LM优化，计算残差：\n")
+            # 使用重构的残差计算方法
+            old_residual, J = self._compute_all_residuals_and_jacobians(
+                current_params, fitting_points, constraint_points)
             
-            depth_residual, depth_gradient = self._depth_constraint_residual_and_gradient(current_params.center[2], fitting_points, self.depth_epsilon, self.depth_sigma, self.depth_lambda)
-            
-            old_residual = self._concatenate_residual(surface_residual, center_residual, depth_residual)
-            
-            # 计算雅可比矩阵（只针对拟合点）
-            J = self._calculate_jacobian(surface_residual, center_residual, depth_gradient, current_params, fitting_points,self.alpha, self.huber_kappa, self.depth_lambda)
-
             
             # 求解正规方程
-            delta = self._solve_normal_equations(J, old_residual, lambda_lm,self.alpha)
+            delta = self._solve_normal_equations(J, old_residual, lambda_lm)
             
             logging.debug(f"第{iteration}次LM优化，未裁剪前计算的步长：{np.linalg.norm(delta)}")
             delta = self._clip_step_size(delta)
@@ -644,23 +937,13 @@ class LevenbergMarquardtOptimizer(Optimizer):
             new_params.center += delta[:3]
             new_params.radius += delta[3]
             
-
             logging.debug(f"第{iteration}次LM优化初始参数: {current_params}")
             logging.debug(f"第{iteration}次LM优化准备更新参数: {new_params}")
             
-            # 应用约束点限制参数范围（如果有约束点）
-            if constraint_points:
-                new_params = self._apply_constraint_limits(new_params, constraint_points)
-                logging.debug(f"第{iteration}次LM优化，应用约束点限制参数范围后: {new_params}")
-            
             # 计算新目标函数值
-            new_surface_residual, new_center_residual = self.residual_calculator.calculate_residuals(
-                new_params, fitting_points)
-            logging.debug(f"第{iteration}次LM优化，\n计算新表面残差：\n{new_surface_residual}\n 新中心残差：\n{new_center_residual}")
-            
-            new_depth_residual, _ = self._depth_constraint_residual_and_gradient(new_params.center[2], fitting_points, self.depth_epsilon, self.depth_sigma, self.depth_lambda)
-            new_residual = self._concatenate_residual(new_surface_residual, new_center_residual, new_depth_residual)
-            new_target = target_function(new_surface_residual, new_center_residual, new_depth_residual,self.alpha, self.huber_kappa, self.depth_lambda)
+            new_residual, _ = self._compute_all_residuals_and_jacobians(
+                new_params, fitting_points, constraint_points)
+            new_target = target_function(new_residual, self.alpha, self.huber_kappa)
             
             logging.debug(f"第{iteration}次LM优化，计算新目标函数值: {new_target}")
             
@@ -674,13 +957,15 @@ class LevenbergMarquardtOptimizer(Optimizer):
                 
                 # 检查收敛
                 if self._check_convergence(delta, delta_convergence_threshold, old_residual, new_residual, residual_convergence_threshold):
-                    logging.info(f"LM优化收敛，迭代次数: {iteration + 1}")
+                    logging.debug(f"LM优化收敛，迭代次数: {iteration + 1}")
+                    logging.debug(f"LM优化收敛，最终参数: {current_params}")
+                    logging.debug("------------------------------------------------------------------------------------------------------")
                     return FittingResult(
                         parameters=current_params,
-                        confidence=self.confidence_calculator.calculate_geometry_confidence(current_params, fitting_points, constraint_points),
+                        confidence=self.confidence_calculator.calculate_weighted_confidence(current_params, fitting_points, constraint_points),
                         converged=True,
                         iteration_count=iteration + 1,
-                        final_residual_norm=np.linalg.norm(surface_residual),
+                        final_residual_norm=np.linalg.norm(old_residual),
                         strategy_used="lm"
                     )
             else:
@@ -694,19 +979,9 @@ class LevenbergMarquardtOptimizer(Optimizer):
             confidence=self.confidence_calculator.calculate_geometry_confidence(current_params, fitting_points, constraint_points),
             converged=False,
             iteration_count=self.max_iterations,
-            final_residual_norm=np.linalg.norm(surface_residual),
+            final_residual_norm=np.linalg.norm(old_residual),
             strategy_used="lm"
         )
-        
-    def _concatenate_residual(self, surface_residual: np.ndarray,
-                            center_residual: np.ndarray,
-                            depth_residual: float) -> np.ndarray:
-        """拼接残差，并带缩放"""
-        return np.concatenate([
-            np.sqrt(self.alpha) * surface_residual,
-            np.sqrt(1 - self.alpha) * center_residual,
-            [np.sqrt(self.depth_lambda) * depth_residual]
-        ])   
         
     def _clip_step_size(self, delta: np.ndarray) -> np.ndarray:
         """裁剪步长范数"""
@@ -730,115 +1005,9 @@ class LevenbergMarquardtOptimizer(Optimizer):
         logging.debug(f"检查更新是否有效: {target_value} <= {self.last_target_value} = {improved}")
         return improved
     
-    def _apply_constraint_limits(self, params: FittingParameters, 
-                                constraint_points: List[Tuple[np.ndarray, str]]) -> FittingParameters:
-        """应用约束点限制参数范围"""
-        if not constraint_points:
-            return params
-        
-        # 计算约束点到球心的距离
-        distances = []
-        for point, _ in constraint_points:
-            dist = np.linalg.norm(point - params.center)
-            distances.append(dist)
-        
-        # 根据约束点调整半径范围
-        max_distance = max(distances + [ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS"][1]]) if distances else params.radius
-        min_distance = min(distances + [ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS"][0]]) if distances else params.radius
-        
-        # 限制半径在合理范围内
-        constrained_radius = np.clip(params.radius, min_distance, max_distance)
-        
-        # 创建新的参数对象
-        new_params = params.copy()
-        new_params.radius = constrained_radius
-        
-        logging.debug(f"约束点限制: 原始半径={params.radius:.3f}, 约束后半径={constrained_radius:.3f}")
-        
-        return new_params
-    
-    
-    def _depth_constraint_residual_and_gradient(self, center_z: float, points: List[Tuple[np.ndarray, str]], 
-                                epsilon: float = 5.0, sigma: float = 1.0, 
-                                lambda_: float = 1.0) -> Tuple[float, float]:
-        """计算深度约束残差"""
-        if not points:
-            return 0.0, 0.0
-        
-        # 找到所有点中的最大深度（最小z值）
-        max_z = max(point[0][2] for point in points)
-        
-        # 计算u值
-        u = max(0, max_z + epsilon - center_z)
-        
-        # 计算平滑约束
-        exp_term = np.exp(u / sigma)
-        return np.log(1 + exp_term), -(exp_term / (1 + exp_term)) * (1 / sigma)
-
-    
-    def _calculate_jacobian(self, surface_residual: np.ndarray, center_residual: np.ndarray, depth_gradient: float, params: FittingParameters, 
-                            points: List[Tuple[np.ndarray, str]], 
-                            alpha: float = 0.5,
-                            huber_kappa: float = 0.6,
-                            depth_lambda: float = 1.0) -> np.ndarray:
-        """计算雅可比矩阵 (f1: surface, f2: center)"""
-        
-        def _judge_denom_valid(diff: np.ndarray) -> bool:
-            return np.linalg.norm(diff) > 1e-8
-        
-        if not points:
-            return np.zeros((0, 4))
-        
-        N = len(points)
-        J = np.zeros((2 * N + 1, 4))  # f1 和 f2 和 d 拼接
-        
-        surface_weight = np.ones(N)
-        for i,f in enumerate(surface_residual):
-            if abs(f) > huber_kappa:
-                surface_weight[i] = huber_kappa / abs(f)
-                
-        center_weight = np.ones(N)
-        for i,f in enumerate(center_residual):
-            if abs(f) > huber_kappa:
-                center_weight[i] = huber_kappa / abs(f)
-        
-        # --- f1: 表面残差 ---
-        for i in range(N):
-            point, _ = points[i]
-            diff = point - params.center
-            dist = np.linalg.norm(diff)
-            
-            if _judge_denom_valid(diff):
-                J[i, 0:3] = -np.sqrt(alpha) * (diff / dist) * surface_weight[i] # 对中心导数
-                J[i, 3]   = -np.sqrt(alpha) * surface_weight[i]                 # 对半径导数
-            else:
-                J[i, :] = 0.0
-        
-        # --- f2: 中心残差 ---
-        for i in range(N):
-            point, _ = points[i]
-            diff = point - params.center
-            dist = np.linalg.norm(diff)
-            
-            if _judge_denom_valid(diff):
-                J[N + i, 0:3] = -np.sqrt(1 - alpha) * (diff / dist) * center_weight[i]  # 只对中心
-                J[N + i, 3]   = 0.0                                # 半径不参与
-            else:
-                J[N + i, :] = 0.0
-        
-        # --- f3: 深度约束残差 ---
-        J[2 * N, 2] = depth_gradient * np.sqrt(depth_lambda)
-        J[2 * N, 3] = 0.0
-        
-        return J
-
-    
-    def _solve_normal_equations(self, J: np.ndarray, residual: np.ndarray, lambda_lm: float,alpha: float = 0.5) -> np.ndarray:
+    def _solve_normal_equations(self, J: np.ndarray, residual: np.ndarray, lambda_lm: float) -> np.ndarray:
         """求解正规方程"""
-        # 现在只使用拟合点，所以雅可比矩阵J和残差的维度应该匹配
-        # 合并残差：surface_residual和center_residual都是长度为N的数组
-        
-        # 检查维度匹配 - 现在J是(2*N, 4)，residual长度应该是2*N
+        # 检查维度匹配
         if len(residual) != J.shape[0]:
             logging.error(f"维度不匹配: J.shape[0]={J.shape[0]}, residual长度={len(residual)}")
             return np.zeros(4)
@@ -856,46 +1025,87 @@ class LevenbergMarquardtOptimizer(Optimizer):
         except np.linalg.LinAlgError:
             logging.warning("线性方程组求解失败，使用最小二乘法求解")
             delta = np.linalg.lstsq(H_lm, -g, rcond=None)[0]
+        finally:
+            logging.debug(f"求解线性方程组结果: {delta}")
+            return delta 
         
-        logging.debug(f"求解线性方程组结果: {delta}")
-        return delta
-    
-
 class RANSACOptimizer(Optimizer):
     """RANSAC优化器"""
     
-    def __init__(self, max_iterations: int = 50, threshold: float = 0.3, 
-                 min_inlier_ratio: float = 0.7, base_optimizer: Optimizer = None):
+    def __init__(self, max_iterations: int = 20, surface_threshold: float = None, 
+                 center_threshold: float = None, base_optimizer: Optimizer = None):
         self.max_iterations = max_iterations
-        self.threshold = threshold
-        self.min_inlier_ratio = min_inlier_ratio
+        
+        # 设置默认阈值（当点类型不在约束中时使用）
+        if surface_threshold is None:
+            self.surface_threshold = 0.5
+        else:
+            self.surface_threshold = surface_threshold
+            
+        if center_threshold is None:
+            self.center_threshold = 1.0
+        else:
+            self.center_threshold = center_threshold
+            
+        # 打印各点类型的阈值信息
+        logging.debug("RANSAC各点类型阈值设置：")
+        for point_type in FITTING_ENABLE + OUTSIDE_EYEBALL:
+            if point_type in ANATOMICAL_CONSTRAINTS["TO_SURFACE"]:
+                min_val, max_val = ANATOMICAL_CONSTRAINTS["TO_SURFACE"][point_type]
+                surface_threshold = (max_val - min_val) / 2
+                logging.debug(f"  {point_type} 表面阈值: ({min_val}, {max_val}) -> {surface_threshold:.4f}")
+            
+            if point_type in ANATOMICAL_CONSTRAINTS["TO_CENTER"]:
+                min_val, max_val = ANATOMICAL_CONSTRAINTS["TO_CENTER"][point_type]
+                center_threshold = (max_val - min_val) / 2
+                logging.debug(f"  {point_type} 中心阈值: ({min_val}, {max_val}) -> {center_threshold:.4f}")
+            
         self.base_optimizer = base_optimizer or LevenbergMarquardtOptimizer()
         self.residual_calculator = ResidualCalculator()
+        self.min_sample_count = 4
     
     def optimize(self, initial_params: FittingParameters, 
                 fitting_points: List[Tuple[np.ndarray, str]],
                 constraint_points: List[Tuple[np.ndarray, str]]) -> FittingResult:
         
         best_result = None
-        best_inlier_count = 0
+        best_confidence = 0.0
+        best_iteration = 0
+        
+        # 用于维护所有迭代的距离信息
+        all_iterations_distances = []
         
         for iteration in range(self.max_iterations):
+            logging.debug(f"======================================================================================================")
             # 随机采样
-            if len(fitting_points) >= 4:
+            if len(fitting_points) >= self.min_sample_count:
                 import random
-                sampled_points = random.sample(fitting_points, 4)
+                sampled_points = random.sample(fitting_points, self.min_sample_count)
             else:
-                sampled_points = fitting_points
+                sampled_points = fitting_points    
+            
+            logging.debug(f"RANSAC优化器，第{iteration}次迭代，采样点数：{len(sampled_points)}")
             
             # 使用基础优化器
             result = self.base_optimizer.optimize(initial_params, sampled_points, constraint_points)
             
-            # 计算内点数量
-            inlier_count = self._count_inliers(result.parameters, fitting_points)
+            # 计算并打印所有点到中心和表面的距离
+            point_distances = self._print_all_points_distances(result.parameters, iteration)
+            all_iterations_distances.append(point_distances)
             
-            if inlier_count > best_inlier_count:
-                best_inlier_count = inlier_count
+            # 使用confidence作为更新标准
+            logging.debug(f"RANSAC优化器，第{iteration}次迭代，confidence：{result.confidence:.4f}")    
+            
+            if result.confidence > best_confidence:
+                best_confidence = result.confidence
                 best_result = result
+                best_iteration = iteration
+                logging.debug(f"RANSAC优化更新，第{best_iteration}次迭代，confidence：{best_confidence:.4f}")
+            
+            logging.debug(f"======================================================================================================")
+        
+        # 打印所有迭代的平均距离
+        self._print_average_distances(all_iterations_distances)
         
         if best_result is None:
             # 如果没有找到好的结果，返回初始参数
@@ -908,17 +1118,154 @@ class RANSACOptimizer(Optimizer):
                 strategy_used="ransac"
             )
         
+        best_result.strategy_used = "ransac"
+        best_result.iteration_count = best_iteration
         return best_result
     
-    def _count_inliers(self, params: FittingParameters, 
-                      points: List[Tuple[np.ndarray, str]]) -> int:
-        """计算内点数量"""
-        if not points:
-            return 0
+    def _print_all_points_distances(self, params: FittingParameters, 
+                                iteration: int) -> List[Tuple[str, float, float]]:
+        """打印所有点到中心和表面的距离，返回每个点的距离信息"""
+        # 从全局data_manager获取所有点类型的数据
+        from project.recg_fit_data.data_manager import RECG_FIT_DATA_MANAGER
         
-        surface_residual, _ = self.residual_calculator.calculate_residuals(params, points)
-        inlier_count = sum(1 for r in surface_residual if abs(r) < self.threshold)
-        return inlier_count
+        all_point_distances = []
+        
+        # 智能判断使用哪个眼睛的数据
+        target_eye = self._determine_target_eye(params)
+        
+        # 获取所有拟合点类型
+        for point_type in FITTING_ENABLE:
+            points = RECG_FIT_DATA_MANAGER.get_coordinate_point(target_eye, point_type)
+            if points:
+                for i, point in enumerate(points):
+                    # 确保是3D坐标点
+                    coord_3d = point[:3] if len(point) >= 3 else point
+                    
+                    # 计算到中心的距离
+                    center_dist = np.linalg.norm(coord_3d - params.center)
+                    
+                    # 计算到表面的距离（减去半径）
+                    surface_dist = center_dist - params.radius
+                    
+                    all_point_distances.append((point_type, center_dist, surface_dist))
+                    logging.debug(f"  点{i} ({point_type}): 到中心距离={center_dist:.4f}, 到表面距离={surface_dist:.4f}")
+        
+        # 获取所有约束点类型
+        for point_type in OUTSIDE_EYEBALL:
+            points = RECG_FIT_DATA_MANAGER.get_coordinate_point(target_eye, point_type)
+            if points:
+                for i, point in enumerate(points):
+                    # 确保是3D坐标点
+                    coord_3d = point[:3] if len(point) >= 3 else point
+                    
+                    # 计算到中心的距离
+                    center_dist = np.linalg.norm(coord_3d - params.center)
+                    
+                    # 计算到表面的距离（减去半径）
+                    surface_dist = center_dist - params.radius
+                    
+                    all_point_distances.append((point_type, center_dist, surface_dist))
+                    logging.debug(f"  点{i} ({point_type}): 到中心距离={center_dist:.4f}, 到表面距离={surface_dist:.4f}")
+        
+        if not all_point_distances:
+            logging.debug(f"RANSAC第{iteration}次迭代：无点数据")
+        else:
+            logging.debug(f"RANSAC第{iteration}次迭代 - 所有点距离信息：")
+        
+        return all_point_distances
+
+    def _determine_target_eye(self, params: FittingParameters) -> str:
+        """智能判断应该使用哪个眼睛的数据来计算距离"""
+        from project.recg_fit_data.data_manager import RECG_FIT_DATA_MANAGER
+        
+        # 分别计算到左眼和右眼瞳孔中心的距离
+        left_pupil_points = RECG_FIT_DATA_MANAGER.get_coordinate_point("left", "pupil")
+        right_pupil_points = RECG_FIT_DATA_MANAGER.get_coordinate_point("right", "pupil")
+        
+        left_distance = float('inf')
+        right_distance = float('inf')
+        
+        if left_pupil_points:
+            left_pupil = left_pupil_points[0][:3] if len(left_pupil_points[0]) >= 3 else left_pupil_points[0]
+            left_distance = np.linalg.norm(left_pupil - params.center)
+        
+        if right_pupil_points:
+            right_pupil = right_pupil_points[0][:3] if len(right_pupil_points[0]) >= 3 else right_pupil_points[0]
+            right_distance = np.linalg.norm(right_pupil - params.center)
+        
+        # 判断逻辑：
+        # 1. 如果拟合的球心更接近左眼瞳孔，使用左眼数据
+        # 2. 如果拟合的球心更接近右眼瞳孔，使用右眼数据
+        # 3. 如果距离差异不明显（小于阈值），默认使用左眼
+        
+        distance_threshold = 30.0  # 30mm阈值
+        
+        if left_distance < right_distance - distance_threshold:
+            logging.debug(f"球心距离左眼瞳孔更近({left_distance:.2f}mm vs {right_distance:.2f}mm)，使用左眼数据")
+            return "left"
+        elif right_distance < left_distance - distance_threshold:
+            logging.debug(f"球心距离右眼瞳孔更近({right_distance:.2f}mm vs {left_distance:.2f}mm)，使用右眼数据")
+            return "right"
+        else:
+            logging.debug(f"球心距离双眼瞳孔差异不明显({left_distance:.2f}mm vs {right_distance:.2f}mm)，默认使用左眼数据")
+            return "left"
+    
+    def _print_average_distances(self, all_iterations_distances: List[List[Tuple[str, float, float]]]):
+        """打印所有迭代中每个点的平均距离统计"""
+        if not all_iterations_distances:
+            logging.debug("RANSAC优化完成：无距离数据")
+            return
+        
+        # 统计每个点类型在所有迭代中的距离
+        point_type_stats = {}
+        
+        # 遍历所有迭代的距离数据
+        for iteration, point_distances in enumerate(all_iterations_distances):
+            for point_type, center_dist, surface_dist in point_distances:
+                if point_type not in point_type_stats:
+                    point_type_stats[point_type] = {
+                        'center_distances': [],
+                        'surface_distances': [],
+                        'count': 0
+                    }
+                point_type_stats[point_type]['center_distances'].append(center_dist)
+                point_type_stats[point_type]['surface_distances'].append(surface_dist)
+                point_type_stats[point_type]['count'] += 1
+        
+        # 计算每个点类型的平均距离、最大距离、最小距离
+        logging.debug("RANSAC优化完成 - 每个点类型在所有迭代中的距离统计：")
+        for point_type, stats in point_type_stats.items():
+            center_distances = stats['center_distances']
+            surface_distances = stats['surface_distances']
+            
+            avg_center = np.mean(center_distances)
+            avg_surface = np.mean(surface_distances)
+            min_center = np.min(center_distances)
+            max_center = np.max(center_distances)
+            min_surface = np.min(surface_distances)
+            max_surface = np.max(surface_distances)
+            
+            logging.info(f"  {point_type}: 平均到中心距离={avg_center:.4f} (范围: {min_center:.4f}-{max_center:.4f}), "
+                        f"平均到表面距离={avg_surface:.4f} (范围: {min_surface:.4f}-{max_surface:.4f}) (出现{stats['count']}次)")
+        
+        # 计算所有点的整体平均距离、最大距离、最小距离
+        all_center_distances = []
+        all_surface_distances = []
+        for stats in point_type_stats.values():
+            all_center_distances.extend(stats['center_distances'])
+            all_surface_distances.extend(stats['surface_distances'])
+        
+        if all_center_distances:
+            overall_avg_center = np.mean(all_center_distances)
+            overall_avg_surface = np.mean(all_surface_distances)
+            overall_min_center = np.min(all_center_distances)
+            overall_max_center = np.max(all_center_distances)
+            overall_min_surface = np.min(all_surface_distances)
+            overall_max_surface = np.max(all_surface_distances)
+            
+            logging.info(f"RANSAC整体平均距离: 到中心={overall_avg_center:.4f} (范围: {overall_min_center:.4f}-{overall_max_center:.4f}), "
+                        f"到表面={overall_avg_surface:.4f} (范围: {overall_min_surface:.4f}-{overall_max_surface:.4f})")   
+            
 
 class FailOptimizer(Optimizer):
     """失败优化器"""
@@ -969,6 +1316,7 @@ class StrategySelector:
             
             if (data_quality["point_count"] >= strategy.min_points and 
                 data_quality["visibility"] >= strategy.min_visibility):
+                logging.debug(f" 当前点数: {data_quality['point_count']}, 当前可见性: {data_quality['visibility']:.3f}")
                 logging.info(f"选择策略: {strategy.name}")
                 return strategy
             else:
@@ -1010,14 +1358,90 @@ class FittingController:
         
         return result
     
+    def _fit_circle_to_points(self, points: List[np.ndarray]) -> Tuple[np.ndarray, float]:
+        """三点确定外接圆"""
+        if len(points) < 3:
+            raise ValueError("至少需要3个点")
+        
+        # 取前三个点
+        p1, p2, p3 = points[:3]
+        
+        # 计算三条边的中点
+        mid1 = (p1 + p2) / 2
+        mid2 = (p2 + p3) / 2
+        
+        # 计算边的方向向量
+        v1 = p2 - p1
+        v2 = p3 - p2
+        
+        # 计算垂直向量（法向量）
+        normal = np.cross(v1, v2)
+        if np.linalg.norm(normal) < 1e-6:
+            raise ValueError("三点共线，无法确定外接圆")
+        
+        # 计算垂直平分线的方向
+        perp1 = np.cross(normal, v1)
+        perp2 = np.cross(normal, v2)
+        
+        # 归一化
+        perp1 = perp1 / np.linalg.norm(perp1)
+        perp2 = perp2 / np.linalg.norm(perp2)
+        
+        # 圆心是两条垂直平分线的交点
+        # 简化：使用两条垂直平分线的中点作为圆心
+        center = (mid1 + mid2) / 2
+        
+        # 半径是圆心到任意点的距离
+        radius = np.linalg.norm(center - p1)
+        
+        return center, radius
+
     def _initialize_parameters(self, fitting_points: List[Tuple[np.ndarray, str]]) -> FittingParameters:
-        """初始化参数"""
+        """初始化参数 - 自动选择最佳策略"""
         if not fitting_points:
             return FittingParameters(center=np.array([0, 0, 0]), radius=ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"])
         
-        # 简单的初始化策略：使用第一个点的位置作为球心
-        first_point = fitting_points[0][0]
-        return FittingParameters(center=first_point, radius=ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"])
+        # 按类型分组
+        iris_points = [point[0] for point in fitting_points if point[1] == "iris"]
+        pupil_points = [point[0] for point in fitting_points if point[1] == "pupil"]
+        
+        # 策略1：优先使用虹膜点方案
+        if len(iris_points) >= 3:
+            try:
+                # 随机取3个虹膜点拟合外接圆
+                import random
+                selected_iris = random.sample(iris_points, 3)
+                circle_center, circle_radius = self._fit_circle_to_points(selected_iris)
+                logging.debug(f"虹膜点拟合外接圆，圆心：{circle_center}，半径：{circle_radius}")
+                
+                # 计算delta z
+                iris_to_center_median = (ANATOMICAL_CONSTRAINTS["TO_CENTER"]["iris"][0] + 
+                                       ANATOMICAL_CONSTRAINTS["TO_CENTER"]["iris"][1]) / 2  # 斜边
+                delta_z = np.sqrt(iris_to_center_median**2 - circle_radius**2)  # 直角边
+                
+                # 圆心坐标加上delta z作为眼球中心
+                eyeball_center = circle_center.copy()
+                eyeball_center[2] += delta_z
+                
+                return FittingParameters(center=eyeball_center, radius=circle_radius)
+            except Exception as e:
+                logging.warning(f"虹膜点拟合失败: {e}")
+        
+        # 策略2：使用瞳孔点方案
+        if pupil_points:
+            pupil_point = pupil_points[0]  # 取第一个瞳孔点
+            pupil_to_center_median = (ANATOMICAL_CONSTRAINTS["TO_CENTER"]["pupil"][0] + 
+                                    ANATOMICAL_CONSTRAINTS["TO_CENTER"]["pupil"][1]) / 2
+            
+            # 瞳孔点加上到中心的初始生理偏移中值
+            eyeball_center = pupil_point.copy()
+            eyeball_center[2] += pupil_to_center_median
+            
+            return FittingParameters(center=eyeball_center, radius=ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"])
+        
+        # 策略3：失败情况
+        logging.error("无法找到有效的瞳孔点或虹膜点进行初始化")
+        return FittingParameters(center=np.array([0, 0, 0]), radius=ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"])
     
     def fit_all_eyes(self) -> Dict[str, FittingResult]:
         """拟合所有眼睛"""
@@ -1085,8 +1509,32 @@ def fit_eye(eye: str, data_manager: RecgFitDataManager = RECG_FIT_DATA_MANAGER, 
         return result.parameters
     return result
 
-def fit_all_eyes(data_manager: RecgFitDataManager = RECG_FIT_DATA_MANAGER, params_only: bool = False) -> Dict[str, FittingResult]:
-    """简单的拟合所有眼睛函数"""
+def fit_all_eyes(data_manager: RecgFitDataManager = RECG_FIT_DATA_MANAGER, params_only: bool = False) -> Dict[str, Union[FittingResult, FittingParameters]]:
+    """
+    简单的拟合所有眼睛函数
+    
+    Args:
+        data_manager: 数据管理器，默认使用全局的RECG_FIT_DATA_MANAGER
+        params_only: 是否只返回参数，默认False返回完整结果
+        
+    Returns:
+        Dict[str, Union[FittingResult, FittingParameters]]: 
+            - 当params_only=False时: {"left": FittingResult, "right": FittingResult}
+            - 当params_only=True时: {"left": FittingParameters, "right": FittingParameters}
+            
+        FittingResult包含:
+            - parameters: FittingParameters (球心坐标和半径)
+            - confidence: float (置信度，0.0-1.0)
+            - converged: bool (是否收敛)
+            - iteration_count: int (迭代次数)
+            - final_residual_norm: float (最终残差范数)
+            - strategy_used: str (使用的策略名称)
+            
+        FittingParameters包含:
+            - center: np.ndarray (球心坐标 [x, y, z])
+            - radius: float (球体半径)
+            - sphere_fitting: bool (是否使用球体拟合)
+    """
     controller = create_fitting_controller(data_manager)
     results = controller.fit_all_eyes()
     if params_only:

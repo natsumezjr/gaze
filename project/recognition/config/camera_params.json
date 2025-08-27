@@ -2,8 +2,8 @@
     "camera_name": "HD Camera",
     "camera_type": "RGB",
     "intrinsic_params": {
-        "fx": 450.0,
-        "fy": 450.0,
+        "fx": 657.7,
+        "fy": 657.7,
         "cx": 320.0,
         "cy": 240.0
     },

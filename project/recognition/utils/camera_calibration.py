@@ -18,7 +18,7 @@ class CameraCalibrator:
             cls._instance._initialized = False
         return cls._instance
     
-    def __init__(self, file_path: str = None, rgb_d=False):
+    def __init__(self, file_path: str = None, rgb_d=True):
         if self._initialized:
             return
         
@@ -53,17 +53,13 @@ class CameraCalibrator:
         :return: 验证和调整后的相机参数字典
         """
         try:
-            if not self._rgb_d:
-                config = self._get_default_config()
+            if os.path.exists(self._config_file_path):
+                with open(self._config_file_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                print(f"从配置文件加载参数: {self._config_file_path}")
             else:
-                # 加载配置文件
-                if os.path.exists(self._config_file_path):
-                    with open(self._config_file_path, 'r', encoding='utf-8') as f:
-                        config = json.load(f)
-                    print(f"从配置文件加载参数: {self._config_file_path}")
-                else:
-                    print("配置文件不存在，使用默认参数")
-                    config = self._get_default_config()
+                print("配置文件不存在，使用默认参数")
+                config = self._get_default_config()
             
             # 验证和调整参数
             validated_config = self._validate_and_adjust_params(config)
