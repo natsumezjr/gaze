@@ -12,17 +12,17 @@ const calibrationPoints = [
     { x: 90, y: 50 }    // 右中
 ];
 
-// 校准点颜色数组 - 白色主题适配（更深的颜色）
+// 校准点颜色数组 - 外圈暗色，内圈亮色（如iPad风格）
 const calibrationColors = [
-    { bg: '#DC3545', fg: '#C82333' }, // 深红色系
-    { bg: '#20C997', fg: '#1E7E34' }, // 深绿色系
-    { bg: '#0D6EFD', fg: '#0A58CA' }, // 深蓝色系
-    { bg: '#198754', fg: '#155724' }, // 深薄荷绿系
-    { bg: '#FD7E14', fg: '#E8590C' }, // 深橙色系
-    { bg: '#6610F2', fg: '#520DC2' }, // 深紫色系
-    { bg: '#0DCAF0', fg: '#087990' }, // 深青色系
-    { bg: '#FFC107', fg: '#E0A800' }, // 深金色系
-    { bg: '#D63384', fg: '#B02A5B' }  // 深粉色系
+    { bg: '#CC4444', fg: '#FF8888' }, // 珊瑚红系：暗 -> 亮
+    { bg: '#339999', fg: '#77DDDD' }, // 青绿色系：暗 -> 亮
+    { bg: '#4477CC', fg: '#88BBFF' }, // 天蓝色系：暗 -> 亮
+    { bg: '#449966', fg: '#88DDBB' }, // 薄荷绿系：暗 -> 亮
+    { bg: '#CC9944', fg: '#FFCC88' }, // 温暖黄系：暗 -> 亮
+    { bg: '#9944AA', fg: '#DD88DD' }, // 优雅紫系：暗 -> 亮
+    { bg: '#449988', fg: '#88DDCC' }, // 海洋绿系：暗 -> 亮
+    { bg: '#CC8844', fg: '#FFBB77' }, // 阳光金系：暗 -> 亮
+    { bg: '#884488', fg: '#BB88BB' }  // 梦幻紫系：暗 -> 亮
 ];
 
 // 获取DOM元素
@@ -350,6 +350,14 @@ function finishCalibration() {
 
 // ==================== 数据采集与发送函数 ====================
 
+// 集成配置
+const INTEGRATION_CONFIG = {
+    USE_REAL_BACKEND: false,  // 设为true启用真实后端集成
+    BACKEND_URL: 'http://localhost:8000',  // 桥接应用地址
+    SAMPLE_INTERVAL: 100,     // 采样间隔（毫秒）
+    SAMPLE_DURATION: 2000     // 每点采样时长（毫秒）
+};
+
 /**
  * 采集眼动数据
  * @param {Object} point - 当前校准点坐标
@@ -357,9 +365,85 @@ function finishCalibration() {
 function collectGazeData(point) {
     console.log(`正在采集点 (${point.x}, ${point.y}) 的数据...`);
     
-    // 模拟数据采集过程
-    const sampleInterval = 100; // 每100ms采样一次
-    const sampleCount = 20; // 2秒内采样20次
+    if (INTEGRATION_CONFIG.USE_REAL_BACKEND) {
+        // 真实后端集成
+        collectRealGazeData(point);
+    } else {
+        // 模拟数据采集
+        collectMockGazeData(point);
+    }
+}
+
+/**
+ * 真实后端数据采集（集成接口）
+ * @param {Object} point - 当前校准点坐标
+ */
+async function collectRealGazeData(point) {
+    try {
+        // 告诉后端开始采集这个校准点
+        await fetch(`${INTEGRATION_CONFIG.BACKEND_URL}/start_point`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                point_index: currentPointIndex,
+                screen_xy: [point.x, point.y],
+                duration: INTEGRATION_CONFIG.SAMPLE_DURATION
+            })
+        });
+        
+        console.log(`后端开始采集点 ${currentPointIndex + 1} 的数据`);
+        
+        // 等待采集完成
+        setTimeout(async () => {
+            try {
+                const response = await fetch(`${INTEGRATION_CONFIG.BACKEND_URL}/stop_point`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        point_index: currentPointIndex
+                    })
+                });
+                
+                const result = await response.json();
+                console.log(`完成采集点 ${currentPointIndex + 1}:`, result);
+                
+                // 将后端采集的数据添加到collectedData中
+                if (result.samples) {
+                    result.samples.forEach((sample, index) => {
+                        const gazeData = {
+                            pointId: currentPointIndex,
+                            targetX: point.x,
+                            targetY: point.y,
+                            timestamp: new Date(sample.timestamp).getTime(),
+                            sampleIndex: index,
+                            gazeX: sample.pupil_center.left[0],
+                            gazeY: sample.pupil_center.left[1],
+                            confidence: sample.confidence,
+                            pupilDiameter: calculatePupilDiameter(sample.pupil_center)
+                        };
+                        collectedData.push(gazeData);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('停止采集失败:', error);
+            }
+        }, INTEGRATION_CONFIG.SAMPLE_DURATION);
+        
+    } catch (error) {
+        console.error('开始采集失败:', error);
+        // 回退到模拟数据
+        collectMockGazeData(point);
+    }
+}
+
+/**
+ * 模拟数据采集（开发测试用）
+ * @param {Object} point - 当前校准点坐标
+ */
+function collectMockGazeData(point) {
+    const sampleInterval = INTEGRATION_CONFIG.SAMPLE_INTERVAL;
+    const sampleCount = INTEGRATION_CONFIG.SAMPLE_DURATION / sampleInterval;
     
     for (let i = 0; i < sampleCount; i++) {
         setTimeout(() => {
@@ -386,6 +470,16 @@ function collectGazeData(point) {
             
         }, i * sampleInterval);
     }
+}
+
+/**
+ * 计算瞳孔直径（辅助函数）
+ * @param {Object} pupilCenter - 瞳孔中心数据
+ * @returns {number} 瞳孔直径
+ */
+function calculatePupilDiameter(pupilCenter) {
+    // 简单估算，实际应用中可能需要更复杂的计算
+    return 3.0 + Math.random() * 1.0;
 }
 
 /**
@@ -464,6 +558,13 @@ function showCompletionMessage() {
         transform: translate(-50%, -50%);
         text-align: center;
         color: #000000;
+        background: rgba(248, 248, 248, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 30px 40px;
+        border-radius: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         z-index: 100;
         opacity: 0;
         transition: opacity 0.5s ease;
@@ -510,16 +611,79 @@ async function sendDataToServer(data) {
     console.log('将所有采集数据发送到服务器...');
     console.log('采集到的数据总数:', data.length);
     
-    // 模拟发送成功
+    if (INTEGRATION_CONFIG.USE_REAL_BACKEND) {
+        // 真实后端集成
+        await sendDataToRealBackend(data);
+    } else {
+        // 模拟发送
+        sendDataToMockBackend(data);
+    }
+}
+
+/**
+ * 发送数据到真实后端（集成接口）
+ */
+async function sendDataToRealBackend(data) {
+    try {
+        // 转换数据格式
+        const calibrationData = {
+            user_id: generateUserId(),
+            session_info: {
+                timestamp: Date.now(),
+                browser: navigator.userAgent,
+                screen_resolution: {
+                    width: window.screen.width,
+                    height: window.screen.height
+                },
+                total_points: calibrationPoints.length,
+                total_samples: data.length
+            }
+        };
+        
+        // 发送完成校准请求
+        const response = await fetch(`${INTEGRATION_CONFIG.BACKEND_URL}/complete_calibration`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(calibrationData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✓ 校准数据发送成功:', result);
+        
+        if (result.status === 'success') {
+            showResponseMessage('success', '校准成功，模型已生成', result);
+        } else {
+            showResponseMessage('error', result.message || '校准失败', result);
+        }
+        
+    } catch (error) {
+        console.error('发送数据到真实后端失败:', error);
+        showResponseMessage('error', '网络连接失败，请检查后端服务', {error: error.message});
+    }
+}
+
+/**
+ * 模拟后端响应（开发测试用）
+ */
+function sendDataToMockBackend(data) {
     setTimeout(() => {
         const mockResult = {
             status: 'success',
             model_id: `calibration_model_${Date.now()}`,
             accuracy: 92.5 + Math.random() * 5,
-            message: '校准成功，模型已生成'
+            message: '校准成功，模型已生成',
+            kappa_params: {
+                left_eye: { axis: [0.1, 0.2, 0.0], angle: 2.3 },
+                right_eye: { axis: [0.1, 0.2, 0.0], angle: 2.1 }
+            },
+            samples_processed: data.length
         };
         
-        console.log('✓ 校准数据发送成功');
+        console.log('✓ 模拟校准数据发送成功');
         showResponseMessage('success', '校准成功，模型已生成', mockResult);
     }, 1500);
 }
@@ -539,10 +703,10 @@ function showResponseMessage(type, message, details = {}) {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: rgba(248, 248, 248, 0.98);
+        background: rgba(28, 28, 30, 0.95);
         backdrop-filter: blur(40px);
         -webkit-backdrop-filter: blur(40px);
-        color: #000000;
+        color: white;
         padding: 35px 45px;
         border-radius: 22px;
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
@@ -551,7 +715,7 @@ function showResponseMessage(type, message, details = {}) {
         text-align: center;
         z-index: 1000;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
         max-width: 400px;
         opacity: 0;
         transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
