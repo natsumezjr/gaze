@@ -13,10 +13,23 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
             overflow: hidden;
             user-select: none;
+            transition: background 0.5s ease;
+        }
+
+        /* 底片颜色样式 */
+        body.white-bg {
+            background: #ffffff;
+        }
+
+        body.black-bg {
+            background: #000000;
+        }
+
+        body.off-white-bg {
+            background: #d4d4d4;
         }
 
         .container {
@@ -31,12 +44,24 @@
 
         .header {
             position: absolute;
-            top: 40px;
+            top: 120px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
-            color: white;
             z-index: 10;
+            transition: color 0.5s ease;
+        }
+
+        .white-bg .header {
+            color: #333;
+        }
+
+        .black-bg .header {
+            color: white;
+        }
+
+        .off-white-bg .header {
+            color: #333;
         }
 
         .header h1 {
@@ -46,28 +71,54 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
+        /* 圆形校准点样式 */
         .calibration-point {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 30px;
+            height: 30px;
             background: #fff;
             border-radius: 50%;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 5;
+            border: 2px solid #ddd;
+            opacity: 0.8;
+        }
+
+        /* 六边形校准点样式 */
+        .calibration-point.hexagon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            border-radius: 0;
         }
 
         .calibration-point.active {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             background: #007AFF;
+            border-color: #007AFF;
             box-shadow: 0 8px 30px rgba(0, 122, 255, 0.4);
             animation: pulse 1.5s infinite;
         }
 
         .calibration-point.completed {
             background: #34C759;
+            border-color: #34C759;
             box-shadow: 0 4px 20px rgba(52, 199, 89, 0.4);
+        }
+
+        /* 中心点特殊样式 */
+        .calibration-point.center-point {
+            width: 40px;
+            height: 40px;
+            background: #FF6B35;
+            border-color: #FF6B35;
+        }
+
+        .calibration-point.center-point.active {
+            width: 60px;
+            height: 60px;
+            background: #FF6B35;
+            border-color: #FF6B35;
         }
 
         @keyframes pulse {
@@ -84,16 +135,32 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            color: white;
             z-index: 10;
+            transition: color 0.5s ease;
+        }
+
+        .white-bg .progress-container {
+            color: #333;
+        }
+
+        .black-bg .progress-container {
+            color: white;
+        }
+
+        .off-white-bg .progress-container {
+            color: #333;
         }
 
         .progress-bar {
             width: 300px;
             height: 6px;
-            background: rgba(255,255,255,0.3);
+            background: rgba(0,0,0,0.3);
             border-radius: 3px;
             overflow: hidden;
+        }
+
+        .black-bg .progress-bar {
+            background: rgba(255,255,255,0.3);
         }
 
         .progress-fill {
@@ -102,6 +169,91 @@
             border-radius: 3px;
             transition: width 0.3s ease;
             width: 0%;
+        }
+
+        /* 形状选择器 */
+        .shape-selector {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            display: flex;
+            gap: 10px;
+            z-index: 15;
+        }
+
+        /* 颜色选择器 */
+        .color-selector {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            display: flex;
+            gap: 10px;
+            z-index: 15;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: #007AFF;
+            transform: scale(1.1);
+        }
+
+        .color-option.white {
+            background: #ffffff;
+            border: 2px solid #ddd;
+        }
+
+        .color-option.black {
+            background: #000000;
+        }
+
+        .color-option.off-white {
+            background: #d4d4d4;
+            border: 2px solid #ddd;
+        }
+
+        .shape-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .shape-option:hover {
+            transform: scale(1.1);
+        }
+
+        .shape-option.active {
+            border-color: #007AFF;
+            transform: scale(1.1);
+        }
+
+        .shape-option.circle {
+            border-radius: 50%;
+        }
+
+        .shape-option.hexagon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            border-radius: 0;
         }
 
         .start-screen {
@@ -166,10 +318,67 @@
             cursor: pointer;
             margin-right: 15px;
         }
+
+        /* 视线离开提醒 */
+        .attention-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            color: white;
+            text-align: center;
+        }
+
+        .attention-alert h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: blink 1s infinite;
+        }
+
+        .attention-alert p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .attention-alert button {
+            background: white;
+            color: #ff0000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
     </style>
 </head>
-<body>
+<body class="white-bg">
     <div class="container">
+        <!-- 布局选择器 -->
+        <div class="shape-selector">
+            <div class="shape-option circle active" onclick="changeLayout('rectangle')" title="矩形布局">□</div>
+            <div class="shape-option hexagon" onclick="changeLayout('hexagon')" title="六边形布局">⬡</div>
+        </div>
+
+        <!-- 颜色选择器 -->
+        <div class="color-selector">
+            <div class="color-option white active" onclick="changeBackground('white')" title="白色背景"></div>
+            <div class="color-option black" onclick="changeBackground('black')" title="黑色背景"></div>
+            <div class="color-option off-white" onclick="changeBackground('off-white')" title="偏白背景"></div>
+        </div>
+
         <div class="header">
             <h1>眼动追踪校准</h1>
             <p>请注视屏幕上的校准点</p>
@@ -186,6 +395,18 @@
             <div class="start-content">
                 <h2>眼动追踪校准</h2>
                 <p>请确保头部稳定，注视校准点，保持眼睛睁开</p>
+                <p style="margin-top: 20px; font-size: 0.9rem; color: #ccc;">
+                    提示：请选择您喜欢的背景颜色，校准过程中请勿离开屏幕
+                </p>
+                <p style="margin-top: 10px; font-size: 0.9rem; color: #ccc;">
+                    特征点说明：可选择矩形或六边形分布，中心点为橙色圆形
+                </p>
+                <div style="margin-top: 15px;">
+                    <label style="color: #ccc; font-size: 0.9rem;">
+                        <input type="checkbox" id="enableAttentionCheck" checked style="margin-right: 8px;">
+                        启用视线检测（检测到视线离开时暂停校准）
+                    </label>
+                </div>
                 <button class="start-button" onclick="startCalibration()">开始校准</button>
             </div>
         </div>
@@ -198,33 +419,84 @@
                 <button class="start-button" onclick="restartCalibration()">重新校准</button>
             </div>
         </div>
+
+        <!-- 视线离开提醒 -->
+        <div class="attention-alert" id="attentionAlert">
+            <h2>⚠️ 注意力提醒</h2>
+            <p>检测到您的视线离开了屏幕</p>
+            <p>校准过程已暂停</p>
+            <button onclick="resumeCalibration()">继续校准</button>
+        </div>
     </div>
 
     <script>
         class EyeTrackingCalibration {
             constructor() {
+                // 9个校准点：8个边缘点 + 1个中心点
                 this.calibrationPoints = [
-                    { x: 10, y: 10 }, { x: 50, y: 10 }, { x: 90, y: 10 },
-                    { x: 10, y: 50 }, { x: 50, y: 50 }, { x: 90, y: 50 },
-                    { x: 10, y: 90 }, { x: 50, y: 90 }, { x: 90, y: 90 }
+                    // 边缘点（矩形布局）
+                    { x: 10, y: 10, type: 'edge' },    // 左上
+                    { x: 90, y: 10, type: 'edge' },    // 右上
+                    { x: 10, y: 90, type: 'edge' },    // 左下
+                    { x: 90, y: 90, type: 'edge' },    // 右下
+                    { x: 10, y: 50, type: 'edge' },    // 左中
+                    { x: 90, y: 50, type: 'edge' },    // 右中
+                    { x: 50, y: 10, type: 'edge' },    // 上中
+                    { x: 50, y: 90, type: 'edge' },    // 下中
+                    // 中心点
+                    { x: 50, y: 50, type: 'center' }   // 中心
+                ];
+
+                // 六边形布局的校准点（真正的六边形分布）
+                this.hexagonPoints = [
+                    // 六边形顶点
+                    { x: 50, y: 10, type: 'edge' },    // 上顶点
+                    { x: 85, y: 25, type: 'edge' },    // 右上顶点
+                    { x: 85, y: 75, type: 'edge' },    // 右下顶点
+                    { x: 50, y: 90, type: 'edge' },    // 下顶点
+                    { x: 15, y: 75, type: 'edge' },    // 左下顶点
+                    { x: 15, y: 25, type: 'edge' },    // 左上顶点
+                    // 六边形边的中点
+                    { x: 67.5, y: 17.5, type: 'edge' }, // 上右中点
+                    { x: 67.5, y: 82.5, type: 'edge' }, // 下右中点
+                    { x: 32.5, y: 82.5, type: 'edge' }, // 下左中点
+                    { x: 32.5, y: 17.5, type: 'edge' }, // 上左中点
+                    // 中心点
+                    { x: 50, y: 50, type: 'center' }   // 中心
                 ];
                 
                 this.currentPointIndex = 0;
                 this.calibrationData = [];
                 this.pointDuration = 3000;
                 this.transitionDuration = 1000;
+                this.isCalibrating = false;
+                this.isPaused = false;
+                
+                // 视线检测相关
+                this.lastMouseMove = Date.now();
+                this.mouseInactivityThreshold = 5000; // 5秒无鼠标移动视为视线离开（增加阈值）
+                this.mouseCheckInterval = null;
                 
                 this.init();
             }
 
             init() {
                 this.createCalibrationPoints();
+                this.setupMouseTracking();
             }
 
             createCalibrationPoints() {
                 const container = document.querySelector('.container');
                 
-                this.calibrationPoints.forEach((point, index) => {
+                // 清除现有的校准点
+                const existingPoints = container.querySelectorAll('.calibration-point');
+                existingPoints.forEach(point => point.remove());
+                
+                // 获取当前布局
+                const currentLayout = this.getCurrentLayout();
+                const pointsToUse = currentLayout === 'hexagon' ? this.hexagonPoints : this.calibrationPoints;
+                
+                pointsToUse.forEach((point, index) => {
                     const pointElement = document.createElement('div');
                     pointElement.className = 'calibration-point';
                     pointElement.id = `point-${index}`;
@@ -232,21 +504,110 @@
                     pointElement.style.top = `${point.y}%`;
                     pointElement.style.transform = 'translate(-50%, -50%)';
                     
+                    // 为中心点添加特殊样式
+                    if (point.type === 'center') {
+                        pointElement.classList.add('center-point');
+                    }
+                    
                     container.appendChild(pointElement);
+                    
+                    // 调试信息
+                    console.log(`创建校准点 ${index + 1}: 位置(${point.x}%, ${point.y}%), 类型: ${point.type}`);
                 });
+                
+                console.log(`总共创建了 ${pointsToUse.length} 个校准点，布局: ${currentLayout}`);
+                
+                // 更新进度显示
+                this.updateProgressDisplay(pointsToUse.length);
+            }
+
+            getCurrentLayout() {
+                const shapeOptions = document.querySelectorAll('.shape-option');
+                let currentLayout = 'rectangle';
+                
+                shapeOptions.forEach(option => {
+                    if (option.classList.contains('active')) {
+                        currentLayout = option.classList.contains('hexagon') ? 'hexagon' : 'rectangle';
+                    }
+                });
+                
+                return currentLayout;
+            }
+
+            updateProgressDisplay(pointCount) {
+                const progressText = document.getElementById('progressText');
+                if (progressText) {
+                    progressText.textContent = `0 / ${pointCount}`;
+                }
+            }
+
+
+
+            setupMouseTracking() {
+                // 监听鼠标移动
+                document.addEventListener('mousemove', () => {
+                    this.lastMouseMove = Date.now();
+                    if (this.isPaused) {
+                        this.hideAttentionAlert();
+                    }
+                });
+
+                // 监听鼠标离开窗口
+                document.addEventListener('mouseleave', () => {
+                    if (this.isCalibrating && !this.isPaused) {
+                        const enableCheck = document.getElementById('enableAttentionCheck');
+                        if (enableCheck && enableCheck.checked) {
+                            this.showAttentionAlert();
+                        }
+                    }
+                });
+
+                // 定期检查鼠标活动 - 增加检测间隔，减少敏感度
+                this.mouseCheckInterval = setInterval(() => {
+                    if (this.isCalibrating && !this.isPaused) {
+                        const enableCheck = document.getElementById('enableAttentionCheck');
+                        if (enableCheck && enableCheck.checked) {
+                            const timeSinceLastMove = Date.now() - this.lastMouseMove;
+                            if (timeSinceLastMove > this.mouseInactivityThreshold) {
+                                this.showAttentionAlert();
+                            }
+                        }
+                    }
+                }, 1000); // 从500ms改为1000ms
+            }
+
+            showAttentionAlert() {
+                this.isPaused = true;
+                document.getElementById('attentionAlert').style.display = 'flex';
+            }
+
+            hideAttentionAlert() {
+                this.isPaused = false;
+                document.getElementById('attentionAlert').style.display = 'none';
             }
 
             startCalibration() {
                 this.currentPointIndex = 0;
                 this.calibrationData = [];
+                this.isCalibrating = true;
+                this.isPaused = false;
                 
                 document.getElementById('startScreen').style.display = 'none';
                 this.showNextPoint();
             }
 
             showNextPoint() {
-                if (this.currentPointIndex >= this.calibrationPoints.length) {
+                const currentLayout = this.getCurrentLayout();
+                const pointsToUse = currentLayout === 'hexagon' ? this.hexagonPoints : this.calibrationPoints;
+                
+                if (this.currentPointIndex >= pointsToUse.length) {
                     this.completeCalibration();
+                    return;
+                }
+
+                // 如果暂停，等待恢复
+                if (this.isPaused) {
+                    setTimeout(() => this.showNextPoint(), 500); // 增加等待时间
                     return;
                 }
 
@@ -255,28 +616,40 @@
                 });
 
                 const currentPoint = document.getElementById(`point-${this.currentPointIndex}`);
-                currentPoint.classList.add('active');
+                if (currentPoint) {
+                    currentPoint.classList.add('active');
+                }
 
                 this.updateProgress();
                 this.collectData();
 
                 setTimeout(() => {
-                    currentPoint.classList.remove('active');
-                    currentPoint.classList.add('completed');
-                    
-                    setTimeout(() => {
-                        this.currentPointIndex++;
+                    if (!this.isPaused) {
+                        if (currentPoint) {
+                            currentPoint.classList.remove('active');
+                            currentPoint.classList.add('completed');
+                        }
+                        
+                        setTimeout(() => {
+                            this.currentPointIndex++;
+                            this.showNextPoint();
+                        }, this.transitionDuration);
+                    } else {
+                        // 如果暂停了，重新开始当前点
                         this.showNextPoint();
-                    }, this.transitionDuration);
+                    }
                 }, this.pointDuration);
             }
 
             collectData() {
-                const point = this.calibrationPoints[this.currentPointIndex];
+                const currentLayout = this.getCurrentLayout();
+                const pointsToUse = currentLayout === 'hexagon' ? this.hexagonPoints : this.calibrationPoints;
+                const point = pointsToUse[this.currentPointIndex];
                 const timestamp = Date.now();
                 
                 const eyeData = {
                     pointIndex: this.currentPointIndex,
+                    pointType: point.type,
                     targetPosition: { x: point.x, y: point.y },
                     timestamp: timestamp,
                     duration: this.pointDuration,
@@ -285,7 +658,8 @@
                         screenWidth: window.innerWidth,
                         screenHeight: window.innerHeight,
                         userAgent: navigator.userAgent,
-                        timestamp: new Date().toISOString()
+                        timestamp: new Date().toISOString(),
+                        background: document.body.className
                     }
                 };
                 
@@ -315,28 +689,41 @@
             }
 
             updateProgress() {
-                const progress = (this.currentPointIndex + 1) / this.calibrationPoints.length;
+                const currentLayout = this.getCurrentLayout();
+                const pointsToUse = currentLayout === 'hexagon' ? this.hexagonPoints : this.calibrationPoints;
+                const progress = (this.currentPointIndex + 1) / pointsToUse.length;
                 const progressFill = document.getElementById('progressFill');
                 const progressText = document.getElementById('progressText');
                 
                 progressFill.style.width = `${progress * 100}%`;
-                progressText.textContent = `${this.currentPointIndex + 1} / ${this.calibrationPoints.length}`;
+                progressText.textContent = `${this.currentPointIndex + 1} / ${pointsToUse.length}`;
+                
+                // 添加调试信息
+                console.log(`校准进度: ${this.currentPointIndex + 1}/${pointsToUse.length}, 暂停状态: ${this.isPaused}, 布局: ${currentLayout}`);
             }
 
             completeCalibration() {
+                this.isCalibrating = false;
                 document.getElementById('completionScreen').style.display = 'flex';
             }
 
             getCalibrationData() {
+                // 获取当前选择的布局
+                const currentLayout = this.getCurrentLayout();
+                const pointsToUse = currentLayout === 'hexagon' ? this.hexagonPoints : this.calibrationPoints;
+
                 return {
                     metadata: {
-                        version: "1.0",
-                        calibrationType: "9-point",
+                        version: "2.2",
+                        calibrationType: `${pointsToUse.length}-point-${currentLayout}`,
                         timestamp: new Date().toISOString(),
                         duration: this.calibrationData.length * this.pointDuration,
-                        pointCount: this.calibrationPoints.length
+                        pointCount: pointsToUse.length,
+                        background: document.body.className,
+                        layout: currentLayout,
+                        features: ["layout-selection", "center-point", "background-selection", "attention-monitoring"]
                     },
-                    calibrationPoints: this.calibrationPoints,
+                    calibrationPoints: pointsToUse,
                     calibrationData: this.calibrationData
                 };
             }
@@ -359,6 +746,8 @@
             restart() {
                 this.currentPointIndex = 0;
                 this.calibrationData = [];
+                this.isCalibrating = false;
+                this.isPaused = false;
                 
                 document.querySelectorAll('.calibration-point').forEach(point => {
                     point.classList.remove('active', 'completed');
@@ -366,6 +755,7 @@
                 
                 document.getElementById('startScreen').style.display = 'flex';
                 document.getElementById('completionScreen').style.display = 'none';
+                this.hideAttentionAlert();
                 
                 this.updateProgress();
             }
@@ -387,6 +777,37 @@
 
         function restartCalibration() {
             calibration.restart();
+        }
+
+        function resumeCalibration() {
+            calibration.hideAttentionAlert();
+        }
+
+        function changeBackground(color) {
+            // 移除所有背景类
+            document.body.classList.remove('white-bg', 'black-bg', 'off-white-bg');
+            
+            // 添加新的背景类
+            document.body.classList.add(`${color}-bg`);
+            
+            // 更新颜色选择器的激活状态
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function changeLayout(layout) {
+            // 更新布局选择器的激活状态
+            document.querySelectorAll('.shape-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 重新创建校准点
+            if (calibration) {
+                calibration.createCalibrationPoints();
+            }
         }
     </script>
 </body>
