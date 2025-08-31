@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>眼动追踪校准系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .calibration-point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 5;
+        }
+
+        .calibration-point.active {
+            width: 40px;
+            height: 40px;
+            background: #007AFF;
+            box-shadow: 0 8px 30px rgba(0, 122, 255, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+
+        .calibration-point.completed {
+            background: #34C759;
+            box-shadow: 0 4px 20px rgba(52, 199, 89, 0.4);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .progress-container {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            z-index: 10;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #007AFF;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        .start-content {
+            text-align: center;
+            color: white;
+            max-width: 500px;
+            padding: 40px;
+        }
+
+        .start-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .start-button:hover {
+            background: #0056CC;
+            transform: translateY(-2px);
+        }
+
+        .completion-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+        }
+
+        .download-button {
+            background: #34C759;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>眼动追踪校准</h1>
+            <p>请注视屏幕上的校准点</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-text" id="progressText">0 / 9</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="start-screen" id="startScreen">
+            <div class="start-content">
+                <h2>眼动追踪校准</h2>
+                <p>请确保头部稳定，注视校准点，保持眼睛睁开</p>
+                <button class="start-button" onclick="startCalibration()">开始校准</button>
+            </div>
+        </div>
+
+        <div class="completion-screen" id="completionScreen">
+            <div class="start-content">
+                <h2>校准完成</h2>
+                <p>校准数据已收集完成</p>
+                <button class="download-button" onclick="downloadData()">下载数据</button>
+                <button class="start-button" onclick="restartCalibration()">重新校准</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class EyeTrackingCalibration {
+            constructor() {
+                this.calibrationPoints = [
+                    { x: 10, y: 10 }, { x: 50, y: 10 }, { x: 90, y: 10 },
+                    { x: 10, y: 50 }, { x: 50, y: 50 }, { x: 90, y: 50 },
+                    { x: 10, y: 90 }, { x: 50, y: 90 }, { x: 90, y: 90 }
+                ];
+                
+                this.currentPointIndex = 0;
+                this.calibrationData = [];
+                this.pointDuration = 3000;
+                this.transitionDuration = 1000;
+                
+                this.init();
+            }
+
+            init() {
+                this.createCalibrationPoints();
+            }
+
+            createCalibrationPoints() {
+                const container = document.querySelector('.container');
+                
+                this.calibrationPoints.forEach((point, index) => {
+                    const pointElement = document.createElement('div');
+                    pointElement.className = 'calibration-point';
+                    pointElement.id = `point-${index}`;
+                    pointElement.style.left = `${point.x}%`;
+                    pointElement.style.top = `${point.y}%`;
+                    pointElement.style.transform = 'translate(-50%, -50%)';
+                    
+                    container.appendChild(pointElement);
+                });
+            }
+
+            startCalibration() {
+                this.currentPointIndex = 0;
+                this.calibrationData = [];
+                
+                document.getElementById('startScreen').style.display = 'none';
+                this.showNextPoint();
+            }
+
+            showNextPoint() {
+                if (this.currentPointIndex >= this.calibrationPoints.length) {
+                    this.completeCalibration();
+                    return;
+                }
+
+                document.querySelectorAll('.calibration-point').forEach(point => {
+                    point.classList.remove('active', 'completed');
+                });
+
+                const currentPoint = document.getElementById(`point-${this.currentPointIndex}`);
+                currentPoint.classList.add('active');
+
+                this.updateProgress();
+                this.collectData();
+
+                setTimeout(() => {
+                    currentPoint.classList.remove('active');
+                    currentPoint.classList.add('completed');
+                    
+                    setTimeout(() => {
+                        this.currentPointIndex++;
+                        this.showNextPoint();
+                    }, this.transitionDuration);
+                }, this.pointDuration);
+            }
+
+            collectData() {
+                const point = this.calibrationPoints[this.currentPointIndex];
+                const timestamp = Date.now();
+                
+                const eyeData = {
+                    pointIndex: this.currentPointIndex,
+                    targetPosition: { x: point.x, y: point.y },
+                    timestamp: timestamp,
+                    duration: this.pointDuration,
+                    gazeData: this.simulateGazeData(point),
+                    systemInfo: {
+                        screenWidth: window.innerWidth,
+                        screenHeight: window.innerHeight,
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString()
+                    }
+                };
+                
+                this.calibrationData.push(eyeData);
+            }
+
+            simulateGazeData(targetPoint) {
+                const samples = [];
+                const sampleCount = Math.floor(this.pointDuration / 16);
+                
+                for (let i = 0; i < sampleCount; i++) {
+                    const timeOffset = (i / sampleCount) * this.pointDuration;
+                    const noiseX = (Math.random() - 0.5) * 2;
+                    const noiseY = (Math.random() - 0.5) * 2;
+                    
+                    samples.push({
+                        timestamp: Date.now() + timeOffset,
+                        x: targetPoint.x + noiseX,
+                        y: targetPoint.y + noiseY,
+                        confidence: 0.8 + Math.random() * 0.2,
+                        pupilDiameter: 3.5 + Math.random() * 0.5,
+                        fixation: i > sampleCount * 0.1
+                    });
+                }
+                
+                return samples;
+            }
+
+            updateProgress() {
+                const progress = (this.currentPointIndex + 1) / this.calibrationPoints.length;
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+                
+                progressFill.style.width = `${progress * 100}%`;
+                progressText.textContent = `${this.currentPointIndex + 1} / ${this.calibrationPoints.length}`;
+            }
+
+            completeCalibration() {
+                document.getElementById('completionScreen').style.display = 'flex';
+            }
+
+            getCalibrationData() {
+                return {
+                    metadata: {
+                        version: "1.0",
+                        calibrationType: "9-point",
+                        timestamp: new Date().toISOString(),
+                        duration: this.calibrationData.length * this.pointDuration,
+                        pointCount: this.calibrationPoints.length
+                    },
+                    calibrationPoints: this.calibrationPoints,
+                    calibrationData: this.calibrationData
+                };
+            }
+
+            downloadData() {
+                const data = this.getCalibrationData();
+                const jsonString = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `eye_tracking_calibration_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            restart() {
+                this.currentPointIndex = 0;
+                this.calibrationData = [];
+                
+                document.querySelectorAll('.calibration-point').forEach(point => {
+                    point.classList.remove('active', 'completed');
+                });
+                
+                document.getElementById('startScreen').style.display = 'flex';
+                document.getElementById('completionScreen').style.display = 'none';
+                
+                this.updateProgress();
+            }
+        }
+
+        let calibration;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            calibration = new EyeTrackingCalibration();
+        });
+
+        function startCalibration() {
+            calibration.startCalibration();
+        }
+
+        function downloadData() {
+            calibration.downloadData();
+        }
+
+        function restartCalibration() {
+            calibration.restart();
+        }
+    </script>
+</body>
+</html>
