@@ -13,6 +13,8 @@ from project.fitting.core.kappa_calibrator_pro import (
     build_samples_from_arrays
 )
 from project.fitting.core.gaze_estimator import compute_theoretical_gaze
+import os # Added for JSON file mode
+from project.fitting.app.state import SESSION_MANAGER, FittingResultLite
 
 def calculate_distances_to_eyeball(eye: str, fitting_result, data_manager):
     """
@@ -214,6 +216,20 @@ def main():
             
             # 计算各点到眼球中心和表面的距离
             calculate_distances_to_eyeball(key, result, data_manager)
+
+            # 写入会话管理器，保存最近一次拟合结果（用于标定/前端交互）
+            try:
+                lite = FittingResultLite(
+                    center=result.parameters.center,
+                    radius=float(result.parameters.radius),
+                    confidence=float(result.confidence),
+                    converged=bool(result.converged),
+                    final_residual_norm=float(result.final_residual_norm),
+                    strategy_used=str(result.strategy_used)
+                )
+                SESSION_MANAGER.set_last_fitting(key, lite)
+            except Exception as _e:
+                logging.warning(f"保存最近拟合结果失败: {_e}")
             
     except Exception as e:
         logging.warning(f"眼球拟合过程出现错误: {e}")
@@ -234,9 +250,10 @@ def main():
     print("1. 使用模拟数据（默认）")
     print("2. 使用真实摄像头")
     print("3. 自定义摄像头配置")
+    print("4. 从JSON文件读取数据")
     
     try:
-        choice = input("\n请选择 (1/2/3，直接回车使用默认): ").strip()
+        choice = input("\n请选择 (1/2/3/4，直接回车使用默认): ").strip()
         
         if choice == "2":
             # 真实摄像头模式
@@ -258,6 +275,23 @@ def main():
             }
             use_real_camera = False  # 仍使用模拟数据，但用自定义配置
             print(f"使用自定义配置: 焦距={focal_length}, 主点=({principal_x}, {principal_y})")
+            
+        elif choice == "4":
+            # JSON文件模式
+            print("使用JSON文件数据模式...")
+            use_real_camera = False
+            camera_config = None
+            
+            # 检查JSON文件是否存在
+            json_file = "eye_tracking_data.json"
+            if not os.path.exists(json_file):
+                print(f"JSON文件 {json_file} 不存在，将创建示例文件")
+                # 创建示例JSON文件
+                from project.fitting.core.eye_tracking_data_interface import EyeTrackingDataInterface
+                interface = EyeTrackingDataInterface()
+                interface._create_sample_json_file(json_file)
+            
+            print(f"将使用JSON文件: {json_file}")
             
         else:
             # 默认模拟数据模式

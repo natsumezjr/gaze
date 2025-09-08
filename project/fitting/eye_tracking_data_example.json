@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "description": "眼动追踪校准数据示例 - 9点校准",
+    "created_at": "2024-12-01T10:30:00.000000",
+    "data_format": "JSON",
+    "coordinate_system": "camera_coordinates_mm",
+    "sample_count": 9,
+    "calibration_type": "9_point_grid",
+    "hardware": "simulated_data"
+  },
+  "eyes": [
+    [0.0, 0.0, 0.0],
+    [0.05, 0.0, 0.0],
+    [0.1, 0.0, 0.0],
+    [0.0, 0.05, 0.0],
+    [0.05, 0.05, 0.0],
+    [0.1, 0.05, 0.0],
+    [0.0, 0.1, 0.0],
+    [0.05, 0.1, 0.0],
+    [0.1, 0.1, 0.0]
+  ],
+  "pupils": [
+    [0.0, 0.0, 0.1],
+    [0.05, 0.0, 0.1],
+    [0.1, 0.0, 0.1],
+    [0.0, 0.05, 0.1],
+    [0.05, 0.05, 0.1],
+    [0.1, 0.05, 0.1],
+    [0.0, 0.1, 0.1],
+    [0.05, 0.1, 0.1],
+    [0.1, 0.1, 0.1]
+  ],
+  "target_pixels": [
+    [192, 108],
+    [960, 108],
+    [1728, 108],
+    [192, 540],
+    [960, 540],
+    [1728, 540],
+    [192, 972],
+    [960, 972],
+    [1728, 972]
+  ],
+  "camera_matrix": [
+    [1000.0, 0.0, 960.0],
+    [0.0, 1000.0, 540.0],
+    [0.0, 0.0, 1.0]
+  ],
+  "screen_resolution": [1920, 1080],
+  "units": {
+    "coordinates": "millimeters",
+    "pixels": "pixels",
+    "angles": "degrees"
+  },
+  "calibration_info": {
+    "method": "9_point_grid",
+    "duration_seconds": 18,
+    "samples_per_point": 20,
+    "point_order": [
+      "top_left", "top_center", "top_right",
+      "middle_left", "center", "middle_right", 
+      "bottom_left", "bottom_center", "bottom_right"
+    ]
+  }
+}

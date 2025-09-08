@@ -89,7 +89,8 @@ class Sample:
         if self.target_ray is not None:
             return normalize(self.target_ray)
         if self.target_point is not None:
-            return normalize(np.asarray(self.target_point))  # camera at origin
+            # 改为以眼中心为参考：eye → target 的方向
+            return normalize(np.asarray(self.target_point) - np.asarray(self.c_eye))
         if self.target_pixel is not None and self.K is not None:
             u, v = self.target_pixel
             return project_pixel_to_ray(u, v, self.K)

@@ -12,6 +12,8 @@ import numpy as np
 import logging
 from typing import Dict, Optional, Tuple
 import os
+import json
+from datetime import datetime
 
 # ==================== 可选的硬件库导入 ====================
 # 取消注释你需要的库：
@@ -286,30 +288,214 @@ class EyeTrackingDataInterface:
             raise
     
     def _get_file_data(self, num_samples):
-        """从文件读取数据（用于测试）"""
+        """从文件读取数据（支持JSON格式）"""
         try:
-            # 检查是否存在数据文件
-            data_file = "eye_tracking_data.npy"
-            if os.path.exists(data_file):
-                # 从文件加载数据
-                data = np.load(data_file, allow_pickle=True).item()
-                logging.info(f"从文件加载数据: {data_file}")
+            # 优先检查JSON文件
+            json_file = "eye_tracking_data.json"
+            npy_file = "eye_tracking_data.npy"
+            
+            if os.path.exists(json_file):
+                # 从JSON文件加载数据
+                data = self._load_json_data(json_file)
+                logging.info(f"从JSON文件加载数据: {json_file}")
+                return data
+            elif os.path.exists(npy_file):
+                # 从NPY文件加载数据
+                data = np.load(npy_file, allow_pickle=True).item()
+                logging.info(f"从NPY文件加载数据: {npy_file}")
                 return data
             else:
-                # 创建示例数据文件
-                self._create_sample_data_file(data_file)
-                logging.info(f"创建示例数据文件: {data_file}")
+                # 创建示例JSON数据文件
+                self._create_sample_json_file(json_file)
+                logging.info(f"创建示例JSON数据文件: {json_file}")
                 return self._get_simulated_data(num_samples)
                 
         except Exception as e:
             logging.error(f"文件数据获取失败: {e}")
             return self._get_simulated_data(num_samples)
     
-    def _create_sample_data_file(self, filename):
-        """创建示例数据文件"""
-        sample_data = self._get_simulated_data(10)
-        np.save(filename, sample_data)
-        logging.info(f"示例数据文件已创建: {filename}")
+    def _load_json_data(self, json_file):
+        """从JSON文件加载眼动追踪数据"""
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # 验证JSON数据格式
+            if not self._validate_json_data(data):
+                raise ValueError("JSON数据格式不正确")
+            
+            # 转换JSON数据为numpy数组
+            converted_data = self._convert_json_to_numpy(data)
+            
+            return converted_data
+            
+        except Exception as e:
+            logging.error(f"JSON文件读取失败: {e}")
+            raise
+    
+    def _validate_json_data(self, data):
+        """验证JSON数据格式"""
+        required_keys = ['eyes', 'pupils', 'target_pixels', 'camera_matrix']
+        
+        # 检查必需字段
+        for key in required_keys:
+            if key not in data:
+                logging.error(f"缺少必需字段: {key}")
+                return False
+        
+        # 检查数据类型
+        if not isinstance(data['eyes'], list) or not isinstance(data['pupils'], list):
+            logging.error("eyes和pupils必须是数组")
+            return False
+        
+        if not isinstance(data['target_pixels'], list):
+            logging.error("target_pixels必须是数组")
+            return False
+        
+        if not isinstance(data['camera_matrix'], list):
+            logging.error("camera_matrix必须是数组")
+            return False
+        
+        return True
+    
+    def _convert_json_to_numpy(self, json_data):
+        """将JSON数据转换为numpy数组格式"""
+        try:
+            # 转换眼球中心坐标
+            eyes = np.array(json_data['eyes'], dtype=np.float32)
+            
+            # 转换瞳孔中心坐标
+            pupils = np.array(json_data['pupils'], dtype=np.float32)
+            
+            # 转换目标像素坐标
+            target_pixels = np.array(json_data['target_pixels'], dtype=np.float32)
+            
+            # 转换相机内参矩阵
+            camera_matrix = np.array(json_data['camera_matrix'], dtype=np.float32)
+            
+            # 检查数据维度
+            if eyes.shape[1] != 3 or pupils.shape[1] != 3:
+                raise ValueError("眼球和瞳孔坐标必须是3D坐标")
+            
+            if target_pixels.shape[1] != 2:
+                raise ValueError("目标像素坐标必须是2D坐标")
+            
+            if camera_matrix.shape != (3, 3):
+                raise ValueError("相机内参矩阵必须是3x3")
+            
+            # 检查数据一致性
+            if not (eyes.shape[0] == pupils.shape[0] == target_pixels.shape[0]):
+                raise ValueError("所有数据数组的样本数量必须一致")
+            
+            return {
+                'eyes': eyes,
+                'pupils': pupils,
+                'target_pixels': target_pixels,
+                'K': camera_matrix,
+                'data_type': 'json_file'
+            }
+            
+        except Exception as e:
+            logging.error(f"JSON数据转换失败: {e}")
+            raise
+    
+    def _create_sample_json_file(self, filename):
+        """创建示例JSON数据文件"""
+        sample_data = {
+            "metadata": {
+                "description": "眼动追踪校准数据示例",
+                "created_at": datetime.now().isoformat(),
+                "data_format": "JSON",
+                "coordinate_system": "camera_coordinates_mm",
+                "sample_count": 10
+            },
+            "eyes": [
+                [0.0, 0.0, 0.0],      # 眼球中心1 (mm)
+                [0.1, 0.0, 0.0],      # 眼球中心2
+                [0.0, 0.1, 0.0],      # 眼球中心3
+                [-0.1, 0.0, 0.0],     # 眼球中心4
+                [0.0, -0.1, 0.0],     # 眼球中心5
+                [0.05, 0.05, 0.0],    # 眼球中心6
+                [-0.05, 0.05, 0.0],   # 眼球中心7
+                [0.05, -0.05, 0.0],   # 眼球中心8
+                [-0.05, -0.05, 0.0],  # 眼球中心9
+                [0.0, 0.0, 0.1]       # 眼球中心10
+            ],
+            "pupils": [
+                [0.0, 0.0, 0.1],      # 瞳孔中心1 (mm)
+                [0.1, 0.0, 0.1],      # 瞳孔中心2
+                [0.0, 0.1, 0.1],      # 瞳孔中心3
+                [-0.1, 0.0, 0.1],     # 瞳孔中心4
+                [0.0, -0.1, 0.1],     # 瞳孔中心5
+                [0.05, 0.05, 0.1],    # 瞳孔中心6
+                [-0.05, 0.05, 0.1],   # 瞳孔中心7
+                [0.05, -0.05, 0.1],   # 瞳孔中心8
+                [-0.05, -0.05, 0.1],  # 瞳孔中心9
+                [0.0, 0.0, 0.2]       # 瞳孔中心10
+            ],
+            "target_pixels": [
+                [100, 100],            # 屏幕目标点1 (像素)
+                [960, 100],            # 屏幕目标点2
+                [1820, 100],           # 屏幕目标点3
+                [100, 540],            # 屏幕目标点4
+                [960, 540],            # 屏幕目标点5
+                [1820, 540],           # 屏幕目标点6
+                [100, 980],            # 屏幕目标点7
+                [960, 980],            # 屏幕目标点8
+                [1820, 980],           # 屏幕目标点9
+                [960, 540]             # 屏幕目标点10
+            ],
+            "camera_matrix": [
+                [1000.0, 0.0, 960.0],   # 相机内参矩阵
+                [0.0, 1000.0, 540.0],   # fx, fy, cx, cy
+                [0.0, 0.0, 1.0]
+            ],
+            "screen_resolution": [1920, 1080],
+            "units": {
+                "coordinates": "millimeters",
+                "pixels": "pixels",
+                "angles": "degrees"
+            }
+        }
+        
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(sample_data, f, indent=2, ensure_ascii=False)
+        
+        logging.info(f"示例JSON数据文件已创建: {filename}")
+    
+    def save_data_to_json(self, data, filename="eye_tracking_data.json"):
+        """将数据保存为JSON格式"""
+        try:
+            # 转换numpy数组为Python列表
+            json_data = {
+                "metadata": {
+                    "description": "眼动追踪校准数据",
+                    "created_at": datetime.now().isoformat(),
+                    "data_format": "JSON",
+                    "coordinate_system": "camera_coordinates_mm",
+                    "sample_count": len(data['eyes'])
+                },
+                "eyes": data['eyes'].tolist(),
+                "pupils": data['pupils'].tolist(),
+                "target_pixels": data['target_pixels'].tolist(),
+                "camera_matrix": data['K'].tolist(),
+                "screen_resolution": self.camera_config['resolution'],
+                "units": {
+                    "coordinates": "millimeters",
+                    "pixels": "pixels",
+                    "angles": "degrees"
+                }
+            }
+            
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(json_data, f, indent=2, ensure_ascii=False)
+            
+            logging.info(f"数据已保存到JSON文件: {filename}")
+            return True
+            
+        except Exception as e:
+            logging.error(f"保存JSON文件失败: {e}")
+            return False
     
     def _detect_eye_centers(self, frame, num_samples):
         """
