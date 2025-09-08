@@ -232,13 +232,17 @@ class RandomSamplingStrategy(SamplingStrategy):
         
         # 拟合点采样
         if len(fitting_points) >= self.min_fitting_points:
-            sampled_fitting = random.sample(fitting_points, self.min_fitting_points)
+            fitting_sample_num = np.random.randint(self.min_fitting_points, len(fitting_points) + 1)
+            logging.debug(f"拟合点随机采样数量：{fitting_sample_num},最小采样数量：{self.min_fitting_points}")
+            sampled_fitting = random.sample(fitting_points, fitting_sample_num)
         else:
             sampled_fitting = fitting_points
         
         # 约束点采样
         if len(constraint_points) >= self.min_constraint_points:
-            sampled_constraint = random.sample(constraint_points, self.min_constraint_points)
+            constraint_sample_num = np.random.randint(self.min_constraint_points, len(constraint_points) + 1)
+            logging.debug(f"约束点随机采样数量：{constraint_sample_num},最小采样数量：{self.min_constraint_points}")
+            sampled_constraint = random.sample(constraint_points, constraint_sample_num)
         else:
             sampled_constraint = constraint_points
         
@@ -1033,7 +1037,7 @@ class RANSACOptimizer(Optimizer):
     """RANSAC优化器"""
     
     def __init__(self, max_iterations: int = 20, surface_threshold: float = None, 
-                 center_threshold: float = None, base_optimizer: Optimizer = None):
+                 center_threshold: float = None, base_optimizer: Optimizer = None, base_sampling_strategy: SamplingStrategy = None):
         self.max_iterations = max_iterations
         
         # 设置默认阈值（当点类型不在约束中时使用）
@@ -1060,6 +1064,7 @@ class RANSACOptimizer(Optimizer):
                 center_threshold = (max_val - min_val) / 2
                 logging.debug(f"  {point_type} 中心阈值: ({min_val}, {max_val}) -> {center_threshold:.4f}")
             
+        self.base_sampling_strategy = base_sampling_strategy or RandomSamplingStrategy(min_fitting_points=3, min_constraint_points=3)
         self.base_optimizer = base_optimizer or LevenbergMarquardtOptimizer()
         self.residual_calculator = ResidualCalculator()
         self.min_sample_count = 4
@@ -1078,16 +1083,13 @@ class RANSACOptimizer(Optimizer):
         for iteration in range(self.max_iterations):
             logging.debug(f"======================================================================================================")
             # 随机采样
-            if len(fitting_points) >= self.min_sample_count:
-                import random
-                sampled_points = random.sample(fitting_points, self.min_sample_count)
-            else:
-                sampled_points = fitting_points    
-            
-            logging.debug(f"RANSAC优化器，第{iteration}次迭代，采样点数：{len(sampled_points)}")
+
+            sampled_fitting_points, sampled_constraint_points = self.base_sampling_strategy.sample(fitting_points, constraint_points)
+
+            logging.debug(f"RANSAC优化器，第{iteration}次迭代，采样点数：{len(sampled_fitting_points)}")
             
             # 使用基础优化器
-            result = self.base_optimizer.optimize(initial_params, sampled_points, constraint_points)
+            result = self.base_optimizer.optimize(initial_params, sampled_fitting_points, sampled_constraint_points)
             
             # 计算并打印所有点到中心和表面的距离
             point_distances = self._print_all_points_distances(result.parameters, iteration)
@@ -1096,7 +1098,7 @@ class RANSACOptimizer(Optimizer):
             # 使用confidence作为更新标准
             logging.debug(f"RANSAC优化器，第{iteration}次迭代，confidence：{result.confidence:.4f}")    
             
-            if result.confidence > best_confidence:
+            if result.confidence > best_confidence and result.converged:
                 best_confidence = result.confidence
                 best_result = result
                 best_iteration = iteration
@@ -1461,25 +1463,25 @@ def create_default_strategies() -> List[FittingStrategy]:
             optimizer=LevenbergMarquardtOptimizer(),
             confidence=0.7,
             min_visibility=0.9,
-            min_points=8
+            min_points=5
         ),
         # 中质量数据策略
         FittingStrategy(
             name="medium_quality",
-            sampling_strategy=RandomSamplingStrategy(),
-            optimizer=RANSACOptimizer(),
+            sampling_strategy=RandomSamplingStrategy(min_fitting_points=3, min_constraint_points=3),
+            optimizer=RANSACOptimizer(base_sampling_strategy=RandomSamplingStrategy(min_fitting_points=3, min_constraint_points=3)),
             confidence=0.8,
             min_visibility=0.7,
-            min_points=4
+            min_points=3
         ),
         # 低质量数据策略
         FittingStrategy(
             name="low_quality",
-            sampling_strategy=RandomSamplingStrategy(min_fitting_points=3),
-            optimizer=RANSACOptimizer(max_iterations=30),
+            sampling_strategy=RandomSamplingStrategy(min_fitting_points=2, min_constraint_points=1),
+            optimizer=RANSACOptimizer(max_iterations=30, base_sampling_strategy=RandomSamplingStrategy(min_fitting_points=2, min_constraint_points=1)),
             confidence=0.9,
             min_visibility=0.5,
-            min_points=3,
+            min_points=2,
             sphere_fitting=False
         ),
         # 失败策略

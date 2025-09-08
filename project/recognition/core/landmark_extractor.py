@@ -11,7 +11,7 @@ from project.recognition.config.settings import *
 
 def calculate_visibility(landmark: List[float], image: np.ndarray, landmark_index: int) -> float:
     """计算关键点的可见性分数"""
-    return 0.92
+    return 0.6
 
 def extract_landmarks(bgr_image: np.ndarray) -> List[List[float]]:
     """
