@@ -1,0 +1,20 @@
+{
+    "depth_mode": "auto",
+    "fixed_depth_options": {
+        "near": 0.4,
+        "medium": 0.8,
+        "far": 1.2,
+        "default": 0.6
+    },
+    "auto_depth_settings": {
+        "min_depth": 0.3,
+        "max_depth": 2.0,
+        "real_pupil_distance": 0.065,
+        "fallback_depth": 0.6
+    },
+    "depth_camera_settings": {
+        "enabled": false,
+        "camera_index": 1,
+        "depth_scale": 0.001
+    }
+}
