@@ -266,14 +266,27 @@ def main():
                 # 基于人脸大小的动态深度估计
                 try:
                     # 检测人脸以估计距离
-                    face_detected = face_detector.detect_face(frame, None)
+                    # 传入占位深度图以满足形状校验
+                    temp_depth = auto_settings.get('fallback_depth', 0.6)
+                    temp_depth_map = np.ones((h, w), dtype=np.float32) * (temp_depth / camera_params['depth_scale'])
+                    face_detected = face_detector.detect_face(frame, temp_depth_map)
                     if face_detected:
                         # 获取人脸关键点
-                        landmarks = face_detector.recg_fit_data_manager.get_coordinate_point("left", "pupil")
-                        if landmarks and len(landmarks) > 0:
-                            # 基于瞳孔间距估计深度
-                            # 这里简化处理，实际应该计算左右瞳孔的像素距离
-                            pupil_distance_pixels = 50  # 简化：假设瞳孔间距为50像素
+                        try:
+                            from project.recognition.core.landmark_extractor import extract_landmarks, get_landmark_indices
+                            lm = extract_landmarks(frame)
+                            indices = get_landmark_indices()
+                            left_idx = indices["left"]["pupil"][0]
+                            right_idx = indices["right"]["pupil"][0]
+                            if lm and len(lm) > max(left_idx, right_idx):
+                                lx, ly = lm[left_idx][0], lm[left_idx][1]
+                                rx, ry = lm[right_idx][0], lm[right_idx][1]
+                                pupil_distance_pixels = float(np.hypot(lx - rx, ly - ry))
+                            else:
+                                pupil_distance_pixels = 0.0
+                        except Exception:
+                            pupil_distance_pixels = 0.0
+                        if pupil_distance_pixels > 1e-3:
                             # 深度 = (真实瞳孔间距 * 焦距) / 像素瞳孔间距
                             fx = camera_params['intrinsic_params']['fx']
                             real_pupil_distance = auto_settings.get('real_pupil_distance', 0.065)
@@ -331,7 +344,7 @@ def main():
                         
                         # 检查数据管理器状态
                         logging.info("检查数据管理器状态...")
-                        data_manager = face_detector.recg_fit_data_manager
+                        data_manager = face_detector.get_data_manager()
                         left_points = data_manager.get_coordinate_point("left", "pupil")
                         right_points = data_manager.get_coordinate_point("right", "pupil")
                         logging.info(f"左眼瞳孔点数: {len(left_points) if left_points else 0}")
@@ -416,7 +429,7 @@ def main():
             
             if key == ord('s') and calibration_started and current_point_index < len(target_points):
                 # 收集当前点数据
-                pupil_data = face_detector.recg_fit_data_manager.get_coordinate_point("left", "pupil")
+                pupil_data = face_detector.get_data_manager().get_coordinate_point("left", "pupil")
                 if pupil_data:
                     current_target = target_points[current_point_index]
                     push_sample({"timestamp": time.time(), "target_pixel": current_target, "eye": "left"})

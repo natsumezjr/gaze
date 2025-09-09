@@ -135,7 +135,7 @@ def main():
     except Exception as e:
         logging.warning(f"眼球拟合过程出现错误: {e}")
         print(f"眼球拟合过程出现错误: {e}")
-        logging.info("继续运行kappa校准演示...")
+        # 保持流程不中断
     
     
     print("\n程序执行完成！")
