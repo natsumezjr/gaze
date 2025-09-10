@@ -1,10 +1,12 @@
 
 import logging
 import numpy as np
+import time
 from project.fitting.core.fitting_strategy import fit_all_eyes
 from project.recg_fit_data.data_manager import RECG_FIT_DATA_MANAGER, FITTING_TYPE, EYE_TYPE
 
 from project.fitting.app.state import SESSION_MANAGER, FittingResultLite
+from project.fitting.app.api import start_session, push_sample, fit_kappa, compute_gaze
 
 def calculate_distances_to_eyeball(eye: str, fitting_result, data_manager):
     """
@@ -91,6 +93,58 @@ def calculate_distances_to_eyeball(eye: str, fitting_result, data_manager):
     logging.info(f"球外点数: {points_outside_sphere} ({points_outside_sphere/total_points*100:.5f}%)")
     logging.info(f"{'='*80}")
 
+
+def run_kappa_calibration():
+    """运行kappa校准（使用封装API）"""
+    logging.info("\n" + "="*80)
+    logging.info("开始KAPPA校准")
+    logging.info("="*80)
+    try:
+        session = SESSION_MANAGER.get_session()
+        if session is None or len(session.samples) == 0:
+            logging.error("无可用样本，请先 push_sample 收集校准点")
+            return None, None, None
+
+        result = fit_kappa()
+        model = SESSION_MANAGER.get_session().kappa_model
+        if model is not None:
+            logging.info(f"Kappa校准结果 - 角度: {model.angle_deg:.3f}°  质量: {getattr(model, 'quality', 1.0)}")
+        logging.info("Kappa校准完成！")
+        return model, result, None
+    except Exception as e:
+        logging.error(f"Kappa校准失败: {e}")
+        return None, None, None
+
+def initialize_calibration_session():
+    """初始化校准会话"""
+    try:
+        session_info = start_session("integrated-calibration")
+        logging.info(f"会话初始化成功: {session_info}")
+        print(f"会话初始化成功: {session_info}")
+        return True
+    except Exception as e:
+        logging.error(f"会话初始化失败: {e}")
+        print(f"会话初始化失败: {e}")
+        return False
+
+def collect_calibration_sample(target_pixel, eye="left"):
+    """收集校准样本"""
+    try:
+        push_sample({"timestamp": time.time(), "target_pixel": target_pixel, "eye": eye})
+        logging.info(f"已收集校准样本数据：{target_pixel}")
+        return True
+    except Exception as e:
+        logging.error(f"收集校准样本失败: {e}")
+        return False
+
+def compute_calibrated_gaze(eye, target_pixel):
+    """计算校准后的视线"""
+    try:
+        gaze = compute_gaze(eye, target_pixel)
+        return gaze
+    except Exception as e:
+        logging.error(f"计算校准视线失败: {e}")
+        return None
 
 def main():
     """

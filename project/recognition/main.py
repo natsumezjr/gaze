@@ -57,18 +57,9 @@ try:
     from project.recognition.utils.camera_calibration import CameraCalibrator
     from project.recognition.utils.camera_data_manager import add_frame, get_image, get_depth, get_resolution
     
-    # 导入校准模块
-    from project.fitting.app.api import start_session, push_sample, fit_kappa, compute_gaze
+    # 导入校准模块（使用API进行封装调用）
     from project.fitting.app.state import SESSION_MANAGER
-    from project.fitting.main import main as fit_main
-    from project.fitting.core.kappa_calibrator_pro import (
-        estimate_kappa as estimate_kappa_pro,
-        apply_kappa,
-        evaluate_fit,
-        incremental_update,
-        build_samples_from_arrays
-    )
-    from project.fitting.core.gaze_estimator import compute_theoretical_gaze
+    from project.fitting.main import main as fit_main, run_kappa_calibration, initialize_calibration_session, collect_calibration_sample, compute_calibrated_gaze
 except ImportError as e:
     logging.error(f"导入错误: {e}")
     logging.error("请确保已安装项目包: pip install -e .")
@@ -99,102 +90,6 @@ def send_to_frontend(data):
     logging.info(f"发送给前端: {data}")
     print(f"[前端通信] 发送数据: {data}")
 
-def run_kappa_calibration():
-    """运行kappa校准"""
-    logging.info("\n" + "="*80)
-    logging.info("开始KAPPA校准")
-    logging.info("="*80)
-    
-    try:
-        # 获取会话数据
-        logging.info("检查会话管理器状态...")
-        session = SESSION_MANAGER.get_session()
-        if not session:
-            logging.error("会话管理器中没有会话数据")
-            return None, None, None
-        elif not session.samples:
-            logging.error(f"会话中有 {len(session.samples)} 个样本，需要至少1个样本进行kappa校准")
-            return None, None, None
-        
-        logging.info(f"会话数据检查通过，共有 {len(session.samples)} 个样本")
-        
-        # 提取数据
-        logging.info("提取校准数据...")
-        try:
-            eyes = np.vstack([s.eye_center.reshape(1, 3) for s in session.samples])
-            pupils = np.vstack([s.pupil_center.reshape(1, 3) for s in session.samples])
-            target_pixels = np.vstack([np.array(s.target_pixel).reshape(1, 2) for s in session.samples])
-            logging.info("数据提取成功")
-        except Exception as e:
-            logging.error(f"数据提取失败: {e}")
-            return None, None, None
-        
-        # 相机内参矩阵
-        K = np.array([[1000.0, 0.0, 960.0], [0.0, 1000.0, 540.0], [0.0, 0.0, 1.0]], dtype=float)
-        logging.info(f"相机内参矩阵: {K}")
-        
-        logging.info(f"使用 {len(session.samples)} 个校准样本进行kappa校准")
-        logging.info(f"眼球中心范围: {np.min(eyes, axis=0)} 到 {np.max(eyes, axis=0)}")
-        logging.info(f"瞳孔中心范围: {np.min(pupils, axis=0)} 到 {np.max(pupils, axis=0)}")
-        logging.info(f"目标像素范围: {np.min(target_pixels, axis=0)} 到 {np.max(target_pixels, axis=0)}")
-        
-        # 构建样本
-        logging.info("构建kappa校准样本...")
-        try:
-            samples_pro = build_samples_from_arrays(
-                eyes, pupils, 
-                target_pixels=target_pixels, 
-                K=K
-            )
-            logging.info(f"样本构建成功，共 {len(samples_pro)} 个样本")
-        except Exception as e:
-            logging.error(f"样本构建失败: {e}")
-            return None, None, None
-        
-        # 估计kappa
-        logging.info("开始估计kappa参数...")
-        try:
-            kappa_pro, info_pro = estimate_kappa_pro(samples_pro, lock_roll=True)
-            logging.info(f"Kappa校准结果 - Kappa: {np.degrees(kappa_pro)}°")
-            logging.info(f"校准信息: {info_pro}")
-        except Exception as e:
-            logging.error(f"Kappa估计失败: {e}")
-            return None, None, None
-        
-        # 应用kappa补偿
-        logging.info("应用kappa补偿...")
-        theoretical_gaze = compute_theoretical_gaze(eyes[0], pupils[0])
-        compensated_gaze = apply_kappa(theoretical_gaze.reshape(1, 3), kappa_pro)[0]
-        
-        logging.info(f"理论视线: {theoretical_gaze}")
-        logging.info(f"补偿后视线: {compensated_gaze}")
-        
-        # 评估拟合质量
-        logging.info("评估拟合质量...")
-        fit_quality = evaluate_fit(samples_pro, kappa_pro, K, return_pixel_err=True)
-        logging.info(f"拟合质量: {fit_quality}")
-        
-        # 演示增量更新
-        logging.info("演示增量kappa更新...")
-        kappa_prev = kappa_pro.copy()
-        v = theoretical_gaze
-        d = compensated_gaze
-        
-        for i in range(3):
-            kappa_new = incremental_update(kappa_prev, v, d, beta=0.1)
-            angle_change = np.degrees(np.linalg.norm(kappa_new - kappa_prev))
-            logging.info(f"第{i+1}次更新: Kappa变化 {angle_change:.4f}°")
-            kappa_prev = kappa_new.copy()
-        
-        logging.info("Kappa校准完成！")
-        return kappa_pro, info_pro, fit_quality
-        
-    except Exception as e:
-        logging.error(f"Kappa校准失败: {e}")
-        import traceback
-        error_trace = traceback.format_exc()
-        logging.error(f"详细错误信息: {error_trace}")
-        return None, None, None
 
 # 校准状态
 calibration_started = False
@@ -364,13 +259,7 @@ def main():
                         print("Step 2: 初始化校准会话")
                         
                         # 开始校准会话
-                        try:
-                            session_info = start_session("integrated-calibration")
-                            logging.info(f"会话初始化成功: {session_info}")
-                            print(f"会话初始化成功: {session_info}")
-                        except Exception as e:
-                            logging.error(f"会话初始化失败: {e}")
-                            print(f"会话初始化失败: {e}")
+                        initialize_calibration_session()
                         
                         # 注意：kappa校准需要先收集校准样本，所以这里不进行kappa校准
                         # kappa校准将在收集完9个校准点后进行
@@ -432,11 +321,11 @@ def main():
                 pupil_data = face_detector.get_data_manager().get_coordinate_point("left", "pupil")
                 if pupil_data:
                     current_target = target_points[current_point_index]
-                    push_sample({"timestamp": time.time(), "target_pixel": current_target, "eye": "left"})
-                    logging.info(f"已收集第 {current_point_index + 1} 个点的数据：{current_target}")
-                    current_point_index += 1
-                    
-                        
+                    if collect_calibration_sample(current_target, "left"):
+                        logging.info(f"已收集第 {current_point_index + 1} 个点的数据：{current_target}")
+                        current_point_index += 1
+                    else:
+                        logging.warning("收集校准样本失败")
                 else:
                     logging.warning("未检测到瞳孔数据，无法采集样本。")
             
@@ -457,8 +346,11 @@ def main():
                     logging.info("== Step 3: 计算补偿后的视线 ==")
                     print("== Step 3: 计算补偿后的视线 ==")
                     center_uv = target_points[4]
-                    gaze = compute_gaze("left", center_uv)
-                    print("Gaze (compensated):", gaze["gaze"])
+                    gaze = compute_calibrated_gaze("left", center_uv)
+                    if gaze:
+                        print("Gaze (compensated):", gaze["gaze"])
+                    else:
+                        logging.warning("计算校准视线失败")
                     
                     logging.info("== Step 4: 评估拟合质量 ==")
                     print("== Step 4: 评估拟合质量 ==")
