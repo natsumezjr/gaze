@@ -12,8 +12,8 @@ html, body {
 }
 
 body {
-    background-color: #000000;
-    color: white;
+    background-color: #FFFFFF;
+    color: #000000;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", Helvetica, Arial, sans-serif;
     display: flex;
     justify-content: center;
@@ -30,23 +30,23 @@ body {
     z-index: 10;
 }
 
-/* 标题样式 - iOS风格 */
+/* 标题样式 - iOS白色风格 */
 .title {
     font-size: 2.5rem;
     font-weight: 600;
     margin-bottom: 3rem;
     letter-spacing: -0.5px;
-    color: #FFFFFF;
+    color: #000000;
     opacity: 0.95;
 }
 
-/* 开始校准按钮样式 - iOS风格 */
-#start-btn {
-    background: rgba(255, 255, 255, 0.12);
+/* 开始校准按钮样式 - iOS白色风格 */
+#start-button {
+    background: rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     padding: 16px 32px;
     font-size: 1.1rem;
     font-weight: 500;
@@ -59,7 +59,7 @@ body {
     overflow: hidden;
 }
 
-#start-btn:before {
+#start-button:before {
     content: '';
     position: absolute;
     top: 0;
@@ -71,17 +71,17 @@ body {
     transition: opacity 0.2s ease;
 }
 
-#start-btn:hover {
+#start-button:hover {
     background: rgba(255, 255, 255, 0.18);
     border-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-1px);
 }
 
-#start-btn:hover:before {
+#start-button:hover:before {
     opacity: 1;
 }
 
-#start-btn:active {
+#start-button:active {
     transform: translateY(0);
     background: rgba(255, 255, 255, 0.08);
 }
@@ -97,81 +97,50 @@ body {
     z-index: 5;
 }
 
-/* 移动校准圆圈 - 完全独立的样式 */
+/* 移动圆圈样式 */
 #moving-circle {
-    position: fixed;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* 修正数字垂直居中 */
-    line-height: 1;
-    text-align: center;
-    /* 圆润数字字体 */
-    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "SF Pro Rounded", sans-serif;
-    font-size: 1.5rem;
-    font-weight: 900;
-    font-variant-numeric: tabular-nums;
-    /* 初始倒计时样式 */
-    background-color: #FFFFFF;
-    color: #000000;
-    border: none;
-    box-shadow: none;
-    opacity: 0;
-    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* 倒计时状态 */
-#moving-circle.countdown {
-    background-color: #FFFFFF !important;
-    color: #000000 !important;
-}
-
-/* 移动圆圈显示状态 */
-#moving-circle.visible {
-    opacity: 1 !important;
-}
-
-/* 移动圆圈内部收缩层 */
-#moving-circle .inner-shrink {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #E74C3C;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#moving-circle.visible {
+    opacity: 1;
+}
+
+#moving-circle.countdown {
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    100% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.inner-shrink {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: all 0.1s ease-out;
-    z-index: 2;
+    background-color: #FFFFFF;
+    transition: all 0.3s ease;
 }
 
-/* 内圈收缩动画 - 优化流畅度 */
 .inner-shrink.shrinking {
-    animation: smoothShrink 2s ease-out forwards;
-    /* 强制使用GPU加速 */
-    transform: translate(-50%, -50%) translateZ(0);
-    will-change: width, height;
+    animation: smoothShrink 2s forwards;
 }
 
 @keyframes smoothShrink {
-    0% {
-        width: 100%;
-        height: 100%;
-        transform: translate(-50%, -50%) scale(1);
-    }
-    95% {
-        width: 25%;
-        height: 25%;
-        transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-        width: 25%;
-        height: 25%;
-        transform: translate(-50%, -50%) scale(1);
-    }
+    0% { width: 100%; height: 100%; }
+    100% { width: 25%; height: 25%; }
 }
 
 /* 响应式设计 */
@@ -181,7 +150,7 @@ body {
         margin-bottom: 1.5rem;
     }
     
-    #start-btn {
+    #start-button {
         padding: 12px 25px;
         font-size: 1rem;
     }
@@ -199,7 +168,7 @@ body {
     top: 30px;
     left: 50%;
     transform: translateX(-50%);
-    color: white;
+    color: #000000;
     font-size: 1.1rem;
     font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
     font-weight: 600;
@@ -219,7 +188,7 @@ body {
     top: 40%;
     left: 50%;
     transform: translateX(-50%);
-    color: white;
+    color: #000000;
     font-size: 1.6rem;
     font-weight: 500;
     text-align: center;
@@ -268,7 +237,51 @@ body {
     transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 
-/* 移动圆圈的内部元素样式 */
+/* 校准点样式 */
+.calibration-point {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 聚焦动画 */
+.calibration-point.focus {
+    animation: focus-animation 1s ease-in-out forwards;
+}
+
+@keyframes focus-animation {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* 消息样式 */
+.message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
 .countdown-circle .inner-circle {
     position: absolute;
     top: 50%;
@@ -276,4 +289,18 @@ body {
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: all 0.1s ease-out;
+}
+
+/* 注视点样式 */
+#gaze-point {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(0, 122, 255, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
