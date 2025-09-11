@@ -1,0 +1,1 @@
+CALIBRATION_POINTS_COUNT = 6 # 可配置校准点数量：6 或 9

@@ -25,6 +25,7 @@ from project.fitting.core.kappa_calibrator_pro import (
 )
 from project.recognition.utils.camera_data_manager import get_resolution
 from project.recg_fit_data.data_manager import RECG_FIT_DATA_MANAGER
+from project.fitting.config.calibration_settings import CALIBRATION_POINTS_COUNT
 
 
 def ensure_pupil_available(eye: str = "left") -> None:
@@ -48,7 +49,19 @@ def nine_point_grid(resolution: tuple[int, int] | None) -> list[tuple[int, int]]
     return points
 
 
+def six_point_grid(resolution: tuple[int, int] | None) -> list[tuple[int, int]]:
+    if resolution is None:
+        w, h = 1920, 1080
+    else:
+        w, h = resolution
+    xs = [int(w * r) for r in (0.1, 0.5, 0.9)]  # Left, Center, Right
+    ys = [int(h * r) for r in (0.25, 0.75)]  # Top, Bottom
+    points = [(x, y) for y in ys for x in xs]
+    return points
+
+
 def main() -> None:
+    # CALIBRATION_POINTS_COUNT = 6  # 可配置校准点数量：6 或 9
     print("== Step 1: Initial fitting ==")
     # Run fitting to populate SESSION_MANAGER.last_fitting
     fit_main()
@@ -68,10 +81,15 @@ def main() -> None:
         print(f"[ERROR] {e}")
         return
 
-    print("== Step 2: Push 9-point samples ==")
+    print(f"== Step 2: Push {CALIBRATION_POINTS_COUNT}-point samples ==")
     start_session("pipeline-test-session")
     res = get_resolution()
-    points = nine_point_grid(res)
+    if CALIBRATION_POINTS_COUNT == 9:
+        points = nine_point_grid(res)
+    elif CALIBRATION_POINTS_COUNT == 6:
+        points = six_point_grid(res)
+    else:
+        raise ValueError(f"Unsupported calibration points count: {CALIBRATION_POINTS_COUNT}")
     for uv in points:
         push_sample({"timestamp": time.time(), "target_pixel": uv, "eye": "left"})
     print(f"Pushed {len(points)} samples.")
@@ -81,7 +99,7 @@ def main() -> None:
     print("Kappa model:", out["kappa_model"])  # axis, angle_deg, samples_count, quality
 
     print("== Step 4: Compute compensated gaze ==")
-    center_uv = (points[4] if len(points) >= 5 else (960, 540))
+    center_uv = (points[len(points) // 2] if len(points) > 0 else (960, 540)) # Use center point for gaze computation
     gaze = compute_gaze("left", center_uv)
     print("Gaze (compensated):", gaze["gaze"])  # origin, direction, target_pixel
 
