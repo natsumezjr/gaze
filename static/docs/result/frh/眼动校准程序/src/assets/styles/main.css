@@ -12,8 +12,8 @@ html, body {
 }
 
 body {
-    background-color: #000000;
-    color: white;
+    background-color: #FFFFFF;
+    color: #000000;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", Helvetica, Arial, sans-serif;
     display: flex;
     justify-content: center;
@@ -30,23 +30,23 @@ body {
     z-index: 10;
 }
 
-/* 标题样式 - iOS风格 */
+/* 标题样式 - iOS白色风格 */
 .title {
     font-size: 2.5rem;
     font-weight: 600;
     margin-bottom: 3rem;
     letter-spacing: -0.5px;
-    color: #FFFFFF;
+    color: #000000;
     opacity: 0.95;
 }
 
-/* 开始校准按钮样式 - iOS风格 */
-#start-btn {
-    background: rgba(255, 255, 255, 0.12);
+/* 开始校准按钮样式 - iOS白色风格 */
+#start-btn, .start-button {
+    background: rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     padding: 16px 32px;
     font-size: 1.1rem;
     font-weight: 500;
@@ -59,7 +59,7 @@ body {
     overflow: hidden;
 }
 
-#start-btn:before {
+#start-btn:before, .start-button:before {
     content: '';
     position: absolute;
     top: 0;
@@ -71,17 +71,17 @@ body {
     transition: opacity 0.2s ease;
 }
 
-#start-btn:hover {
+#start-btn:hover, .start-button:hover {
     background: rgba(255, 255, 255, 0.18);
     border-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-1px);
 }
 
-#start-btn:hover:before {
+#start-btn:hover:before, .start-button:hover:before {
     opacity: 1;
 }
 
-#start-btn:active {
+#start-btn:active, .start-button:active {
     transform: translateY(0);
     background: rgba(255, 255, 255, 0.08);
 }
@@ -97,8 +97,8 @@ body {
     z-index: 5;
 }
 
-/* 移动校准圆圈 - 完全独立的样式 */
-#moving-circle {
+/* 移动校准圆圈 */
+#moving-circle, .moving-circle {
     position: fixed;
     width: 50px;
     height: 50px;
@@ -107,36 +107,34 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* 修正数字垂直居中 */
     line-height: 1;
     text-align: center;
-    /* 圆润数字字体 */
     font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "SF Pro Rounded", sans-serif;
     font-size: 1.5rem;
     font-weight: 900;
     font-variant-numeric: tabular-nums;
-    /* 初始倒计时样式 */
     background-color: #FFFFFF;
     color: #000000;
     border: none;
     box-shadow: none;
     opacity: 0;
+    transform: translate(-50%, -50%);
     transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* 倒计时状态 */
-#moving-circle.countdown {
+#moving-circle.countdown, .moving-circle.countdown {
     background-color: #FFFFFF !important;
     color: #000000 !important;
 }
 
 /* 移动圆圈显示状态 */
-#moving-circle.visible {
+#moving-circle.visible, .moving-circle.visible {
     opacity: 1 !important;
 }
 
 /* 移动圆圈内部收缩层 */
-#moving-circle .inner-shrink {
+#moving-circle .inner-shrink, .moving-circle .inner-shrink, .inner-shrink {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -174,106 +172,140 @@ body {
     }
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .title {
-        font-size: 2rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    #start-btn {
-        padding: 12px 25px;
-        font-size: 1rem;
-    }
-    
-    .calibration-point {
-        /* 移动设备上稍微大一些，便于观察 */
-        width: min(10vw, 10vh, 70px);
-        height: min(10vw, 10vh, 70px);
-    }
-}
+/* 真实视线点样式已移至GazePoint.vue组件 */
 
-/* 校准进度指示器 */
+/* 进度指示器 */
 .progress-indicator {
     position: fixed;
     top: 30px;
     left: 50%;
     transform: translateX(-50%);
-    color: white;
+    color: #000000;
     font-size: 1.1rem;
     font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
     font-weight: 600;
     z-index: 20;
     opacity: 0;
     transition: opacity 0.3s ease;
-    letter-spacing: -0.2px;
 }
 
 .progress-indicator.visible {
     opacity: 1;
 }
 
-/* 倒计时提示样式 */
+/* 倒计时提示 */
 .countdown-prompt {
     position: fixed;
     top: 40%;
     left: 50%;
-    transform: translateX(-50%);
-    color: white;
-    font-size: 1.6rem;
-    font-weight: 500;
-    text-align: center;
-    z-index: 100;
+    transform: translate(-50%, -50%);
+    color: #000000;
+    font-size: 1.5rem;
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+    font-weight: 600;
+    z-index: 20;
     opacity: 0;
-    transition: opacity 0.5s ease;
-    letter-spacing: -0.3px;
+    transition: opacity 0.3s ease;
+    text-align: center;
+    max-width: 80%;
+    line-height: 1.5;
 }
 
 .countdown-prompt.visible {
     opacity: 1;
 }
 
-/* 倒计时圆圈样式 */
+/* 倒计时圆圈 */
 .countdown-circle {
     position: fixed;
-    top: 50%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: #FFFFFF !important;
+    background-color: #E0E0E0;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #000000;
     font-size: 1.5rem;
-    font-weight: 600;
-    color: #000000 !important;
-    z-index: 100;
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+    font-weight: 700;
+    z-index: 20;
     opacity: 0;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    /* 确保不受其他样式影响 */
-    border: none !important;
-    box-shadow: none !important;
+    transition: opacity 0.3s ease;
+    margin-top: 100px;
 }
 
-/* 倒计时圆圈显示 */
 .countdown-circle.visible {
-    opacity: 1 !important;
-    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 1;
 }
 
-/* 倒计时圆圈移动状态 */
-.countdown-circle.moving {
-    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+/* 媒体查询 - 适配不同屏幕尺寸 */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    #start-btn, .start-button {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+    
+    .countdown-prompt {
+        font-size: 1.5rem;
+    }
+    
+    .countdown-circle {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
 }
 
-/* 移动圆圈的内部元素样式 */
-.countdown-circle .inner-circle {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: all 0.1s ease-out;
+/* 完成屏幕 */
+#completionScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+#completionScreen h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #000000;
+}
+
+#completionScreen p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #333333;
+    max-width: 80%;
+    text-align: center;
+    line-height: 1.5;
+}
+
+#completionScreen button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    background-color: #000000;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#completionScreen button:hover {
+    background-color: #333333;
 }
