@@ -1416,9 +1416,14 @@ class FittingController:
                 circle_center, circle_radius = self._fit_circle_to_points(selected_iris)
                 logging.debug(f"虹膜点拟合外接圆，圆心：{circle_center}，半径：{circle_radius}")
                 
-                # 计算delta z
+                # 计算delta z - 验证数学有效性
                 iris_to_center_median = (ANATOMICAL_CONSTRAINTS["TO_CENTER"]["iris"][0] + 
                                        ANATOMICAL_CONSTRAINTS["TO_CENTER"]["iris"][1]) / 2  # 斜边
+                
+                # 确保三角形数学有效：hypotenuse > leg
+                if iris_to_center_median**2 < circle_radius**2:
+                    raise ValueError(f"Invalid triangle: iris_to_center_median({iris_to_center_median}) < circle_radius({circle_radius})")
+                
                 delta_z = np.sqrt(iris_to_center_median**2 - circle_radius**2)  # 直角边
                 
                 # 圆心坐标加上delta z作为眼球中心

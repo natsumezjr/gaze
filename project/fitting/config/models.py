@@ -84,7 +84,7 @@ class Plane:
             self.width_m = 0.60
             self.height_m = 0.34
     
-    def _intersection_of_vector_and_plane(self, vector: np.ndarray) -> np.ndarray | None:
+    def _intersection_of_vector_and_plane(self, vector: np.ndarray) -> Optional[np.ndarray]:
         '''
         计算向量与平面的交点（假设向量起点为世界原点）。
         Args:
@@ -116,7 +116,7 @@ class Plane:
         y = np.dot(point - self.point, self.y_axis)
         return np.array([x, y])
     
-    def intersection_on_plane(self, vector: np.ndarray) -> np.ndarray | None:
+    def intersection_on_plane(self, vector: np.ndarray) -> Optional[np.ndarray]:
         '''
         计算向量与平面的交点
         Args:

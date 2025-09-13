@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>眼动校准程序 - 集成版本</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 集成版本特有样式 */
+        .system-status {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 12px;
+            color: #666;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff4444;
+            transition: all 0.3s ease;
+        }
+        
+        .status-indicator.connected {
+            background: #00C851;
+        }
+        
+        .status-indicator.processing {
+            background: #ffaa00;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 11px;
+            max-width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 300;
+            display: none;
+        }
+        
+        .debug-panel.visible {
+            display: block;
+        }
+        
+        .debug-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            z-index: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1 class="title">眼动校准程序</h1>
+        <button id="start-btn" class="start-button">初始化系统中...</button>
+        <div id="calibration-container" class="calibration-container"></div>
+    </div>
+    
+    <!-- 系统状态指示器 -->
+    <div class="system-status">
+        <div class="status-indicator" id="status-indicator"></div>
+        <span id="status-text">连接中...</span>
+    </div>
+    
+    <!-- 注视反馈说明 -->
+    <div style="position: fixed; bottom: 120px; left: 20px; background: rgba(255,255,255,0.9); padding: 12px; border-radius: 8px; font-size: 12px; max-width: 250px; z-index: 200; opacity: 0; transition: opacity 0.3s ease;" id="gaze-help">
+        <div style="font-weight: 600; margin-bottom: 4px;">注视反馈说明：</div>
+        <div style="color: #666; line-height: 1.4;">
+            • 浅蓝色圆圈：当前注视位置<br>
+            • 绿色圆圈：注视准确<br>
+            • 虚线圆圈：检测置信度低<br>
+            • 小圆点：注视轨迹
+        </div>
+    </div>
+    
+    <!-- 调试面板 -->
+    <button class="debug-toggle" onclick="toggleDebugPanel()">Debug</button>
+    <div class="debug-panel" id="debug-panel">
+        <div>眼动校准系统 - 调试信息</div>
+        <hr style="margin: 8px 0; border: none; border-top: 1px solid #444;">
+        <div id="debug-content"></div>
+    </div>
+    
+    <script src="script_integrated.js"></script>
+    <script>
+        // 调试面板功能
+        let debugVisible = false;
+        let debugContent = [];
+        
+        function toggleDebugPanel() {
+            debugVisible = !debugVisible;
+            const panel = document.getElementById('debug-panel');
+            panel.classList.toggle('visible', debugVisible);
+        }
+        
+        function addDebugLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugContent.push(`[${timestamp}] ${message}`);
+            if (debugContent.length > 20) {
+                debugContent.shift(); // 保持最新20条记录
+            }
+            
+            const contentDiv = document.getElementById('debug-content');
+            if (contentDiv) {
+                contentDiv.innerHTML = debugContent.join('<br>');
+                contentDiv.scrollTop = contentDiv.scrollHeight;
+            }
+        }
+        
+        function updateSystemStatus(status, text) {
+            const indicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            indicator.className = `status-indicator ${status}`;
+            statusText.textContent = text;
+            
+            addDebugLog(`状态更新: ${status} - ${text}`);
+        }
+        
+        // 监听页面加载和初始化事件
+        window.addEventListener('load', () => {
+            addDebugLog('页面加载完成');
+        });
+        
+        // 重写console.log以同时输出到调试面板
+        const originalConsoleLog = console.log;
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            addDebugLog(args.join(' '));
+        };
+        
+        // 重写console.error以同时输出到调试面板  
+        const originalConsoleError = console.error;
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            addDebugLog('ERROR: ' + args.join(' '));
+        };
+        
+        // 全局状态更新函数，供script_integrated.js调用
+        window.updateSystemStatus = updateSystemStatus;
+        window.addDebugLog = addDebugLog;
+    </script>
+</body>
+</html>
