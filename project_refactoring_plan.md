@@ -128,53 +128,116 @@ gaze_tracking_system/
 ### 4.1 眼球球面拟合算法 (`sphere_fitter.py`)
 
 #### 4.1.1 算法原理
-基于RANSAC的鲁棒球面拟合算法，用于从眼部关键点估计眼球几何参数。
+基于RANSAC + Levenberg-Marquardt的鲁棒球面拟合算法，用于从眼部关键点估计眼球几何参数。该算法结合了RANSAC的鲁棒性和LM算法的精确性。
 
 #### 4.1.2 数学公式
-球面方程：$(x - c_x)^2 + (y - c_y)^2 + (z - c_z)^2 = r^2$
+
+**球面方程**：
+$$(x - c_x)^2 + (y - c_y)^2 + (z - c_z)^2 = r^2$$
 
 其中：
 - $C = (c_x, c_y, c_z)$ 为球心坐标
 - $r$ 为球体半径
 
+**残差定义**：
+系统定义了多种残差类型来约束拟合过程：
+
+1. **表面残差**：
+$$f_{surface,i} = \sqrt{\alpha} \cdot (||p_i - c|| - r - bias_{surface,i}) \cdot w_{huber,i}$$
+
+2. **中心残差**：
+$$f_{center,i} = \sqrt{1-\alpha} \cdot (||p_i - c|| - bias_{center,i}) \cdot w_{huber,i}$$
+
+3. **深度残差**（Softplus约束）：
+$$f_{depth} = \sqrt{\lambda_{depth}} \cdot \sigma \cdot \ln(1 + \exp(u/\sigma))$$
+
+其中 $u = \max(0, \max_z + \epsilon - c_z)$
+
+4. **眼球外约束残差**：
+$$f_{outside,i} = \sqrt{\lambda_{outside}} \cdot \sigma_{outside} \cdot \ln(1 + \exp(u_i/\sigma_{outside}))$$
+
+其中 $u_i = \max(0, r - ||p_i - c||)$
+
+**Huber权重函数**：
+$$w_{huber,i} = \min(1, \frac{\kappa}{|f_{raw,i}|})$$
+
+**目标函数**：
+$$\Phi(\theta) = \frac{1}{2} \sum_{i} f_i^2$$
+
 #### 4.1.3 算法步骤
+
+**RANSAC阶段**：
 1. **随机采样**：从虹膜边界点中随机选择4个点
-2. **球面拟合**：使用最小二乘法拟合球面参数
+2. **初始拟合**：使用最小二乘法拟合球面参数
 3. **内点检测**：计算所有点到拟合球面的距离，判断内点
 4. **迭代优化**：重复上述步骤，选择内点最多的模型
-5. **精细拟合**：使用所有内点重新拟合最终参数
+5. **置信度评估**：基于几何约束和正态分布计算置信度
+
+**Levenberg-Marquardt优化阶段**：
+1. **残差计算**：计算所有残差项及其雅可比矩阵
+2. **正规方程求解**：$(J^T J + \lambda I) \Delta = -J^T r$
+3. **步长控制**：裁剪步长范数，防止发散
+4. **收敛判断**：检查参数变化和残差变化
+5. **阻尼调整**：根据目标函数变化调整阻尼因子
 
 #### 4.1.4 关键参数
 ```python
+# RANSAC参数
 RANSAC_PARAMS = {
-    "max_iterations": 1000,        # 最大迭代次数
-    "threshold": 2.0,              # 内点阈值(mm)
-    "min_inliers": 8,              # 最小内点数
-    "confidence": 0.99,            # 置信度
-    "max_trials": 10000            # 最大尝试次数
+    "max_iterations": 20,           # 最大迭代次数
+    "min_fitting_points": 3,        # 最小拟合点数
+    "min_constraint_points": 3,     # 最小约束点数
+    "base_optimizer": "lm"          # 基础优化器
 }
 
+# Levenberg-Marquardt参数
+LM_PARAMS = {
+    "max_iterations": 30,           # 最大迭代次数
+    "lambda_init": 0.01,            # 初始阻尼因子
+    "lambda_factor": 10.0,          # 阻尼因子调整倍数
+    "delta_convergence_threshold": 1.0,  # 参数收敛阈值
+    "residual_convergence_threshold": 0.01,  # 残差收敛阈值
+    "max_step_size": 4.0,           # 最大步长
+    "alpha": 0.1,                   # 表面残差权重
+    "huber_kappa": 1.5,             # Huber阈值
+    "depth_epsilon": 5.0,           # 深度容差(mm)
+    "depth_sigma": 100.0,           # 深度平滑参数
+    "depth_lambda": 0.01,           # 深度约束权重
+    "outside_eyeball_sigma": 1.0,   # 眼球外约束平滑参数
+    "outside_eyeball_lambda": 0.1   # 眼球外约束权重
+}
+
+# 解剖学约束
 ANATOMICAL_CONSTRAINTS = {
-    "eyeball_radius_range": (11.0, 13.0),  # 眼球半径范围(mm)
-    "default_radius": 12.0,                # 默认半径(mm)
-    "surface_bias": {                      # 表面偏差(mm)
+    "TO_SURFACE": {                 # 表面偏差(mm)
         "pupil": (-4.5, -2.5),
-        "iris": (-1.8, -0.4)
+        "iris": (-1.8, -0.4),
+        "inner_canthus": (4.0, 8.0),
+        "upper_eyelid": (0.0, 2.0),
+        "lower_eyelid": (0.2, 1.6),
+        "outer_canthus": (2.5, 6.7)
     },
-    "center_bias": {                       # 中心偏差(mm)
+    "TO_CENTER": {                  # 中心偏差(mm)
         "pupil": (7.95, 9.95),
-        "iris": (10.40, 12.04)
-    }
+        "iris": (10.40, 12.04),
+        "inner_canthus": (16.0, 20.0),
+        "upper_eyelid": (11.3, 13.3),
+        "lower_eyelid": (12.0, 14.0),
+        "outer_canthus": (14.9, 18.9)
+    },
+    "EYEBALL_RADIUS": (11.0, 13.0), # 眼球半径范围(mm)
+    "EYEBALL_RADIUS_DEFAULT": 12.0   # 默认半径(mm)
 }
 ```
 
 ### 4.2 Kappa角标定算法 (`kappa_calibrator.py`)
 
 #### 4.2.1 算法原理
-Kappa角是光轴与视轴之间的微小角度差异，通过校准样本估计个体化的Kappa参数。
+Kappa角是光轴与视轴之间的微小角度差异，通过校准样本估计个体化的Kappa参数。使用小角度线性化将非线性旋转问题转化为线性最小二乘问题。
 
 #### 4.2.2 数学公式
-光轴到视轴的旋转关系：
+
+**旋转关系**：
 $$\vec{v}_{visual} = R(\vec{\alpha}) \cdot \vec{v}_{optical}$$
 
 其中：
@@ -182,57 +245,123 @@ $$\vec{v}_{visual} = R(\vec{\alpha}) \cdot \vec{v}_{optical}$$
 - $\vec{v}_{visual}$ 为视轴向量（指向注视目标）
 - $R(\vec{\alpha})$ 为旋转矩阵，$\vec{\alpha} = [\alpha_x, \alpha_y, \alpha_z]$ 为Kappa角
 
-小角度线性化：
+**小角度线性化**：
 $$R(\vec{\alpha}) \vec{v} \approx \vec{v} + \vec{\alpha} \times \vec{v}$$
 
+**Rodrigues旋转公式**：
+$$R(\vec{\alpha}) = I + \sin(|\vec{\alpha}|) \frac{[\vec{\alpha}]_\times}{|\vec{\alpha}|} + (1-\cos(|\vec{\alpha}|)) \frac{[\vec{\alpha}]_\times^2}{|\vec{\alpha}|^2}$$
+
+其中 $[\vec{\alpha}]_\times$ 为反对称矩阵：
+$$[\vec{\alpha}]_\times = \begin{bmatrix}
+0 & -\alpha_z & \alpha_y \\
+\alpha_z & 0 & -\alpha_x \\
+-\alpha_y & \alpha_x & 0
+\end{bmatrix}$$
+
+**线性化方程**：
+$$\vec{\alpha} \times \vec{v} = -[\vec{v}]_\times \vec{\alpha}$$
+
+因此：
+$$-\hat{v} \vec{\alpha} = \vec{d} - \vec{v}$$
+
+其中 $\hat{v} = [\vec{v}]_\times$ 为反对称矩阵。
+
+**加权最小二乘**：
+$$\min_{\vec{\alpha}} ||W^{1/2} (M\vec{\alpha} - b)||^2$$
+
+其中：
+- $M = [-\hat{v}_1; -\hat{v}_2; \ldots; -\hat{v}_N]$ 为 $3N \times 3$ 矩阵
+- $b = [\vec{d}_1 - \vec{v}_1; \vec{d}_2 - \vec{v}_2; \ldots; \vec{d}_N - \vec{v}_N]$ 为 $3N$ 向量
+- $W$ 为权重矩阵
+
+**Huber鲁棒权重**：
+$$w_i = \begin{cases}
+1 & \text{if } |r_i| \leq \delta \\
+\frac{\delta}{|r_i|} & \text{if } |r_i| > \delta
+\end{cases}$$
+
+其中 $r_i$ 为角度残差，$\delta$ 为Huber阈值。
+
 #### 4.2.3 算法步骤
+
 1. **样本收集**：收集多个已知注视点的校准样本
-2. **线性化**：将旋转关系线性化为 $-\hat{v} \vec{\alpha} = \vec{d} - \vec{v}$
-3. **最小二乘求解**：求解线性方程组得到Kappa角
-4. **鲁棒优化**：使用Huber权重抑制异常值
-5. **质量评估**：计算角度误差和像素误差
+2. **数据预处理**：验证样本有效性，计算光轴和视轴向量
+3. **线性化**：构建线性方程组 $M\vec{\alpha} = b$
+4. **初始求解**：使用加权最小二乘法求解Kappa角
+5. **鲁棒优化**：使用Huber权重进行迭代重加权
+6. **质量评估**：计算角度误差和像素误差
 
 #### 4.2.4 关键参数
 ```python
 KAPPA_CALIBRATION_PARAMS = {
-    "lock_roll": True,              # 锁定滚转角
+    "lock_roll": True,              # 锁定滚转角（αz=0）
     "robust_iters": 3,              # 鲁棒迭代次数
     "huber_delta_deg": 5.0,         # Huber阈值(度)
     "min_samples": 9,               # 最小样本数
     "max_angular_error": 2.0,       # 最大角度误差(度)
-    "max_pixel_error": 50.0         # 最大像素误差(像素)
+    "max_pixel_error": 50.0,        # 最大像素误差(像素)
+    "weight_threshold": 1e-12       # 权重阈值
 }
+
+# 角度误差计算
+def angle_error_deg(kappa, V, D):
+    """计算角度误差（度）"""
+    R = rodrigues(kappa)
+    V_rot = (R @ V.T).T
+    dots = np.clip(np.sum(V_rot * D, axis=1), -1.0, 1.0)
+    return np.degrees(np.arccos(dots))
 ```
 
 ### 4.3 屏幕交点计算算法 (`screen_intersection.py`)
 
 #### 4.3.1 算法原理
-计算视线向量与屏幕平面的交点，并转换为像素坐标。
+计算视线向量与屏幕平面的交点，并转换为像素坐标。使用射线与平面求交的几何方法，结合坐标变换实现精确的像素映射。
 
 #### 4.3.2 数学公式
-射线与平面求交：
-$$\vec{P} = \vec{O} + t \cdot \vec{D}$$
+
+**射线方程**：
+$$\vec{P}(t) = \vec{O} + t \cdot \vec{D}$$
 
 其中：
 - $\vec{O}$ 为射线起点（眼球中心）
 - $\vec{D}$ 为射线方向（视线向量）
 - $t$ 为参数
 
-平面方程：$\vec{N} \cdot (\vec{P} - \vec{P_0}) = 0$
+**平面方程**：
+$$\vec{N} \cdot (\vec{P} - \vec{P_0}) = 0$$
 
-交点参数：
+其中：
+- $\vec{N}$ 为平面法向量
+- $\vec{P_0}$ 为平面上一点
+
+**交点参数**：
 $$t = \frac{\vec{N} \cdot (\vec{P_0} - \vec{O})}{\vec{N} \cdot \vec{D}}$$
 
-像素坐标转换：
+**交点坐标**：
+$$\vec{P}_{intersect} = \vec{O} + t \cdot \vec{D}$$
+
+**平面坐标系转换**：
+$$\vec{p}_{2D} = \begin{bmatrix}
+\vec{x}_{axis} \cdot (\vec{P}_{intersect} - \vec{P_0}) \\
+\vec{y}_{axis} \cdot (\vec{P}_{intersect} - \vec{P_0})
+\end{bmatrix}$$
+
+**像素坐标映射**：
 $$u = \frac{x - x_{min}}{x_{max} - x_{min}} \cdot W_{screen}$$
 $$v = \frac{y - y_{min}}{y_{max} - y_{min}} \cdot H_{screen}$$
 
+其中：
+- $(x_{min}, y_{min})$ 和 $(x_{max}, y_{max})$ 为屏幕在平面坐标系中的边界
+- $W_{screen}$ 和 $H_{screen}$ 为屏幕像素分辨率
+
 #### 4.3.3 算法步骤
+
 1. **平面定义**：定义屏幕平面（法向量、中心点、坐标轴）
 2. **射线求交**：计算视线与屏幕平面的交点
 3. **坐标转换**：将3D交点转换为屏幕2D坐标
 4. **像素映射**：将物理坐标映射到像素坐标
 5. **边界检查**：验证交点是否在屏幕范围内
+6. **有效性验证**：检查交点是否在合理范围内
 
 #### 4.3.4 关键参数
 ```python
@@ -246,15 +375,29 @@ SCREEN_CONFIG = {
         "height": 1080
     },
     "position": {                   # 屏幕位置(mm)
-        "center": [0, 0, 0],
-        "normal": [0, 0, 1],
-        "x_axis": [1, 0, 0],
-        "y_axis": [0, 1, 0]
+        "center": [0, 0, 0],        # 屏幕中心
+        "normal": [0, 0, 1],        # 法向量
+        "x_axis": [1, 0, 0],        # X轴方向
+        "y_axis": [0, 1, 0]         # Y轴方向
+    },
+    "corners": {                    # 屏幕四角坐标(mm)
+        "top_left": [-300, -170, 0],
+        "top_right": [300, -170, 0],
+        "bottom_left": [-300, 170, 0],
+        "bottom_right": [300, 170, 0]
     },
     "camera_offset": {              # 相机偏移(mm)
         "x": 0.0,
         "y": 5.0
     }
+}
+
+# 几何计算参数
+GEOMETRY_PARAMS = {
+    "intersection_tolerance": 1e-8,  # 交点计算容差
+    "parallel_threshold": 1e-6,      # 平行判断阈值
+    "boundary_margin": 0.01,         # 边界容差(m)
+    "max_distance": 10.0             # 最大视线距离(m)
 }
 ```
 
