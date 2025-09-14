@@ -155,7 +155,7 @@ class CoordinateConverter:
             else:
                 logger.warning(f"关键点 {i} 转换失败")
         
-        logger.info(f"批量转换完成：成功 {success_count}/{len(landmarks)} 个关键点")
+        logger.debug(f"批量转换完成：成功 {success_count}/{len(landmarks)} 个关键点")
         return coords_3d
     
     def extract_eye_coordinates(self, landmarks, depth_map):

@@ -171,7 +171,7 @@ def batch_convert_landmarks(landmarks: List[Union[Tuple[float, float, float], Tu
         except Exception as e:
             logger.warning(f"关键点 {i} 转换失败: {e}")
     
-    logger.info(f"批量转换完成：成功 {success_count}/{len(landmarks)} 个关键点")
+    logger.debug(f"批量转换完成：成功 {success_count}/{len(landmarks)} 个关键点")
     return coords_3d
 
 def validate_3d_coordinates(coords_3d: List[np.ndarray]) -> bool:
