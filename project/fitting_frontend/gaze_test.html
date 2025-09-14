@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注视点测试页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: #f0f0f0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 测试目标点 */
+        .test-target {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #007AFF;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .test-target:hover {
+            background: #0056CC;
+        }
+
+        /* 注视点反馈 */
+        .gaze-feedback {
+            position: fixed;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.15s ease-out;
+
+            background: radial-gradient(
+                circle,
+                rgba(255, 0, 102, 0.6) 0%,
+                rgba(255, 0, 102, 0.3) 40%,
+                rgba(255, 0, 102, 0.1) 70%,
+                transparent 100%
+            );
+            border: 2px solid rgba(255, 0, 102, 0.8);
+            box-shadow:
+                0 0 12px rgba(255, 0, 102, 0.4),
+                0 0 6px rgba(255, 0, 102, 0.6);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translate(-50%, -50%) translateZ(0);
+            will-change: transform, opacity;
+        }
+
+        .gaze-feedback::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(255, 0, 102, 1);
+            box-shadow: 0 0 4px rgba(255, 0, 102, 0.8);
+        }
+
+        .gaze-feedback.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .gaze-feedback.accurate {
+            border-color: rgba(34, 197, 94, 0.8);
+            background: radial-gradient(
+                circle,
+                rgba(34, 197, 94, 0.6) 0%,
+                rgba(34, 197, 94, 0.3) 40%,
+                rgba(34, 197, 94, 0.1) 70%,
+                transparent 100%
+            );
+            box-shadow:
+                0 0 12px rgba(34, 197, 94, 0.4),
+                0 0 6px rgba(34, 197, 94, 0.6);
+        }
+
+        .gaze-feedback.accurate::before {
+            background: rgba(34, 197, 94, 1);
+            box-shadow: 0 0 4px rgba(34, 197, 94, 0.8);
+        }
+
+        .gaze-feedback.low-confidence {
+            border-style: dashed;
+            animation: confidencePulse 1s infinite;
+        }
+
+        @keyframes confidencePulse {
+            0%, 100% {
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
+        /* 控制面板 */
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            min-width: 280px;
+        }
+
+        .control-panel h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff4444;
+            transition: all 0.3s ease;
+        }
+
+        .status-dot.connected {
+            background: #22c55e;
+        }
+
+        .control-buttons {
+            margin-top: 15px;
+        }
+
+        .btn {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 4px 4px 4px 0;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #0056CC;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 信息面板 */
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            min-width: 250px;
+            font-size: 14px;
+        }
+
+        .gaze-info {
+            font-family: 'Courier New', monospace;
+            margin: 5px 0;
+        }
+
+        /* 测试说明 */
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            font-size: 14px;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 测试目标点 -->
+    <div class="test-target" style="top: 20%; left: 20%;">1</div>
+    <div class="test-target" style="top: 20%; left: 50%;">2</div>
+    <div class="test-target" style="top: 20%; left: 80%;">3</div>
+    <div class="test-target" style="top: 50%; left: 20%;">4</div>
+    <div class="test-target" style="top: 50%; left: 80%;">5</div>
+    <div class="test-target" style="top: 80%; left: 20%;">6</div>
+    <div class="test-target" style="top: 80%; left: 50%;">7</div>
+    <div class="test-target" style="top: 80%; left: 80%;">8</div>
+
+    <!-- 注视点反馈 -->
+    <div class="gaze-feedback" id="gaze-feedback"></div>
+
+    <!-- 控制面板 -->
+    <div class="control-panel">
+        <h3>注视点测试</h3>
+        <div class="status-item">
+            <span>后端连接:</span>
+            <div class="status-dot" id="backend-status"></div>
+        </div>
+        <div class="status-item">
+            <span>摄像头状态:</span>
+            <div class="status-dot" id="camera-status"></div>
+        </div>
+        <div class="status-item">
+            <span>注视追踪:</span>
+            <div class="status-dot" id="tracking-status"></div>
+        </div>
+        <div class="control-buttons">
+            <button class="btn" id="start-camera-btn" onclick="startCamera()">启动摄像头</button>
+            <button class="btn" id="start-tracking-btn" onclick="startTracking()" disabled>开始追踪</button>
+            <button class="btn" onclick="stopTracking()">停止追踪</button>
+        </div>
+    </div>
+
+    <!-- 信息面板 -->
+    <div class="info-panel">
+        <div><strong>实时注视信息</strong></div>
+        <div class="gaze-info">坐标: <span id="gaze-coords">-</span></div>
+        <div class="gaze-info">置信度: <span id="gaze-confidence">-</span></div>
+        <div class="gaze-info">准确度: <span id="gaze-accuracy">-</span></div>
+        <div class="gaze-info">更新频率: <span id="update-rate">-</span></div>
+        <hr style="margin: 10px 0; border: none; border-top: 1px solid #eee;">
+        <div><strong>调试信息</strong></div>
+        <div class="gaze-info" style="font-size: 12px;">瞳孔数据: <span id="debug-pupil-count">-</span></div>
+        <div class="gaze-info" style="font-size: 12px;">原始瞳孔: <span id="debug-pupil-raw">-</span></div>
+        <div class="gaze-info" style="font-size: 12px;">归一化: <span id="debug-pupil-norm">-</span></div>
+        <div class="gaze-info" style="font-size: 12px;">粗拟合: <span id="debug-coarse-fitting">-</span></div>
+        <div class="gaze-info" style="font-size: 12px;">眼球中心: <span id="debug-eye-center">-</span></div>
+        <div class="gaze-info" style="font-size: 12px;">3D偏移: <span id="debug-3d-offset">-</span></div>
+        <div class="gaze-info" style="font-size: 12px;">分辨率: <span id="debug-resolution">-</span></div>
+    </div>
+
+    <!-- 测试说明 -->
+    <div class="instructions">
+        <strong>测试说明：</strong>
+        依次注视屏幕上的蓝色圆点(1-8)，观察粉色注视反馈圆圈是否跟随你的视线移动。
+        如果注视点准确，圆圈会变成绿色。
+    </div>
+
+    <script src="gaze_test.js"></script>
+</body>
+</html>

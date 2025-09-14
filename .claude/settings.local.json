@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(C:Usersfrh05.condaenvsgazeScriptsactivate)",
+      "Bash(pip install:*)",
+      "Bash(/c/Users/frh05/.conda/envs/gaze/python.exe backend_server.py)",
+      "Bash(C:Usersfrh05.condaenvsgazepython.exe test_mediapipe.py)",
+      "Bash(/c/Users/frh05/.conda/envs/gaze/python.exe test_mediapipe.py)",
+      "Bash(/c/Users/frh05/.conda/envs/gaze/python.exe -m pip install requests)",
+      "Bash(curl:*)",
+      "Bash(for i in {1..5})",
+      "Bash(done)",
+      "Bash(xargs rm:*)",
+      "Bash(python:*)",
+      "Bash(pkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(wmic process:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

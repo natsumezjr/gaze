@@ -1,7 +1,7 @@
 import numpy as np
 import mediapipe as mp
 import cv2
-from typing import List, Dict
+from typing import List, Dict, Optional, Tuple
 from project.recg_fit_data.data_manager import FITTING_TYPE
 from project.recg_fit_data.data_manager import KeyCoordinates, EYE_TYPE
 from project.recognition.config.settings import *
@@ -16,7 +16,7 @@ def calculate_visibility(landmark: List[float], image: np.ndarray, landmark_inde
 # 兼容变量（不在简化实现中使用）
 _FACE_MESH = None
 _FACE_DET = None
-_LAST_LANDMARKS: List[List[float]] | None = None
+_LAST_LANDMARKS: Optional[List[List[float]]] = None
 _MISS_COUNT = 0
 _MISS_GRACE = 5
 
@@ -36,7 +36,7 @@ def _get_face_detector():
     return None
 
 
-def _compute_roi_from_last(landmarks: List[List[float]], image_shape: tuple[int, int], scale: float = 1.6):
+def _compute_roi_from_last(landmarks: List[List[float]], image_shape: Tuple[int, int], scale: float = 1.6):
     # 简化：不使用ROI
     return None
 

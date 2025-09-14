@@ -1,5 +1,5 @@
 {
-    "camera_name": "HD Camera",
+    "camera_name": "Integrated IR Camera",
     "camera_type": "RGB",
     "intrinsic_params": {
         "fx": 500.0,
@@ -23,5 +23,5 @@
     },
     "calibration_date": "2024-01-15",
     "calibration_method": "PowerShell Auto Detection",
-    "notes": "通过PowerShell自动检测获得，制造商: Microsoft"
+    "notes": "通过PowerShell自动检测获得，制造商: Realtek"
 }
