@@ -11,7 +11,48 @@ from project.recognition.config.settings import *
 
 def calculate_visibility(landmark: List[float], image: np.ndarray, landmark_index: int) -> float:
     """计算关键点的可见性分数"""
-    return 0.6
+    try:
+        x, y, z = landmark[:3]
+        height, width = image.shape[:2]
+        
+        # 检查坐标是否在图像范围内
+        if x < 0 or x >= width or y < 0 or y >= height:
+            return 0.0
+        
+        # 检查坐标是否合理（不是NaN或无穷大）
+        if not (np.isfinite(x) and np.isfinite(y) and np.isfinite(z)):
+            return 0.0
+        
+        # 基于坐标位置的可见性计算
+        # 中心区域可见性更高
+        center_x, center_y = width // 2, height // 2
+        distance_from_center = np.sqrt((x - center_x)**2 + (y - center_y)**2)
+        max_distance = np.sqrt(center_x**2 + center_y**2)
+        
+        # 距离中心越近，可见性越高
+        visibility = max(0.1, 1.0 - (distance_from_center / max_distance) * 0.5)
+        
+        # 检查周围像素的亮度（简单的光照检测）
+        try:
+            x_int, y_int = int(x), int(y)
+            if 0 <= x_int < width-1 and 0 <= y_int < height-1:
+                # 检查周围3x3区域的亮度
+                region = image[y_int-1:y_int+2, x_int-1:x_int+2]
+                if region.size > 0:
+                    brightness = np.mean(region)
+                    # 亮度适中时可见性更高
+                    if 50 < brightness < 200:
+                        visibility *= 1.2
+                    elif brightness < 30 or brightness > 220:
+                        visibility *= 0.7
+        except:
+            pass
+        
+        return min(1.0, max(0.1, visibility))
+        
+    except Exception as e:
+        logging.warning(f"计算可见性时出错: {e}")
+        return 0.5
 
 # 兼容变量（不在简化实现中使用）
 _FACE_MESH = None
@@ -252,6 +293,45 @@ if __name__ == "__main__":
             cv2.destroyAllWindows()
             print("✅ 测试完成")
     
+def calculate_data_quality(landmarks: List[List[float]], image: np.ndarray) -> dict:
+    """计算数据质量指标"""
+    try:
+        if not landmarks:
+            return {'quality': 0.0, 'visibility': 0.0, 'stability': 0.0}
+        
+        # 计算可见性
+        visibility_values = []
+        for landmark in landmarks:
+            if len(landmark) >= 4:
+                visibility_values.append(landmark[3])
+        
+        avg_visibility = np.mean(visibility_values) if visibility_values else 0.0
+        
+        # 计算稳定性（坐标变化的标准差）
+        x_coords = [landmark[0] for landmark in landmarks if len(landmark) >= 3]
+        y_coords = [landmark[1] for landmark in landmarks if len(landmark) >= 3]
+        
+        x_std = np.std(x_coords) if x_coords else 0.0
+        y_std = np.std(y_coords) if y_coords else 0.0
+        
+        # 稳定性分数（标准差越小越稳定）
+        stability = max(0.0, 1.0 - (x_std + y_std) * 2)
+        
+        # 综合质量分数
+        quality = (avg_visibility * 0.6 + stability * 0.4)
+        
+        return {
+            'quality': quality,
+            'visibility': avg_visibility,
+            'stability': stability,
+            'point_count': len(landmarks),
+            'valid_points': len([l for l in landmarks if len(l) >= 4])
+        }
+        
+    except Exception as e:
+        logging.warning(f"计算数据质量时出错: {e}")
+        return {'quality': 0.0, 'visibility': 0.0, 'stability': 0.0}
+
     try:
         run_real_time_test()
     except Exception as e:

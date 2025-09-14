@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 眼动追踪系统主程序
+实现完整的眼动追踪校准流程，包含前端界面
+按照 workflow_summary.md 的流程组织
 """
 
 from __future__ import annotations
@@ -12,29 +14,58 @@ import cv2
 import numpy as np
 import logging
 import time
-
+import threading
+import webbrowser
 from datetime import datetime
+from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 
 # 配置日志
 def setup_logging():
-    """配置日志系统"""
-    log_dir = "logs"
+    """配置日志系统 - 所有输出都记录到日志文件"""
+    # 获取项目根目录的logs文件夹
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_dir = os.path.dirname(current_dir)
+    workspace_root = os.path.dirname(project_dir)
+    log_dir = os.path.join(workspace_root, "logs")
+    
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = os.path.join(log_dir, f"recognition_{timestamp}.log")
+    log_file = os.path.join(log_dir, f"gaze_tracking_{timestamp}.log")
+    
+    # 创建自定义日志格式
+    class ColoredFormatter(logging.Formatter):
+        def format(self, record):
+            # 添加颜色代码到日志级别
+            if record.levelno == logging.INFO:
+                record.levelname = f"\033[32m{record.levelname}\033[0m"  # 绿色
+            elif record.levelno == logging.WARNING:
+                record.levelname = f"\033[33m{record.levelname}\033[0m"  # 黄色
+            elif record.levelno == logging.ERROR:
+                record.levelname = f"\033[31m{record.levelname}\033[0m"  # 红色
+            elif record.levelno == logging.DEBUG:
+                record.levelname = f"\033[36m{record.levelname}\033[0m"  # 青色
+            return super().format(record)
+    
+    # 文件处理器（无颜色）
+    file_handler = logging.FileHandler(log_file, encoding='utf-8')
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    
+    # 控制台处理器（有颜色）
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(ColoredFormatter('%(asctime)s - %(levelname)s - %(message)s'))
     
     logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(log_file, encoding='utf-8'),
-            logging.StreamHandler()
-        ]
+        level=logging.INFO,
+        handlers=[file_handler, console_handler]
     )
     
-    logging.info(f"日志文件创建: {log_file}")
+    logging.info(f"眼动追踪系统日志: {log_file}")
+    logging.info("="*80)
+    logging.info("🎯 眼动追踪系统启动")
+    logging.info("="*80)
     return log_file
 
 # 设置日志
@@ -57,13 +88,79 @@ try:
     from project.recognition.utils.camera_calibration import CameraCalibrator
     from project.recognition.utils.camera_data_manager import add_frame, get_image, get_depth, get_resolution
     
-    # 导入校准模块（使用API进行封装调用）
+    # 导入校准模块
     from project.fitting.app.state import SESSION_MANAGER
     from project.fitting.main import main as fit_main, run_kappa_calibration, initialize_calibration_session, collect_calibration_sample, compute_calibrated_gaze
 except ImportError as e:
     logging.error(f"导入错误: {e}")
     logging.error("请确保已安装项目包: pip install -e .")
     sys.exit(1)
+
+# 创建Flask应用
+app = Flask(__name__, 
+           template_folder=os.path.join(current_dir, 'frontend', 'templates'),
+           static_folder=os.path.join(current_dir, 'frontend', 'static'))
+CORS(app)
+
+# 全局状态管理
+class GazeTrackingSystem:
+    def __init__(self):
+        # 系统状态
+        self.is_initialized = False
+        self.is_camera_active = False
+        self.is_coarse_fitting_done = False
+        self.is_calibrating = False
+        self.is_calibration_complete = False
+        
+        # 摄像头相关
+        self.camera_calibrator = None
+        self.face_detector = None
+        self.cap = None
+        self.camera_thread = None
+        self.camera_running = False
+        
+        # 校准相关
+        self.current_point_index = 0
+        self.total_points = 9  # 9点校准
+        self.target_points = []
+        self.collected_samples = []
+        
+        # 拟合结果
+        self.coarse_fitting_results = {
+            'status': 'pending',
+            'message': '等待初始化...'
+        }
+        self.final_results = {
+            'kappa_angle': None,
+            'fit_quality': None,
+            'status': 'pending'
+        }
+        
+        # 当前注视点
+        self.current_gaze = {
+            'gaze_x': 960,
+            'gaze_y': 540,
+            'confidence': 0.0
+        }
+        
+    def reset(self):
+        """重置系统状态"""
+        self.is_calibrating = False
+        self.is_calibration_complete = False
+        self.current_point_index = 0
+        self.collected_samples = []
+        self.coarse_fitting_results = {
+            'status': 'pending',
+            'message': '等待初始化...'
+        }
+        self.final_results = {
+            'kappa_angle': None,
+            'fit_quality': None,
+            'status': 'pending'
+        }
+
+# 创建系统实例
+gaze_system = GazeTrackingSystem()
 
 def nine_point_grid(resolution: tuple[int, int] | None) -> list[tuple[int, int]]:
     """生成9点校准网格的像素坐标"""
@@ -76,144 +173,27 @@ def nine_point_grid(resolution: tuple[int, int] | None) -> list[tuple[int, int]]
     points = [(x, y) for y in ys for x in xs]
     return points
 
-def get_coarse_fitting_results():
-    """获取粗拟合结果，供前端调用"""
-    return coarse_fitting_results.copy()
-
-def send_to_frontend(data):
-    """发送数据给前端（示例函数，需要根据实际前端接口实现）"""
-    # 这里可以添加实际的发送逻辑，比如：
-    # - WebSocket发送
-    # - HTTP POST请求
-    # - 写入共享文件
-    # - 通过消息队列发送
-    logging.info(f"发送给前端: {data}")
-    print(f"[前端通信] 发送数据: {data}")
-
-
-# 校准状态
-calibration_started = False
-calibration_finished = False
-target_points = []
-current_point_index = 0
-
-# 两段式拟合状态
-coarse_fitting_done = False
-
-# 存储拟合结果用于发送给前端
-coarse_fitting_results = {
-    'kappa_angle': None,
-    'fit_quality': None,
-    'status': 'pending',  # pending, success, failed
-    'message': ''
-}
-
-def main():
+def camera_processing_thread():
+    """摄像头数据处理线程 - 核心工作流程"""
+    logging.info("摄像头处理线程启动")
     frame_id = 0
-    rgb_d = True
-    camera_calibrator = CameraCalibrator(rgb_d=rgb_d)
-    cap = camera_calibrator.get_cap()
-    
-    if cap is None:
-        logging.error("无法初始化摄像头")
-        return
-    
-    camera_params = camera_calibrator.load_camera_params()
-    face_detector = FaceDetector(camera_params, rgb_d=rgb_d)
-
-    # 校准状态
-    calibration_started = False
-    calibration_finished = False
-    target_points = []
-    current_point_index = 0
-    
-    # 两段式拟合状态
-    coarse_fitting_done = False
-    
-    # 简化：不做去抖/滞回与图像增强
     
     try:
-        while not calibration_finished:
-            ret, frame = cap.read()
+        while gaze_system.camera_running:
+            if gaze_system.cap is None:
+                time.sleep(0.1)
+                continue
+                
+            ret, frame = gaze_system.cap.read()
             if not ret:
-                logging.error("无法读取摄像头数据")
-                break
+                logging.warning("无法读取摄像头数据")
+                time.sleep(0.1)
+                continue
             
-            # 使用可配置的深度图
+            # 生成深度图（固定深度0.6m）
             h, w = frame.shape[:2]
-            
-            # 加载深度配置
-            try:
-                import json
-                depth_config_path = os.path.join(current_dir, "config", "depth_settings.json")
-                with open(depth_config_path, 'r', encoding='utf-8') as f:
-                    depth_config = json.load(f)
-                depth_mode = depth_config.get('depth_mode', 'auto')
-                fixed_depths = depth_config.get('fixed_depth_options', {})
-                auto_settings = depth_config.get('auto_depth_settings', {})
-            except Exception as e:
-                logging.warning(f"加载深度配置失败，使用默认设置: {e}")
-                depth_mode = 'auto'
-                fixed_depths = {'near': 0.4, 'medium': 0.8, 'far': 1.2, 'default': 0.6}
-                auto_settings = {'min_depth': 0.3, 'max_depth': 2.0, 'real_pupil_distance': 0.065, 'fallback_depth': 0.6}
-            
-            if depth_mode == 'auto':
-                # 基于人脸大小的动态深度估计
-                try:
-                    # 检测人脸以估计距离
-                    # 传入占位深度图以满足形状校验
-                    temp_depth = auto_settings.get('fallback_depth', 0.6)
-                    temp_depth_map = np.ones((h, w), dtype=np.float32) * (temp_depth / camera_params['depth_scale'])
-                    face_detected = face_detector.detect_face(frame, temp_depth_map)
-                    if face_detected:
-                        # 获取人脸关键点
-                        try:
-                            from project.recognition.core.landmark_extractor import extract_landmarks, get_landmark_indices
-                            lm = extract_landmarks(frame)
-                            indices = get_landmark_indices()
-                            left_idx = indices["left"]["pupil"][0]
-                            right_idx = indices["right"]["pupil"][0]
-                            if lm and len(lm) > max(left_idx, right_idx):
-                                lx, ly = lm[left_idx][0], lm[left_idx][1]
-                                rx, ry = lm[right_idx][0], lm[right_idx][1]
-                                pupil_distance_pixels = float(np.hypot(lx - rx, ly - ry))
-                            else:
-                                pupil_distance_pixels = 0.0
-                        except Exception:
-                            pupil_distance_pixels = 0.0
-                        if pupil_distance_pixels > 1e-3:
-                            # 深度 = (真实瞳孔间距 * 焦距) / 像素瞳孔间距
-                            fx = camera_params['intrinsic_params']['fx']
-                            real_pupil_distance = auto_settings.get('real_pupil_distance', 0.065)
-                            estimated_depth = (real_pupil_distance * fx) / pupil_distance_pixels
-                            
-                            # 限制在合理范围内
-                            min_depth = auto_settings.get('min_depth', 0.3)
-                            max_depth = auto_settings.get('max_depth', 2.0)
-                            estimated_depth = max(min_depth, min(max_depth, estimated_depth))
-                            
-                            depth_map = np.ones((h, w), dtype=np.float32) * (estimated_depth / camera_params['depth_scale'])
-                            logging.info(f"动态估计深度: {estimated_depth:.2f}m")
-                        else:
-                            # 使用默认深度
-                            fallback_depth = auto_settings.get('fallback_depth', 0.6)
-                            depth_map = np.ones((h, w), dtype=np.float32) * (fallback_depth / camera_params['depth_scale'])
-                            logging.info(f"使用默认深度: {fallback_depth}m")
-                    else:
-                        # 未检测到人脸，使用默认深度
-                        fallback_depth = auto_settings.get('fallback_depth', 0.6)
-                        depth_map = np.ones((h, w), dtype=np.float32) * (fallback_depth / camera_params['depth_scale'])
-                        logging.info(f"未检测到人脸，使用默认深度: {fallback_depth}m")
-                except Exception as e:
-                    # 出错时使用默认深度
-                    fallback_depth = auto_settings.get('fallback_depth', 0.6)
-                    depth_map = np.ones((h, w), dtype=np.float32) * (fallback_depth / camera_params['depth_scale'])
-                    logging.warning(f"深度估计失败，使用默认深度: {e}")
-            else:
-                # 使用配置的固定深度
-                fixed_depth_meters = fixed_depths.get(depth_mode, fixed_depths.get('default', 0.6))
-                depth_map = np.ones((h, w), dtype=np.float32) * (fixed_depth_meters / camera_params['depth_scale'])
-                logging.debug(f"使用固定深度: {fixed_depth_meters}m")
+            depth_scale = gaze_system.camera_calibrator.get_depth_scale()
+            depth_map = np.ones((h, w), dtype=np.float32) * (0.6 / depth_scale)
             
             # 添加帧数据
             add_frame(frame_id, frame, depth_map)
@@ -221,163 +201,427 @@ def main():
             depth = get_depth(frame_id)
             
             if image is not None and depth is not None:
-                detected = face_detector.detect_face(image, depth)
-
+                # 人脸检测
+                detected = gaze_system.face_detector.detect_face(image, depth)
+                
                 if detected:
-                    face_detector.update_fitting_data()
+                    gaze_system.face_detector.update_fitting_data()
                     
-                    # 第一步：粗拟合（在检测到人脸后立即进行）
-                    if not coarse_fitting_done:
+                    # 第一步：粗拟合（检测到人脸后立即进行）
+                    if not gaze_system.is_coarse_fitting_done:
                         logging.info("="*80)
-                        logging.info("== 第一步：粗拟合（MediaPipe） ==")
+                        logging.info("== 第一步：粗拟合（眼球形状拟合） ==")
                         logging.info("="*80)
-                        print("== 第一步：粗拟合（MediaPipe） ==")
                         
-                        # Step 1: 眼球形状拟合
-                        logging.info("Step 1: 粗拟合 - 眼球形状拟合")
-                        print("Step 1: 粗拟合 - 眼球形状拟合")
-                        
-                        # 检查数据管理器状态
-                        logging.info("检查数据管理器状态...")
-                        data_manager = face_detector.get_data_manager()
-                        left_points = data_manager.get_coordinate_point("left", "pupil")
-                        right_points = data_manager.get_coordinate_point("right", "pupil")
-                        logging.info(f"左眼瞳孔点数: {len(left_points) if left_points else 0}")
-                        logging.info(f"右眼瞳孔点数: {len(right_points) if right_points else 0}")
-                        
-                        # 执行眼球形状拟合
                         try:
+                            # 执行眼球形状拟合
                             logging.info("开始执行眼球形状拟合...")
                             fit_main()
-                            logging.info("眼球形状拟合完成")
+                            
+                            # 初始化校准会话
+                            initialize_calibration_session()
+                            
+                            # 更新状态
+                            gaze_system.is_coarse_fitting_done = True
+                            gaze_system.coarse_fitting_results = {
+                                'status': 'success',
+                                'message': '眼球形状拟合完成，等待开始校准',
+                                'timestamp': time.time()
+                            }
+                            
+                            logging.info("眼球形状拟合完成！")
+                            logging.info("请访问 http://localhost:2233 开始校准")
+                            
                         except Exception as e:
                             logging.error(f"眼球形状拟合失败: {e}")
-                            print(f"眼球形状拟合失败: {e}")
-
-                        # Step 2: 初始化会话（为后续收集校准样本做准备）
-                        logging.info("Step 2: 初始化校准会话")
-                        print("Step 2: 初始化校准会话")
-                        
-                        # 开始校准会话
-                        initialize_calibration_session()
-                        
-                        # 注意：kappa校准需要先收集校准样本，所以这里不进行kappa校准
-                        # kappa校准将在收集完9个校准点后进行
-                        logging.info("眼球形状拟合完成，等待收集校准样本进行kappa校准")
-                        print("眼球形状拟合完成，等待收集校准样本进行kappa校准")
-                        
-                        # 设置粗拟合完成状态，但不进行kappa校准
-                        kappa_pro_coarse, info_pro_coarse, fit_quality_coarse = None, None, None
-                        
-                        # 更新粗拟合状态（眼球形状拟合完成）
-                        coarse_fitting_results.update({
-                            'status': 'success',
-                            'message': '眼球形状拟合完成，等待收集校准样本'
-                        })
-                        
-                        logging.info("眼球形状拟合完成！等待收集校准样本")
-                        print("眼球形状拟合完成！等待收集校准样本")
-                        print("请按 's' 键开始收集9个校准点数据")
-                        
-                        # 发送给前端
-                        send_to_frontend(coarse_fitting_results)
-                        
-                        coarse_fitting_done = True
+                            gaze_system.coarse_fitting_results = {
+                                'status': 'failed',
+                                'message': f'眼球形状拟合失败: {str(e)}',
+                                'timestamp': time.time()
+                            }
                     
-                    # 第二步：开始校准流程（收集9个点）
-                    if not calibration_started and coarse_fitting_done:
-                        logging.info("开始校准流程。请看向屏幕上的红点并按 's' 键。")
-                        print("开始校准流程。请看向屏幕上的红点并按 's' 键。")
-                        # 会话已在第一步初始化，这里只需要设置目标点
-                        res = get_resolution()
-                        target_points = nine_point_grid(res)
-                        calibration_started = True
-                    
-                    if calibration_started:
-                        if current_point_index < len(target_points):
-                            # 在屏幕上绘制当前目标点
-                            current_target = target_points[current_point_index]
-                            cv2.circle(frame, current_target, 10, (0, 0, 255), -1)
-                            cv2.putText(frame, 
-                                        f"Point {current_point_index + 1}/{len(target_points)}", 
-                                        (current_target[0] + 20, current_target[1] + 20), 
-                                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
-                        
+                    # 实时注视点计算
+                    if gaze_system.is_coarse_fitting_done:
+                        try:
+                            # 获取瞳孔数据
+                            data_manager = gaze_system.face_detector.get_data_manager()
+                            left_pupil_data = data_manager.get_coordinate_point("left", "pupil")
+                            
+                            if left_pupil_data and len(left_pupil_data) > 0:
+                                # 计算注视点
+                                latest_pupil = left_pupil_data[-1]
+                                pupil_x = float(latest_pupil[0])
+                                pupil_y = float(latest_pupil[1])
+                                
+                                # 简单的注视点映射
+                                screen_width = 1920
+                                screen_height = 1080
+                                camera_width = 640
+                                camera_height = 480
+                                
+                                # 归一化坐标
+                                norm_x = (pupil_x - camera_width/2) / (camera_width/2)
+                                norm_y = (pupil_y - camera_height/2) / (camera_height/2)
+                                
+                                # 映射到屏幕坐标
+                                gaze_x = screen_width/2 + norm_x * screen_width * 0.4
+                                gaze_y = screen_height/2 - norm_y * screen_height * 0.3
+                                
+                                # 确保在屏幕范围内
+                                gaze_x = max(0, min(screen_width, gaze_x))
+                                gaze_y = max(0, min(screen_height, gaze_y))
+                                
+                                # 更新当前注视点
+                                gaze_system.current_gaze = {
+                                    'gaze_x': gaze_x,
+                                    'gaze_y': gaze_y,
+                                    'confidence': 0.8
+                                }
+                                
+                        except Exception as e:
+                            logging.debug(f"注视点计算失败: {e}")
+                
                 else:
-                    if not calibration_started:
-                        logging.warning(f"帧 {frame_id}: 未检测到人脸")
-                    else:
-                        logging.warning(f"帧 {frame_id}: 人脸丢失")
-            else:
-                logging.error(f"帧 {frame_id}: 图像或深度图获取失败")
-                break
-
-            cv2.imshow("Gaze Calibration", frame)
+                    logging.debug(f"人脸检测失败 - 帧ID: {frame_id}")
             
-            key = cv2.waitKey(1) & 0xFF
-            
-            if key == ord('s') and calibration_started and current_point_index < len(target_points):
-                # 收集当前点数据
-                pupil_data = face_detector.get_data_manager().get_coordinate_point("left", "pupil")
-                if pupil_data:
-                    current_target = target_points[current_point_index]
-                    if collect_calibration_sample(current_target, "left"):
-                        logging.info(f"已收集第 {current_point_index + 1} 个点的数据：{current_target}")
-                        current_point_index += 1
-                    else:
-                        logging.warning("收集校准样本失败")
-                else:
-                    logging.warning("未检测到瞳孔数据，无法采集样本。")
-            
-            # 第四步：精细拟合（使用9个校准点数据）
-            if calibration_started and current_point_index == len(target_points):
-                logging.info("== 第四步：精细拟合（9点校准数据） ==")
-                print("== 第四步：精细拟合（9点校准数据） ==")
-                
-                logging.info("Step 1: 精细拟合 - 眼球形状拟合")
-                print("Step 1: 精细拟合 - 眼球形状拟合")
-                fit_main()
-
-                logging.info("Step 2: 精细拟合 - Kappa校准")
-                print("Step 2: 精细拟合 - Kappa校准")
-                kappa_pro_fine, info_pro_fine, fit_quality_fine = run_kappa_calibration()
-                
-                if kappa_pro_fine is not None:
-                    logging.info("== Step 3: 计算补偿后的视线 ==")
-                    print("== Step 3: 计算补偿后的视线 ==")
-                    center_uv = target_points[4]
-                    gaze = compute_calibrated_gaze("left", center_uv)
-                    if gaze:
-                        print("Gaze (compensated):", gaze["gaze"])
-                    else:
-                        logging.warning("计算校准视线失败")
-                    
-                    logging.info("== Step 4: 评估拟合质量 ==")
-                    print("== Step 4: 评估拟合质量 ==")
-                    print("Evaluation:", fit_quality_fine)
-                    
-                    logging.info("精细拟合完成！校准流程结束！")
-                    print("精细拟合完成！校准流程结束！")
-                else:
-                    logging.error("精细拟合失败，校准流程终止")
-                    print("精细拟合失败，校准流程终止")
-                
-                calibration_finished = True
-            
-            # 检查退出键
-            if key == ord('q'):
-                logging.info("用户按q退出")
-                break
-                
             frame_id += 1
-                
-    except KeyboardInterrupt:
-        logging.info("用户中断")
+            time.sleep(1/30)  # 30fps
+            
     except Exception as e:
-        logging.error(f"发生错误: {e}")
+        logging.error(f"摄像头处理线程错误: {e}")
     finally:
-        cap.release()
-        cv2.destroyAllWindows()
+        logging.info("摄像头处理线程结束")
+
+# ===========================================
+# Flask 路由
+# ===========================================
+
+@app.route('/')
+def index():
+    """主页面"""
+    return render_template('calibration_integrated.html')
+
+@app.route('/api/status', methods=['GET'])
+def get_system_status():
+    """获取系统状态"""
+    return jsonify({
+        'is_initialized': gaze_system.is_initialized,
+        'is_camera_active': gaze_system.is_camera_active,
+        'is_coarse_fitting_done': gaze_system.is_coarse_fitting_done,
+        'is_calibrating': gaze_system.is_calibrating,
+        'is_calibration_complete': gaze_system.is_calibration_complete,
+        'current_point_index': gaze_system.current_point_index,
+        'total_points': gaze_system.total_points,
+        'coarse_fitting_results': gaze_system.coarse_fitting_results,
+        'final_results': gaze_system.final_results
+    })
+
+@app.route('/api/camera/start', methods=['POST'])
+def start_camera():
+    """启动摄像头"""
+    try:
+        if gaze_system.is_camera_active:
+            return jsonify({
+                'success': True,
+                'message': '摄像头已激活',
+                'status': 'already_active'
+            })
+        
+        logging.info("初始化摄像头...")
+        
+        # 初始化摄像头
+        gaze_system.camera_calibrator = CameraCalibrator(rgb_d=True)
+        gaze_system.cap = gaze_system.camera_calibrator.get_cap()
+        
+        if gaze_system.cap is None:
+            raise Exception("无法初始化摄像头")
+        
+        # 加载相机参数并初始化检测器
+        camera_params = gaze_system.camera_calibrator.load_camera_params()
+        gaze_system.face_detector = FaceDetector(camera_params, rgb_d=True)
+        
+        # 启动摄像头处理线程
+        gaze_system.camera_running = True
+        gaze_system.camera_thread = threading.Thread(target=camera_processing_thread, daemon=True)
+        gaze_system.camera_thread.start()
+        
+        gaze_system.is_camera_active = True
+        gaze_system.is_initialized = True
+        
+        return jsonify({
+            'success': True,
+            'message': '摄像头启动成功',
+            'status': 'started'
+        })
+        
+    except Exception as e:
+        logging.error(f"启动摄像头失败: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'启动摄像头失败: {str(e)}',
+            'status': 'error'
+        }), 500
+
+@app.route('/api/calibration/start', methods=['POST'])
+def start_calibration():
+    """开始校准流程"""
+    try:
+        if not gaze_system.is_camera_active:
+            return jsonify({
+                'success': False,
+                'message': '请先启动摄像头',
+                'status': 'camera_not_active'
+            }), 400
+        
+        if not gaze_system.is_coarse_fitting_done:
+            return jsonify({
+                'success': False,
+                'message': '请等待粗拟合完成',
+                'status': 'coarse_fitting_pending'
+            }), 400
+        
+        if gaze_system.is_calibrating:
+            return jsonify({
+                'success': True,
+                'message': '校准已在进行中',
+                'status': 'already_calibrating'
+            })
+        
+        # 开始校准
+        gaze_system.reset()
+        gaze_system.is_calibrating = True
+        
+        # 生成9点校准网格
+        res = get_resolution()
+        gaze_system.target_points = nine_point_grid(res)
+        
+        logging.info("开始9点校准流程")
+        print("开始9点校准流程")
+        
+        return jsonify({
+            'success': True,
+            'message': '校准已开始',
+            'status': 'started',
+            'total_points': gaze_system.total_points,
+            'target_points': gaze_system.target_points
+        })
+        
+    except Exception as e:
+        logging.error(f"开始校准失败: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'开始校准失败: {str(e)}',
+            'status': 'error'
+        }), 500
+
+@app.route('/api/calibration/collect', methods=['POST'])
+def collect_calibration_point():
+    """收集校准点数据"""
+    try:
+        if not gaze_system.is_calibrating:
+            return jsonify({
+                'success': False,
+                'message': '校准未开始',
+                'status': 'not_calibrating'
+            }), 400
+        
+        data = request.get_json()
+        target_pixel = data.get('target_pixel', [0, 0])
+        point_index = data.get('point_index', gaze_system.current_point_index)
+        
+        # 检查是否有瞳孔数据
+        if gaze_system.face_detector:
+            pupil_data = gaze_system.face_detector.get_data_manager().get_coordinate_point("left", "pupil")
+            if not pupil_data:
+                return jsonify({
+                    'success': False,
+                    'message': '未检测到瞳孔数据，请确保人脸在摄像头视野内',
+                    'status': 'no_pupil_data'
+                }), 400
+        
+        # 收集校准样本
+        success = collect_calibration_sample(target_pixel, "left")
+        
+        if success:
+            gaze_system.collected_samples.append({
+                'point_index': point_index,
+                'target_pixel': target_pixel,
+                'timestamp': time.time()
+            })
+            
+            gaze_system.current_point_index += 1
+            
+            logging.info(f"已收集第 {point_index + 1} 个校准点: {target_pixel}")
+            
+            # 检查是否完成所有点
+            is_complete = gaze_system.current_point_index >= gaze_system.total_points
+            
+            if is_complete:
+                # 开始精细拟合
+                logging.info("== 第四步：精细拟合（9点校准数据） ==")
+                
+                try:
+                    # 重新进行眼球形状拟合
+                    fit_main()
+                    
+                    # Kappa校准
+                    kappa_pro, info_pro, fit_quality = run_kappa_calibration()
+                    
+                    if kappa_pro is not None:
+                        gaze_system.final_results = {
+                            'kappa_angle': float(kappa_pro),
+                            'fit_quality': fit_quality,
+                            'status': 'success'
+                        }
+                        
+                        logging.info("精细拟合完成！校准流程结束！")
+                        logging.info(f"Kappa角度: {kappa_pro:.2f}°")
+                        logging.info(f"拟合质量: {fit_quality}")
+                        
+                        gaze_system.is_calibration_complete = True
+                        gaze_system.is_calibrating = False
+                        
+                    else:
+                        gaze_system.final_results = {
+                            'status': 'failed',
+                            'message': 'Kappa校准失败'
+                        }
+                        logging.error("精细拟合失败")
+                        
+                except Exception as e:
+                    logging.error(f"精细拟合失败: {e}")
+                    gaze_system.final_results = {
+                        'status': 'failed',
+                        'message': f'精细拟合失败: {str(e)}'
+                    }
+            
+            return jsonify({
+                'success': True,
+                'message': f'第 {point_index + 1} 个校准点收集成功',
+                'status': 'collected',
+                'current_point_index': gaze_system.current_point_index,
+                'total_points': gaze_system.total_points,
+                'is_complete': is_complete,
+                'final_results': gaze_system.final_results if is_complete else None
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': '校准点数据收集失败',
+                'status': 'collection_failed'
+            }), 500
+            
+    except Exception as e:
+        logging.error(f"收集校准点失败: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'收集校准点失败: {str(e)}',
+            'status': 'error'
+        }), 500
+
+@app.route('/api/gaze/current', methods=['GET'])
+def get_current_gaze():
+    """获取当前注视点坐标"""
+    return jsonify({
+        'success': True,
+        'gaze': gaze_system.current_gaze,
+        'message': '注视点数据获取成功'
+    })
+
+@app.route('/api/gaze/accuracy', methods=['POST'])
+def check_gaze_accuracy():
+    """检查注视准确度"""
+    try:
+        data = request.get_json()
+        target_x = data.get('target_x', 0)
+        target_y = data.get('target_y', 0)
+        
+        current_gaze = gaze_system.current_gaze
+        current_x = current_gaze['gaze_x']
+        current_y = current_gaze['gaze_y']
+        
+        # 计算距离
+        dx = current_x - target_x
+        dy = current_y - target_y
+        distance = (dx * dx + dy * dy) ** 0.5
+        
+        # 确定准确度等级
+        if distance <= 50:
+            level = 'excellent'
+        elif distance <= 100:
+            level = 'good'
+        elif distance <= 200:
+            level = 'fair'
+        else:
+            level = 'poor'
+        
+        return jsonify({
+            'success': True,
+            'accuracy': {
+                'level': level,
+                'distance': round(distance, 2),
+                'deviation': {
+                    'x': round(dx, 2),
+                    'y': round(dy, 2)
+                }
+            },
+            'message': f'准确度检查完成: {level}'
+        })
+        
+    except Exception as e:
+        logging.error(f"检查注视准确度失败: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'检查注视准确度失败: {str(e)}',
+            'accuracy': None
+        }), 500
+
+def open_browser(url="http://localhost:2233", delay=3):
+    """延迟打开浏览器并全屏显示"""
+    def open_url():
+        time.sleep(delay)
+        try:
+            # 使用JavaScript实现全屏
+            fullscreen_url = f"{url}#fullscreen"
+            webbrowser.open(fullscreen_url)
+            logging.info(f"✓ 已自动打开浏览器并全屏: {url}")
+        except Exception as e:
+            logging.error(f"⚠ 无法自动打开浏览器: {e}")
+            logging.info(f"请手动访问: {url}")
+    
+    # 在后台线程中打开浏览器
+    browser_thread = threading.Thread(target=open_url, daemon=True)
+    browser_thread.start()
+
+def main():
+    """主函数"""
+    logging.info("="*80)
+    logging.info("🎯 眼动追踪系统 - 完整工作流程")
+    logging.info("="*80)
+    logging.info("按照 workflow_summary.md 的流程实现")
+    logging.info("="*80)
+    
+    # 自动打开浏览器
+    open_browser()
+    
+    try:
+        # 启动Flask服务器
+        logging.info("启动眼动追踪系统...")
+        logging.info("前端地址: http://localhost:2233")
+        logging.info("按 Ctrl+C 退出")
+        logging.info("="*80)
+        
+        app.run(host='0.0.0.0', port=2233, debug=False, threaded=True)
+        
+    except KeyboardInterrupt:
+        logging.info("系统已停止")
+        logging.info("👋 再见！")
+        
+        # 清理资源
+        if gaze_system.is_camera_active:
+            gaze_system.camera_running = False
+            if gaze_system.cap:
+                gaze_system.cap.release()
 
 if __name__ == "__main__":
     main()

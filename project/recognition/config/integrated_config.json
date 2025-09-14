@@ -1,0 +1,106 @@
+{
+  "system": {
+    "name": "眼动追踪集成系统",
+    "version": "1.0.0",
+    "description": "整合了识别、拟合、追踪、交互四个模块的完整眼动追踪系统"
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 5000,
+    "debug": false,
+    "threaded": true
+  },
+  "recognition": {
+    "camera": {
+      "rgb_d": true,
+      "fps": 30,
+      "resolution": {
+        "width": 640,
+        "height": 480
+      }
+    },
+    "face_detection": {
+      "max_faces": 1,
+      "min_detection_confidence": 0.5,
+      "min_tracking_confidence": 0.5
+    },
+    "depth_estimation": {
+      "mode": "auto",
+      "fixed_depth": 0.6,
+      "auto_settings": {
+        "min_depth": 0.3,
+        "max_depth": 2.0,
+        "real_pupil_distance": 0.065,
+        "fallback_depth": 0.6
+      }
+    }
+  },
+  "fitting": {
+    "calibration": {
+      "total_points": 6,
+      "point_layout": "hexagon",
+      "collection_timeout": 30
+    },
+    "ransac": {
+      "max_trials": 100,
+      "threshold": 0.5,
+      "min_samples": 4
+    },
+    "kappa_calibration": {
+      "enabled": true,
+      "method": "pro"
+    }
+  },
+  "tracking": {
+    "lstm": {
+      "enabled": false,
+      "model_path": "models/lstm_model.pkl",
+      "sequence_length": 10,
+      "prediction_interval": 0.1
+    },
+    "markov": {
+      "enabled": true,
+      "order": 1,
+      "smoothing_factor": 0.1
+    }
+  },
+  "interaction": {
+    "roi": {
+      "default_radius": 50,
+      "priority_levels": {
+        "none": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3
+      }
+    },
+    "gaze_threshold": {
+      "excellent": 50,
+      "good": 100,
+      "fair": 200,
+      "poor": 300
+    }
+  },
+  "ui": {
+    "theme": "white",
+    "calibration_points": [
+      {"x": 33, "y": 20, "color": "#DC3545"},
+      {"x": 67, "y": 20, "color": "#20C997"},
+      {"x": 10, "y": 50, "color": "#0D6EFD"},
+      {"x": 90, "y": 50, "color": "#198754"},
+      {"x": 33, "y": 80, "color": "#FD7E14"},
+      {"x": 67, "y": 80, "color": "#6610F2"}
+    ],
+    "gaze_feedback": {
+      "enabled": true,
+      "trail_length": 8,
+      "fade_duration": 3000
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file_rotation": true,
+    "max_file_size": "10MB",
+    "backup_count": 5
+  }
+}

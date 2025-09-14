@@ -1,0 +1,572 @@
+/* 基本重置样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    background-color: #FFFFFF;
+    color: #000000;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 主容器样式 */
+.main-container {
+    text-align: center;
+    z-index: 10;
+}
+
+/* 标题样式 - iOS白色风格 */
+.title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 3rem;
+    letter-spacing: -0.5px;
+    color: #000000;
+    opacity: 0.95;
+}
+
+/* 开始校准按钮样式 - iOS白色风格 */
+#start-btn {
+    background: rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-family: inherit;
+    letter-spacing: -0.2px;
+    position: relative;
+    overflow: hidden;
+}
+
+#start-btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#start-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+#start-btn:hover:before {
+    opacity: 1;
+}
+
+#start-btn:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* 校准容器样式 */
+.calibration-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* 移动校准圆圈 - 完全独立的样式 */
+#moving-circle {
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 修正数字垂直居中 */
+    line-height: 1;
+    text-align: center;
+    /* 圆润数字字体 */
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "SF Pro Rounded", sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    /* 初始倒计时样式 */
+    background-color: #FFFFFF;
+    color: #000000;
+    border: none;
+    box-shadow: none;
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 倒计时状态 */
+#moving-circle.countdown {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+}
+
+/* 移动圆圈显示状态 */
+#moving-circle.visible {
+    opacity: 1 !important;
+}
+
+/* 移动圆圈内部收缩层 */
+#moving-circle .inner-shrink {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.1s ease-out;
+    z-index: 2;
+}
+
+/* 内圈收缩动画 - 优化流畅度 */
+.inner-shrink.shrinking {
+    animation: smoothShrink 2s ease-out forwards;
+    /* 强制使用GPU加速 */
+    transform: translate(-50%, -50%) translateZ(0);
+    will-change: width, height;
+}
+
+@keyframes smoothShrink {
+    0% {
+        width: 100%;
+        height: 100%;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    95% {
+        width: 25%;
+        height: 25%;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        width: 25%;
+        height: 25%;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    #start-btn {
+        padding: 12px 25px;
+        font-size: 1rem;
+    }
+    
+    .calibration-point {
+        /* 移动设备上稍微大一些，便于观察 */
+        width: min(10vw, 10vh, 70px);
+        height: min(10vw, 10vh, 70px);
+    }
+}
+
+/* 校准进度指示器 */
+.progress-indicator {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #000000;
+    font-size: 1.1rem;
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+    font-weight: 600;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    letter-spacing: -0.2px;
+}
+
+.progress-indicator.visible {
+    opacity: 1;
+}
+
+/* 倒计时提示样式 */
+.countdown-prompt {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #000000;
+    font-size: 1.6rem;
+    font-weight: 500;
+    text-align: center;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    letter-spacing: -0.3px;
+}
+
+.countdown-prompt.visible {
+    opacity: 1;
+}
+
+/* 倒计时圆圈样式 */
+.countdown-circle {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #FFFFFF !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #000000 !important;
+    z-index: 100;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* 确保不受其他样式影响 */
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 倒计时圆圈显示 */
+.countdown-circle.visible {
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+}
+
+/* 倒计时圆圈移动状态 */
+.countdown-circle.moving {
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* 移动圆圈的内部元素样式 */
+.countdown-circle .inner-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.1s ease-out;
+}
+
+/* 集成版本新增样式 */
+
+/* 改进的进度指示器样式 */
+.progress-indicator {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 100;
+    text-align: center;
+    min-width: 200px;
+}
+
+.progress-indicator.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.progress-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #007AFF, #00C7BE);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.progress-count {
+    font-size: 12px;
+    color: #666666;
+    font-weight: 500;
+}
+
+/* 完成消息样式 */
+.completion-message {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1000;
+}
+
+.completion-message.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.completion-content {
+    text-align: center;
+    max-width: 400px;
+}
+
+.completion-icon {
+    font-size: 4rem;
+    color: #00C851;
+    margin-bottom: 1rem;
+    animation: completionBounce 0.6s ease;
+}
+
+@keyframes completionBounce {
+    0%, 20%, 60%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    80% { transform: translateY(-5px); }
+}
+
+.completion-text {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 0.5rem;
+}
+
+.completion-subtitle {
+    font-size: 1rem;
+    color: #666666;
+    margin-bottom: 2rem;
+}
+
+.completion-button {
+    background: rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.completion-button:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+/* 实时注视点反馈样式 */
+.gaze-feedback {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.15s ease-out;
+
+    /* 注视点外观 - 更明显的浅蓝色半透明圆形 */
+    background: radial-gradient(
+        circle,
+        rgba(100, 149, 237, 0.4) 0%,
+        rgba(100, 149, 237, 0.25) 40%,
+        rgba(100, 149, 237, 0.1) 70%,
+        transparent 100%
+    );
+    border: 2px solid rgba(100, 149, 237, 0.6);
+    box-shadow:
+        0 0 12px rgba(100, 149, 237, 0.3),
+        0 0 6px rgba(100, 149, 237, 0.4),
+        inset 0 0 10px rgba(255, 255, 255, 0.4);
+
+    /* 中心点 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* 确保在所有元素之上 */
+    transform: translate(-50%, -50%) translateZ(0);
+    will-change: transform, opacity;
+}
+
+.gaze-feedback::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(100, 149, 237, 0.8);
+    box-shadow: 0 0 4px rgba(100, 149, 237, 0.4);
+}
+
+.gaze-feedback.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.gaze-feedback.accurate {
+    border-color: rgba(34, 197, 94, 0.6);
+    background: radial-gradient(
+        circle,
+        rgba(34, 197, 94, 0.3) 0%,
+        rgba(34, 197, 94, 0.2) 40%,
+        rgba(34, 197, 94, 0.1) 70%,
+        transparent 100%
+    );
+    box-shadow: 
+        0 0 10px rgba(34, 197, 94, 0.3),
+        inset 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.gaze-feedback.accurate::before {
+    background: rgba(34, 197, 94, 0.8);
+    box-shadow: 0 0 4px rgba(34, 197, 94, 0.4);
+}
+
+.gaze-feedback.low-confidence {
+    border-style: dashed;
+    animation: confidencePulse 1s infinite;
+}
+
+@keyframes confidencePulse {
+    0%, 100% { 
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
+}
+
+/* 注视准确度指示器 */
+.gaze-accuracy-indicator {
+    position: fixed;
+    top: 60px;
+    left: 20px;
+    transform: none;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 12px;
+    color: #666;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gaze-accuracy-indicator.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.accuracy-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff4444;
+    transition: all 0.3s ease;
+}
+
+.accuracy-dot.good {
+    background: #22c55e;
+}
+
+.accuracy-dot.medium {
+    background: #f59e0b;
+}
+
+.accuracy-dot.poor {
+    background: #ef4444;
+}
+
+/* 注视轨迹可视化（可选） */
+.gaze-trail {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 40;
+    background: rgba(100, 149, 237, 0.4);
+    border: 1px solid rgba(100, 149, 237, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 2s ease-out, visibility 2s;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 4px rgba(100, 149, 237, 0.2);
+}
+
+.gaze-trail.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.gaze-trail.fading {
+    opacity: 0;
+    visibility: hidden;
+}

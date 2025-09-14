@@ -1,9 +1,9 @@
 {
-    "camera_name": "HD Camera",
+    "camera_name": "Generic USB Camera",
     "camera_type": "RGB",
     "intrinsic_params": {
-        "fx": 1500.0,
-        "fy": 1500.0,
+        "fx": 1344.0,
+        "fy": 756.0,
         "cx": 960.0,
         "cy": 540.0
     },
@@ -22,6 +22,6 @@
         "k3": 0.0
     },
     "calibration_date": "2024-01-15",
-    "calibration_method": "PowerShell Auto Detection",
-    "notes": "通过PowerShell自动检测获得，制造商: Microsoft"
+    "calibration_method": "Generic Preset",
+    "notes": "使用通用预设参数"
 }
