@@ -12,6 +12,8 @@ import time
 import webbrowser
 import threading
 import requests
+import signal
+import atexit
 from datetime import datetime
 
 def print_banner():
@@ -22,6 +24,88 @@ def print_banner():
     print("按照 workflow_summary.md 的流程实现")
     print(f"启动时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("="*80)
+
+def check_port_available(port=2233):
+    """检查端口是否可用"""
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1)
+            result = s.connect_ex(('localhost', port))
+            return result != 0
+    except:
+        return True
+
+def kill_port_process(port=2233):
+    """终止占用端口的进程"""
+    try:
+        import subprocess
+        # 查找占用端口的进程
+        result = subprocess.run(['lsof', '-ti', f':{port}'], 
+                              capture_output=True, text=True)
+        if result.returncode == 0 and result.stdout.strip():
+            pids = result.stdout.strip().split('\n')
+            for pid in pids:
+                if pid:
+                    subprocess.run(['kill', '-9', pid], check=False)
+                    print(f"🔧 已终止占用端口 {port} 的进程 (PID: {pid})")
+    except Exception as e:
+        print(f"⚠ 清理端口时出现警告: {e}")
+
+def close_browser_tabs():
+    """关闭浏览器标签页"""
+    try:
+        import subprocess
+        import platform
+        
+        system = platform.system()
+        
+        if system == "Darwin":  # macOS
+            # 关闭包含 localhost:2233 的标签页
+            subprocess.run([
+                "osascript", "-e", 
+                'tell application "Safari" to close (every tab whose URL contains "localhost:2233")'
+            ], check=False, capture_output=True)
+            
+            subprocess.run([
+                "osascript", "-e", 
+                'tell application "Google Chrome" to close (every tab whose URL contains "localhost:2233")'
+            ], check=False, capture_output=True)
+            
+            subprocess.run([
+                "osascript", "-e", 
+                'tell application "Firefox" to close (every tab whose URL contains "localhost:2233")'
+            ], check=False, capture_output=True)
+            
+        elif system == "Windows":
+            # Windows 下关闭浏览器标签页
+            subprocess.run([
+                "taskkill", "/f", "/im", "chrome.exe"
+            ], check=False, capture_output=True)
+            
+        elif system == "Linux":
+            # Linux 下关闭浏览器进程
+            subprocess.run([
+                "pkill", "-f", "chrome.*localhost:2233"
+            ], check=False, capture_output=True)
+            
+        print("🌐 浏览器标签页已关闭")
+        
+    except Exception as e:
+        print(f"⚠ 关闭浏览器时出现警告: {e}")
+
+def cleanup_on_exit():
+    """程序退出时的清理函数"""
+    print("\n🛑 正在停止系统...")
+    kill_port_process()
+    close_browser_tabs()
+    print("✅ 系统已停止")
+    print("👋 再见！")
+
+# 注册退出清理函数
+atexit.register(cleanup_on_exit)
+signal.signal(signal.SIGINT, lambda s, f: cleanup_on_exit() or sys.exit(0))
+signal.signal(signal.SIGTERM, lambda s, f: cleanup_on_exit() or sys.exit(0))
 
 def check_dependencies():
     """检查依赖"""
@@ -84,6 +168,16 @@ def wait_for_server(port=2233, timeout=30):
 def main():
     """主函数"""
     print_banner()
+    
+    # 检查端口是否被占用
+    if not check_port_available():
+        print(f"⚠ 端口 2233 被占用，正在清理...")
+        kill_port_process()
+        time.sleep(2)  # 等待端口释放
+        
+        if not check_port_available():
+            print("❌ 端口清理失败，请手动检查端口占用情况")
+            sys.exit(1)
     
     # 检查依赖
     if not check_dependencies():

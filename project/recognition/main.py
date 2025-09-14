@@ -16,6 +16,8 @@ import logging
 import time
 import threading
 import webbrowser
+import signal
+import atexit
 from datetime import datetime
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
@@ -101,6 +103,75 @@ app = Flask(__name__,
            template_folder=os.path.join(current_dir, 'frontend', 'templates'),
            static_folder=os.path.join(current_dir, 'frontend', 'static'))
 CORS(app)
+
+# 全局变量用于端口管理
+_port_process = None
+
+def cleanup_port():
+    """清理端口占用"""
+    global _port_process
+    try:
+        if _port_process:
+            _port_process.terminate()
+            _port_process = None
+        logging.info("✅ 端口已释放")
+    except Exception as e:
+        logging.warning(f"⚠ 端口清理时出现警告: {e}")
+
+def close_browser_tabs():
+    """关闭浏览器标签页"""
+    try:
+        import subprocess
+        import platform
+        
+        system = platform.system()
+        
+        if system == "Darwin":  # macOS
+            # 关闭包含 localhost:2233 的标签页
+            subprocess.run([
+                "osascript", "-e", 
+                'tell application "Safari" to close (every tab whose URL contains "localhost:2233")'
+            ], check=False, capture_output=True)
+            
+            subprocess.run([
+                "osascript", "-e", 
+                'tell application "Google Chrome" to close (every tab whose URL contains "localhost:2233")'
+            ], check=False, capture_output=True)
+            
+            subprocess.run([
+                "osascript", "-e", 
+                'tell application "Firefox" to close (every tab whose URL contains "localhost:2233")'
+            ], check=False, capture_output=True)
+            
+        elif system == "Windows":
+            # Windows 下关闭浏览器标签页
+            subprocess.run([
+                "taskkill", "/f", "/im", "chrome.exe"
+            ], check=False, capture_output=True)
+            
+        elif system == "Linux":
+            # Linux 下关闭浏览器进程
+            subprocess.run([
+                "pkill", "-f", "chrome.*localhost:2233"
+            ], check=False, capture_output=True)
+            
+        logging.info("🌐 浏览器标签页已关闭")
+        
+    except Exception as e:
+        logging.warning(f"⚠ 关闭浏览器时出现警告: {e}")
+
+def signal_handler(signum, frame):
+    """信号处理器"""
+    logging.info("🛑 正在停止系统...")
+    cleanup_port()
+    close_browser_tabs()
+    sys.exit(0)
+
+# 注册信号处理器
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+atexit.register(cleanup_port)
+atexit.register(close_browser_tabs)
 
 # 全局状态管理
 class GazeTrackingSystem:
@@ -611,17 +682,34 @@ def main():
         logging.info("按 Ctrl+C 退出")
         logging.info("="*80)
         
-        app.run(host='0.0.0.0', port=2233, debug=False, threaded=True)
+        # 使用更安全的服务器启动方式
+        app.run(host='0.0.0.0', port=2233, debug=False, threaded=True, use_reloader=False)
         
     except KeyboardInterrupt:
-        logging.info("系统已停止")
-        logging.info("👋 再见！")
+        logging.info("🛑 正在停止系统...")
         
+    except Exception as e:
+        logging.error(f"❌ 系统运行出错: {e}")
+        
+    finally:
         # 清理资源
+        logging.info("🧹 清理系统资源...")
+        
+        # 停止摄像头
         if gaze_system.is_camera_active:
             gaze_system.camera_running = False
             if gaze_system.cap:
                 gaze_system.cap.release()
+                logging.info("📹 摄像头已释放")
+        
+        # 清理端口
+        cleanup_port()
+        
+        # 关闭浏览器标签页
+        close_browser_tabs()
+        
+        logging.info("✅ 系统已停止")
+        logging.info("👋 再见！")
 
 if __name__ == "__main__":
     main()
