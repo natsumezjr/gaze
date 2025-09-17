@@ -94,3 +94,4 @@ logs/
 # 项目特定文件
 activate_env.sh
 README_环境设置.md
+run_project.sh
