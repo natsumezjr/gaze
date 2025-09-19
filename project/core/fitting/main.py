@@ -57,7 +57,7 @@ class FittingManager:
                 logger.info(f"{eye} 视线焦点: {pixel_intersection}")
                 logger.info(f"-----------------------------------------------")
                 
-            from project.main import kappa_calibrate_event, EYE_CALIBRATION_APP  
+            """ from project.main import kappa_calibrate_event, EYE_CALIBRATION_APP  
             from project.client.kappa.ui import CalibrationState  
             if not self.kapa_storage.is_pixel_valid():
                 kappa_calibrate_event.set()
@@ -76,7 +76,6 @@ class FittingManager:
                     eyeball_centers = self.kapa_storage.get_center(eye, "eyeball")
                     pupil_centers = self.kapa_storage.get_center(eye, "pupil")
                     target_pixels = self.kapa_storage.get_pixel(eye)
-                    from project.config.screen_config import SCREEN_CONFIG
                     target_points = []
                     for i, target_pixel in enumerate(target_pixels):
                         target_points.append(SCREEN_CONFIG.pixel_to_3d_intersection(target_pixel, eyeball_centers[i]))
@@ -88,7 +87,7 @@ class FittingManager:
                 for eye in EYE_TYPE:
                     gaze = apply_kappa(self.gaze[eye].to_ndarray(), self.kapa_storage.get_kappa(eye))
                     self.gaze[eye] = Vector3D.from_ndarray(gaze)
-            return self.gaze
+            return self.gaze """
         except Exception as e:
             logger.error(f"拟合过程中发生异常: {e}")
             import traceback
@@ -108,9 +107,6 @@ class FittingManager:
         logger.info(f"==============================================")
         
         
-    def kappa_calibrate(self):
-        if not self.kapa_valid_calibrated:
-            pass
-        self.kapa_valid_calibrated = True
+
         
         
