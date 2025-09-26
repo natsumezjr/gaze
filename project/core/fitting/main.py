@@ -3,9 +3,8 @@ from project.core.fitting.fitting_strategy import fit_all_eyes, FittingResult
 from project.managers import SEMAPHORE_MANAGER, SemaphoreManager, FRAME_ID_MANAGER
 from project.config.screen_config import SCREEN_CONFIG
 from project.config.logging_config import setup_logging, get_logger
-from project.data.data_models import Point3D, Vector3D
+from project.data.data_models import Point3D
 from project.core.fitting.kappa_calibrator import KAPPA_STORAGE
-from project.data.data_models import EYE_TYPE
 setup_logging()
 logger = get_logger(__name__)
 
