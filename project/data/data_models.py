@@ -301,16 +301,17 @@ class GazeSamples:
 class CalibrationInterface:
     """标定前端接口"""
     intersection: Point2D
+    background_color: str = "black"  # 背景色字段：black, gray, white
     
     def to_array(self) -> np.ndarray:
         return np.array([self.intersection.x, self.intersection.y])
     
     @classmethod
-    def from_array(cls, arr: np.ndarray) -> 'CalibrationInterface':
-        return cls(intersection=Point2D(x=arr[0], y=arr[1]))
+    def from_array(cls, arr: np.ndarray, background_color: str = "black") -> 'CalibrationInterface':
+        return cls(intersection=Point2D(x=arr[0], y=arr[1]), background_color=background_color)
     
     def __str__(self) -> str:
-        return f"CalibrationInterface(intersection={self.intersection})"
+        return f"CalibrationInterface(intersection={self.intersection}, background_color={self.background_color})"
 
 # 导出所有类型
 __all__ = [
