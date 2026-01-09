@@ -1,15 +1,48 @@
 [project]
 name = "gaze-refactor"
 version = "0.1.0"
-description = ""
+description = "眼动追踪系统"
 authors = [
-    {name = "zeng-jingran",email = "zeng-jingran@example.com"}
+    {name = "zeng-jingran", email = "zeng-jingran@example.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "opencv-python>=4.5.0",
+    "mediapipe>=0.10.0",
+    "numpy>=1.20.0",
+    "scipy>=1.7.0",
+    "Pillow>=8.0.0",
+    "matplotlib>=3.3.0",
+    "pandas>=1.3.0",
+    "pytest>=6.0.0",
+    "pytest-cov>=2.0.0",
+    "psutil>=5.8.0",
+    "pywin32>=306; platform_system == \"Windows\"",
+    "flask>=2.0.0"
 ]
 
+[tool.poetry]
+name = "gaze-refactor"
+version = "0.1.0"
+description = "眼动追踪系统"
+authors = ["zeng-jingran <zeng-jingran@example.com>"]
+packages = [{include = "project"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+opencv-python = ">=4.5.0"
+mediapipe = ">=0.10.0"
+numpy = ">=1.20.0"
+scipy = ">=1.7.0"
+Pillow = ">=8.0.0"
+matplotlib = ">=3.3.0"
+pandas = ">=1.3.0"
+pytest = ">=6.0.0"
+pytest-cov = ">=2.0.0"
+psutil = ">=5.8.0"
+pywin32 = {version = ">=306", markers = "sys_platform == 'win32'"}
+flask = ">=2.0.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

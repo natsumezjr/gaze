@@ -46,19 +46,42 @@ pip install -r project/requirements.txt
 
 ## 使用方法
 
-```bash
-# 进入项目目录
-cd project
+### 使用 Poetry（推荐）
 
-# 运行主程序
-python main.py
+```bash
+# 1. 更新锁文件
+poetry lock
+
+# 2. 安装所有依赖（包括项目本身的可编辑安装）
+poetry install
+
+
+# 3. 运行程序
+poetry run python run.py
+
+# 或
+poetry shell
+python run.py
+```
+
+### 使用 pip
+
+```bash
+# 激活虚拟环境后，需要设置 PYTHONPATH
+# Windows PowerShell:
+$env:PYTHONPATH = "$PWD"
+python run.py
+
+# Linux/macOS:
+export PYTHONPATH=$(pwd)
+python run.py
 ```
 
 ## 项目结构
 
 ```
 gaze-refactor/
-├── project/              # 主项目目录
+├── project/              # 主项目目录（Python 包）
 │   ├── core/            # 核心算法模块
 │   │   ├── recognition/ # 识别模块
 │   │   ├── fitting/     # 拟合模块
@@ -67,6 +90,7 @@ gaze-refactor/
 │   ├── data/            # 数据管理
 │   ├── client/          # 客户端应用
 │   └── utils/           # 工具函数
+├── run.py               # 启动脚本（推荐使用）
 ├── pyproject.toml       # Poetry 配置
 └── README.md           # 项目说明
 ```
