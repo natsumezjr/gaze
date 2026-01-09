@@ -296,6 +296,21 @@ class GazeSamples:
         return None
     
 
+# ================= 标定前端类型 =================
+@dataclass
+class CalibrationInterface:
+    """标定前端接口"""
+    intersection: Point2D
+    
+    def to_array(self) -> np.ndarray:
+        return np.array([self.intersection.x, self.intersection.y])
+    
+    @classmethod
+    def from_array(cls, arr: np.ndarray) -> 'CalibrationInterface':
+        return cls(intersection=Point2D(x=arr[0], y=arr[1]))
+    
+    def __str__(self) -> str:
+        return f"CalibrationInterface(intersection={self.intersection})"
 
 # 导出所有类型
 __all__ = [

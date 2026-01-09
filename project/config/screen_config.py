@@ -32,7 +32,7 @@ class ScreenConfig:
     xmin_m: float = -0.15
     xmax_m: float = 0.15
     ymin_m: float = 0.005
-    ymax_m: float = 0.005 + 0.30
+    ymax_m: float = 0.005 + 0.225
     
     
     

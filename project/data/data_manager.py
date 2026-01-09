@@ -20,7 +20,6 @@ logger = get_logger(__name__)
 import cv2
 import numpy as np
 import threading
-import time
 from datetime import datetime
 from typing import Dict, Optional, Tuple
 
@@ -547,6 +546,29 @@ class RecgFitDataManager:
 # 全局实例
 
 CAMERA_DATA_MANAGER = CameraDataManager()
+
+
+class CalibrationDataManager:
+    """标定数据管理器"""
+    _instance = None
+    _lock = threading.Lock()
+    from project.data.data_models import CalibrationInterface
+    
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    
+    def __init__(self):
+        self.calibration_data = []
+        
+        
+    def set_calibration_data(self, calibration_data: CalibrationInterface):
+        return
+    
+    def get_calibration_data(self) -> CalibrationInterface:
+        return self.calibration_data
 
 # 导出
 __all__ = ['RecgFitDataManager', 'CameraDataManager', 'CAMERA_DATA_MANAGER']
