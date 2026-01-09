@@ -3,8 +3,10 @@ from project.core.recognition.detector import FaceDetector
 import logging
 from time import sleep
 import cv2
-from project.managers import SEMAPHORE_MANAGER, SemaphoreManager, FRAME_ID_MANAGER, FrameIdManager, DATA_PIPELINE_MANAGER
+from project.managers import FRAME_ID_MANAGER, FrameIdManager, DATA_PIPELINE_MANAGER, CALLBACK_MANAGER
 from project.data.data_manager import RecgFitDataManager
+from project.core.visualization import KeypointVisualizer
+from project.events import RECOGNITION_COMPLETE
 # 配置日志
 from project.config.logging_config import setup_logging, get_logger
 setup_logging()
@@ -86,21 +88,35 @@ class ErrorHandler:
         self.retry_count = 0
 
 class RecognitionManager:
-    def __init__(self, semaphore_manager: SemaphoreManager = SEMAPHORE_MANAGER, frame_id_manager: FrameIdManager = FRAME_ID_MANAGER, rgb_d=False):
+    def __init__(self, frame_id_manager: FrameIdManager = FRAME_ID_MANAGER, rgb_d=False):
         self.rgb_d = rgb_d
         self.camera_manager = CameraDataManager(rgb_d=rgb_d)
         self.face_detector = FaceDetector(self.camera_manager.get_camera_params(), rgb_d=rgb_d)
         self.running = False
         self.interval = 0.1
         self.error_handler = ErrorHandler()
-        self.semaphore_manager = semaphore_manager
         self.frame_id_manager = frame_id_manager
         self.data_pipeline = DATA_PIPELINE_MANAGER
+        # 初始化可视化器
+        self.visualizer = KeypointVisualizer(self.camera_manager.get_camera_params())
         # 设置回调函数
         self.error_handler.set_callbacks(
             on_warning=self._handle_warning,
             on_error=self._handle_error
         )
+        self._setup_event_handlers()
+        
+    def _setup_event_handlers(self):
+        """设置事件处理器"""
+        from project.events import SYSTEM_STOP
+        CALLBACK_MANAGER.register(SYSTEM_STOP, self._on_system_stop)
+        logger.debug("RecognitionManager 事件处理器已注册")
+    
+    def _cleanup_event_handlers(self):
+        """清理事件处理器"""
+        from project.events import SYSTEM_STOP
+        CALLBACK_MANAGER.unregister(SYSTEM_STOP, self._on_system_stop)
+        logger.debug("RecognitionManager 事件处理器已注销")
     
     def _handle_warning(self):
         """警告时的睡眠处理"""
@@ -144,6 +160,7 @@ class RecognitionManager:
             logger.debug("摄像头初始化检查完成")
             self.cap = self.camera_manager.get_cap()
             logger.debug("获取摄像头对象成功")
+            
         except RecognitionError as e:
             logger.error(f"摄像头初始化失败: {e}")
             self.error_handler.handle_error(e)
@@ -160,11 +177,6 @@ class RecognitionManager:
                 ret, frame = self.cap.read()
                 self._check_frame_reading(ret, frame)
                 
-                # 显示摄像头画面
-                if frame is not None:
-                    cv2.imshow('眼动追踪系统 - 摄像头画面', frame)
-                    cv2.waitKey(1)  # 非阻塞等待，允许其他处理继续
-                
                 self.camera_manager.add_frame(frame_id, frame)
                 
                 image = self.camera_manager.get_image(frame_id)
@@ -179,8 +191,15 @@ class RecognitionManager:
                 recg_fit_data_manager = RecgFitDataManager(key_coordinates, debug_log=True)
                 self.data_pipeline.store_recognition_data(frame_id, recg_fit_data_manager)
                 
-
-                
+                # 可视化关键点并显示
+                if frame is not None:
+                    visualized_frame = self.visualizer.draw_keypoints(frame, key_coordinates)
+                    cv2.imshow('眼动追踪系统 - 摄像头画面', visualized_frame)
+                    cv2.waitKey(1)  # 非阻塞等待，允许其他处理继续
+                logger.debug(f"识别完成: frame_id={frame_id}")
+                self._cycle_update()
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt
                 
             except RecognitionWarning as w:
                 if not self.error_handler.handle_warning(w):
@@ -190,19 +209,21 @@ class RecognitionManager:
                 if not self.error_handler.handle_error(e):
                     self.running = False
                     break
-            finally:
-                self._cycle_update()
-
-
-            
-    def stop(self):
-        """停止识别"""
-        self.running = False
+        # 识别线程退出时清理资源（在识别线程中执行，避免阻塞事件处理器）
         logger.info("识别线程主循环停止")
-        self.cap.release()
-        logger.info("摄像头资源已释放")
+        if hasattr(self, 'cap') and self.cap is not None:
+            self.cap.release()
+            self.cap = None
+            logger.info("摄像头资源已释放")
         cv2.destroyAllWindows()
         logger.info("OpenCV窗口已关闭")
+            
+    def _on_system_stop(self):
+        """系统停止事件处理 - 只设置标志，资源清理在识别线程退出时执行"""
+        self.running = False
+        # 只注销事件处理器，资源清理在识别线程退出时执行（避免阻塞事件处理链）
+        self._cleanup_event_handlers()
+        logger.info("识别模块停止标志已设置（资源清理将在识别线程退出时执行）")
     
     def restart(self):
         """重启识别"""
@@ -210,13 +231,20 @@ class RecognitionManager:
         self.run()
         
     def _cycle_update(self) -> None:
-        """循环更新"""
+        """循环更新 - 发送事件而不是信号量"""
         frame_id = self.frame_id_manager.get_recognizing_frame_id()
         self.frame_id_manager.add_recognized_frame_id(frame_id)
         logger.debug(f"添加已识别frame_id: {frame_id}")
-        self.frame_id_manager.increment_recognizing_frame_id()
-        self.semaphore_manager.signal_recognition_complete()
-        sleep(self.interval)
+        # 发送识别完成事件（非阻塞）
+        CALLBACK_MANAGER.emit(RECOGNITION_COMPLETE, frame_id)
+        logger.debug(f"发送识别完成事件: frame_id={frame_id}")
+        
+        self.frame_id_manager.generate_recognizing_frame_id()
+        # 使用可中断的sleep，检查running标志
+        elapsed = 0
+        while elapsed < self.interval and self.running:
+            sleep(min(0.01, self.interval - elapsed))  # 每10ms检查一次
+            elapsed += 0.01
         
     def _cycle_start(self) -> int:
         """循环开始"""

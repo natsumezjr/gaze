@@ -1,0 +1,813 @@
+2026-01-09 16:16:09,903 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:10,911 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:11,353 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:11,595 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:11,767 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:11,950 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:12,114 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:12,290 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:12,932 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:13,129 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:13,285 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:13,435 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:13,575 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:13,726 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:13,886 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:13,977 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:14,092 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:14,562 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:14,641 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:14,852 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:15,067 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:29,145 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:29,350 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:29,531 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:29,709 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:30,376 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:30,658 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:30,734 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:30,869 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:31,050 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:31,113 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:31,228 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:31,423 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:31,661 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:31,915 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:32,017 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:32,226 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:32,459 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:32,681 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:32,944 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:33,172 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:33,360 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:33,529 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:33,712 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:33,875 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:34,798 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:35,033 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:16:35,176 - project.client.kappa.keyboard_handler - ERROR - 确认回调执行失败: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\keyboard_handler.py", line 45, in _handle_confirm
+    self.on_confirm()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 519, in _confirm_and_submit_point
+    KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'KapaCallbackEventTypes' has no attribute 'CALIBRATION_POINT_SUBMIT'
+2026-01-09 16:28:41,005 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:41,009 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:41,282 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:41,284 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:41,592 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:41,595 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:41,926 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:41,927 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:42,187 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:42,188 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:43,069 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:43,071 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:43,375 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:43,377 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:43,722 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:43,724 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:44,024 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:44,026 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:44,271 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:44,272 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:49,113 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:49,115 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:49,399 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:49,401 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:49,692 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:49,695 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:49,965 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:49,967 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:50,251 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:50,252 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:50,578 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:50,579 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:50,880 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:50,883 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:51,199 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:51,201 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:51,475 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:51,476 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:51,760 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:51,762 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:52,050 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:52,053 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:52,312 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:52,314 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:52,588 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:52,590 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:52,884 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:52,886 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:53,126 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:53,128 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:53,413 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:53,415 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:53,697 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:53,700 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:53,954 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:53,956 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:54,258 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:54,260 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:54,575 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:54,576 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:54,858 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:54,859 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:55,136 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:55,138 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:28:55,422 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:28:55,424 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:29:00,842 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:29:00,843 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:29:01,352 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:29:01,354 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 16:29:12,325 - project.core.fitting.main - ERROR - 拟合过程中发生异常: list index out of range
+2026-01-09 16:29:12,326 - project.core.fitting.main - ERROR - 异常堆栈: Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\main.py", line 41, in run
+    pupil_center = self.data_manager.get_coordinate_point(eye, "pupil")[0]
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-09 22:28:34,105 - root - ERROR - 无法找到有效的瞳孔点或虹膜点进行初始化
+2026-01-09 22:28:34,109 - project.main - ERROR - 处理识别完成事件时出错: Cannot cast ufunc 'add' output from dtype('float64') to dtype('int32') with casting rule 'same_kind'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\main.py", line 78, in _on_recognition_complete
+    fitting_results = fit_all_eyes(data)
+                      ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1473, in fit_all_eyes
+    results = controller.fit_all_eyes()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1384, in fit_all_eyes
+    results[eye] = self.fit_eye(eye)
+                   ^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1286, in fit_eye
+    result = strategy.optimizer.optimize(initial_params, sampled_fitting, sampled_constraint)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1104, in optimize
+    result = self.base_optimizer.optimize(initial_params, sampled_fitting_points, sampled_constraint_points)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 951, in optimize
+    new_params.center += delta[:3]
+numpy.core._exceptions._UFuncOutputCastingError: Cannot cast ufunc 'add' output from dtype('float64') to dtype('int32') with casting rule 'same_kind'
+2026-01-09 22:28:35,617 - root - ERROR - 无法找到有效的瞳孔点或虹膜点进行初始化
+2026-01-09 22:28:35,619 - project.main - ERROR - 处理识别完成事件时出错: Cannot cast ufunc 'add' output from dtype('float64') to dtype('int32') with casting rule 'same_kind'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\main.py", line 78, in _on_recognition_complete
+    fitting_results = fit_all_eyes(data)
+                      ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1473, in fit_all_eyes
+    results = controller.fit_all_eyes()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1384, in fit_all_eyes
+    results[eye] = self.fit_eye(eye)
+                   ^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1286, in fit_eye
+    result = strategy.optimizer.optimize(initial_params, sampled_fitting, sampled_constraint)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1104, in optimize
+    result = self.base_optimizer.optimize(initial_params, sampled_fitting_points, sampled_constraint_points)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 951, in optimize
+    new_params.center += delta[:3]
+numpy.core._exceptions._UFuncOutputCastingError: Cannot cast ufunc 'add' output from dtype('float64') to dtype('int32') with casting rule 'same_kind'
+2026-01-09 22:28:44,424 - root - ERROR - 无法找到有效的瞳孔点或虹膜点进行初始化
+2026-01-09 22:28:44,424 - project.main - ERROR - 处理识别完成事件时出错: Cannot cast ufunc 'add' output from dtype('float64') to dtype('int32') with casting rule 'same_kind'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\main.py", line 78, in _on_recognition_complete
+    fitting_results = fit_all_eyes(data)
+                      ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1473, in fit_all_eyes
+    results = controller.fit_all_eyes()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1384, in fit_all_eyes
+    results[eye] = self.fit_eye(eye)
+                   ^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1286, in fit_eye
+    result = strategy.optimizer.optimize(initial_params, sampled_fitting, sampled_constraint)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 1104, in optimize
+    result = self.base_optimizer.optimize(initial_params, sampled_fitting_points, sampled_constraint_points)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\core\fitting\fitting_strategy.py", line 951, in optimize
+    new_params.center += delta[:3]
+numpy.core._exceptions._UFuncOutputCastingError: Cannot cast ufunc 'add' output from dtype('float64') to dtype('int32') with casting rule 'same_kind'
+2026-01-09 22:34:31,350 - project.client.kappa.ui - ERROR - 关闭 UI 时出错: main thread is not in main loop
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\main.py", line 292, in main
+    stop_event.wait(timeout=1.0)
+  File "C:\Users\86158\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 622, in wait
+    signaled = self._cond.wait(timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 324, in wait
+    gotit = waiter.acquire(True, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 700, in close
+    if self.root and self.root.winfo_exists():
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 1139, in winfo_exists
+    self.tk.call('winfo', 'exists', self._w))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: main thread is not in main loop
+2026-01-09 23:06:35,105 - project.main - ERROR - 程序异常: unknown color name ""
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\main.py", line 275, in main
+    calibration_ui = EyeCalibrationApp.get_instance()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 68, in get_instance
+    cls._instance = cls()
+                    ^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 129, in __init__
+    self.setup_ui()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 182, in setup_ui
+    self.gaze_points_canvas = tk.Canvas(
+                              ^^^^^^^^^^
+  File "C:\Users\86158\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 2744, in __init__
+    Widget.__init__(self, master, 'canvas', cnf, kw)
+  File "C:\Users\86158\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 2628, in __init__
+    self.tk.call(
+_tkinter.TclError: unknown color name ""
+2026-01-09 23:06:38,810 - project.main - ERROR - 程序异常: unknown color name ""
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\main.py", line 275, in main
+    calibration_ui = EyeCalibrationApp.get_instance()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 68, in get_instance
+    cls._instance = cls()
+                    ^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 129, in __init__
+    self.setup_ui()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 182, in setup_ui
+    self.gaze_points_canvas = tk.Canvas(
+                              ^^^^^^^^^^
+  File "C:\Users\86158\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 2744, in __init__
+    Widget.__init__(self, master, 'canvas', cnf, kw)
+  File "C:\Users\86158\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 2628, in __init__
+    self.tk.call(
+_tkinter.TclError: unknown color name ""
+2026-01-09 23:07:39,324 - project.main - ERROR - 程序异常: wrong # args: should be ".!canvas lower tagOrId ?belowThis?"
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\main.py", line 275, in main
+    calibration_ui = EyeCalibrationApp.get_instance()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 68, in get_instance
+    cls._instance = cls()
+                    ^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 129, in __init__
+    self.setup_ui()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 192, in setup_ui
+    self.gaze_points_canvas.lower()  # 置于最底层
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 2970, in tag_lower
+    self.tk.call((self._w, 'lower') + args)
+_tkinter.TclError: wrong # args: should be ".!canvas lower tagOrId ?belowThis?"
+2026-01-09 23:08:31,357 - project.main - ERROR - 程序异常: 'EyeCalibrationApp' object has no attribute 'gaze_points'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\main.py", line 275, in main
+    calibration_ui = EyeCalibrationApp.get_instance()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 68, in get_instance
+    cls._instance = cls()
+                    ^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 129, in __init__
+    self.setup_ui()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 200, in setup_ui
+    self._set_background_color(BackgroundColor.BLACK)
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 294, in _set_background_color
+    self._update_ui_colors(color_hex, text_color)
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 317, in _update_ui_colors
+    self._redraw_gaze_points()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 366, in _redraw_gaze_points
+    for point, color in self.gaze_points:
+                        ^^^^^^^^^^^^^^^^
+AttributeError: 'EyeCalibrationApp' object has no attribute 'gaze_points'
+2026-01-09 23:08:43,161 - project.main - ERROR - 程序异常: 'EyeCalibrationApp' object has no attribute 'gaze_points'
+Traceback (most recent call last):
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\main.py", line 275, in main
+    calibration_ui = EyeCalibrationApp.get_instance()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 68, in get_instance
+    cls._instance = cls()
+                    ^^^^^
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 129, in __init__
+    self.setup_ui()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 200, in setup_ui
+    self._set_background_color(BackgroundColor.BLACK)
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 294, in _set_background_color
+    self._update_ui_colors(color_hex, text_color)
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 317, in _update_ui_colors
+    self._redraw_gaze_points()
+  File "C:\Users\86158\Desktop\gaze_venv\gaze-refactor\project\client\kappa\ui.py", line 366, in _redraw_gaze_points
+    for point, color in self.gaze_points:
+                        ^^^^^^^^^^^^^^^^
+AttributeError: 'EyeCalibrationApp' object has no attribute 'gaze_points'

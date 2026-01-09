@@ -5,11 +5,11 @@ from typing import List, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
-from project.data.data_models import Point2D
+from project.data.data_models import Point2D, CalibrationRequest, CalibrationResponse
 from project.config.screen_config import _CURRENT_RES_W, _CURRENT_RES_H
 from project.config.logging_config import setup_logging, get_logger
 from project.managers import CALLBACK_MANAGER
-from project.callbacks import CallbackEvents
+from project.events.event_types import KapaCallbackEventTypes
 from project.client.kappa.ui_config import (
     BackgroundColor, BACKGROUND_COLOR_MAP, TEXT_COLOR_MAP,
     CALIBRATION_POINT_COLORS, CALIBRATION_POINTS, ANIMATION_CONFIG
@@ -49,7 +49,7 @@ class CalibrationState(Enum):
     COMPLETED = "completed"
 
 class EyeCalibrationApp:
-    """眼动校准应用 - UI主动发送点位，支持多背景色系统"""
+    """眼动校准应用 - UI主动发送点位，支持多背景色系统（单例模式）"""
     
     _instance = None
     _lock = threading.Lock()
@@ -61,7 +61,18 @@ class EyeCalibrationApp:
                     cls._instance = super().__new__(cls)
         return cls._instance
     
+    @classmethod
+    def get_instance(cls):
+        """获取单例实例"""
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+    
     def __init__(self, callback_manager=None):
+        # 单例模式：避免重复初始化
+        if hasattr(self, '_initialized'):
+            return
+        
         self.callback_manager = callback_manager or CALLBACK_MANAGER
         self.root = tk.Tk()
         self.root.title("眼动校准系统")
@@ -83,6 +94,9 @@ class EyeCalibrationApp:
         # 状态变量
         self.state = CalibrationState.IDLE
         self.is_calibrating = False
+        
+        # 当前标定请求数据（存储 frame_id 和 eye_type）
+        self.current_calibration_request: Optional[CalibrationRequest] = None
         
         # 配置
         self.config = CalibrationConfig(
@@ -108,6 +122,12 @@ class EyeCalibrationApp:
         # 提示信息
         self.instruction_label = None
         
+        # 实现点显示相关（需要在 setup_ui 之前初始化，因为 setup_ui 会调用 _redraw_gaze_points）
+        self.gaze_points_canvas = None  # 用于显示实现点的 Canvas
+        self.gaze_points: List[Tuple[Point2D, str]] = []  # 存储实现点 (point, color)
+        self.gaze_point_color = "#0000FF"  # 默认蓝色
+        self.gaze_point_size = 8  # 实现点大小（半径），增大以便更容易看到
+        
         # 注册回调（接收后端启动请求和粗略视线位置）
         self._register_callbacks()
         
@@ -123,36 +143,59 @@ class EyeCalibrationApp:
         # 动态效果将在创建校准圆圈时初始化
         self.animation_effect = None
         
+        self._initialized = True
+        
         logger.info(f"屏幕分辨率: {self.screen_width}x{self.screen_height}")
         logger.info(f"校准点数量: {len(self.config.points)} × 3组 = {self.total_points}个点")
     
     def _register_callbacks(self):
         """注册回调函数"""
         self.callback_manager.register(
-            CallbackEvents.CALIBRATION_START_REQUEST,
+            KapaCallbackEventTypes.CALIBRATION_START_REQUEST,
             self._on_calibration_start_request
         )
         self.callback_manager.register(
-            CallbackEvents.ROUGH_GAZE_UPDATE,
+            KapaCallbackEventTypes.ROUGH_GAZE_UPDATE,
             self._on_rough_gaze_update
         )
         logger.info("回调函数已注册")
     
-    def _on_rough_gaze_update(self, gaze_point: Point2D):
-        """接收粗略视线位置更新"""
+    def _on_rough_gaze_update(self, calibration_request: CalibrationRequest):
+        """接收粗略视线位置更新（包含 CalibrationRequest）"""
+        # 存储当前的 calibration_request（包含 frame_id 和 eye_type）
+        self.current_calibration_request = calibration_request
+        
         if self.animation_effect:
-            # 在主线程中更新
-            self.root.after(0, lambda: self.animation_effect.update_rough_gaze(gaze_point))
+            # 在主线程中更新粗略视线位置
+            self.root.after(0, lambda: self.animation_effect.update_rough_gaze(calibration_request.intersection))
     
-    def _on_calibration_start_request(self):
+    def _on_calibration_start_request(self, frame_id: int = None):
         """收到校准启动请求（从后端回调）"""
-        logger.info("收到校准启动请求")
+        logger.info(f"收到校准启动请求，frame_id: {frame_id}")
         if self.state == CalibrationState.IDLE:
             # 在主线程中启动校准
             self.root.after(0, self.start_calibration)
     
     def setup_ui(self):
         """设置用户界面"""
+        # 创建全屏 Canvas 用于显示实现点（背景层）
+        # 使用父窗口的背景色，实现视觉上的"透明"效果
+        parent_bg = self.root.cget('bg')
+        self.gaze_points_canvas = tk.Canvas(
+            self.root,
+            width=self.screen_width,
+            height=self.screen_height,
+            bg=parent_bg,  # 使用父窗口背景色
+            highlightthickness=0
+        )
+        self.gaze_points_canvas.place(x=0, y=0)
+        # 注意：Canvas 的层级由创建顺序决定，先创建的在下层
+        # 由于 Canvas 在其他 UI 元素之前创建，它自然在最底层
+        # 禁用鼠标事件，让点击穿透到下层
+        self.gaze_points_canvas.bind("<Button-1>", lambda e: None)
+        self.gaze_points_canvas.bind("<Button-2>", lambda e: None)
+        self.gaze_points_canvas.bind("<Button-3>", lambda e: None)
+        
         # 初始背景色（黑色）
         self._set_background_color(BackgroundColor.BLACK)
         
@@ -243,6 +286,10 @@ class EyeCalibrationApp:
         
         self.root.configure(bg=color_hex)
         
+        # 更新 Canvas 的背景色以匹配父窗口
+        if self.gaze_points_canvas:
+            self.gaze_points_canvas.configure(bg=color_hex)
+        
         # 更新所有UI元素的背景色和文字颜色
         self._update_ui_colors(color_hex, text_color)
         
@@ -265,6 +312,89 @@ class EyeCalibrationApp:
             self.countdown_label.config(bg=bg_color, fg=text_color)
         if hasattr(self, 'instruction_label') and self.instruction_label:
             self.instruction_label.config(bg=bg_color)
+        
+        # 重新绘制实现点（背景切换时需要重新绘制）
+        self._redraw_gaze_points()
+    
+    def add_gaze_point(self, point: Point2D, color: Optional[str] = None):
+        """
+        添加实现点（实际注视点）到 UI 上显示
+        
+        Args:
+            point: 实现点坐标 (Point2D)
+            color: 点的颜色（十六进制字符串，如 "#0000FF"），默认为蓝色
+        """
+        if color is None:
+            color = self.gaze_point_color
+        
+        # 存储点
+        self.gaze_points.append((point, color))
+        
+        # 在主线程中绘制点
+        self.root.after(0, lambda: self._draw_gaze_point(point, color))
+    
+    def _draw_gaze_point(self, point: Point2D, color: str):
+        """在 Canvas 上绘制单个实现点"""
+        if not self.gaze_points_canvas:
+            return
+        
+        try:
+            x, y = int(point.x), int(point.y)
+            size = self.gaze_point_size
+            
+            # 绘制圆形点
+            self.gaze_points_canvas.create_oval(
+                x - size, y - size,
+                x + size, y + size,
+                fill=color,
+                outline=color,
+                width=1,
+                tags="gaze_point"
+            )
+        except Exception as e:
+            logger.error(f"绘制实现点失败: {e}")
+    
+    def _redraw_gaze_points(self):
+        """重新绘制所有实现点（用于背景切换等情况）"""
+        if not self.gaze_points_canvas:
+            return
+        
+        # 检查 gaze_points 是否已初始化
+        if not hasattr(self, 'gaze_points'):
+            return
+        
+        # 清除所有现有的实现点
+        self.gaze_points_canvas.delete("gaze_point")
+        
+        # 重新绘制所有点
+        for point, color in self.gaze_points:
+            self._draw_gaze_point(point, color)
+    
+    def clear_gaze_points(self):
+        """清除所有实现点"""
+        self.gaze_points.clear()
+        if self.gaze_points_canvas:
+            self.gaze_points_canvas.delete("gaze_point")
+    
+    def set_gaze_point_color(self, color: str):
+        """
+        设置实现点的默认颜色
+        
+        Args:
+            color: 颜色（十六进制字符串，如 "#0000FF" 表示蓝色）
+        """
+        self.gaze_point_color = color
+    
+    def set_gaze_point_size(self, size: int):
+        """
+        设置实现点的大小（半径）
+        
+        Args:
+            size: 点的半径（像素）
+        """
+        self.gaze_point_size = size
+        # 重新绘制所有点以应用新大小
+        self._redraw_gaze_points()
     
     def _update_instruction(self, message: str):
         """更新提示信息"""
@@ -503,22 +633,34 @@ class EyeCalibrationApp:
         if self.state != CalibrationState.WAITING_FOR_USER_CONFIRM:
             return
         
+        # 检查是否有 calibration_request（包含 frame_id 和 eye_type）
+        if self.current_calibration_request is None:
+            logger.warning("没有 calibration_request，无法提交标定点")
+            return
+        
         # 获取当前目标点位（Point2D）
         point_percent = self.config.points[self.current_point_index % 9]
         target_x = int((point_percent[0] / 100) * self.screen_width)
         target_y = int((point_percent[1] / 100) * self.screen_height)
-        target_point = Point2D(target_x, target_y)
+        target_pixel = Point2D(target_x, target_y)
         
         # 获取当前背景色
         current_bg = self.background_colors[self.current_background_index].value
         
-        logger.info(f"提交校准点 {self.current_point_index + 1}/{self.total_points}: {target_point}, 背景色: {current_bg}")
-        
-        # 通过回调发送点位数据给后端
-        self.callback_manager.emit(
-            CallbackEvents.CALIBRATION_POINT_SUBMIT,
-            point=target_point,
+        # 创建 CalibrationResponse
+        calibration_response = CalibrationResponse(
+            frame_id=self.current_calibration_request.frame_id,
+            eye_type=self.current_calibration_request.eye_type,
+            target_pixel=target_pixel,
             background_color=current_bg
+        )
+        
+        logger.info(f"提交校准点 {self.current_point_index + 1}/{self.total_points}: frame_id={calibration_response.frame_id}, eye={calibration_response.eye_type}, target_pixel={target_pixel}, 背景色: {current_bg}")
+        
+        # 通过回调发送 CalibrationResponse 给后端
+        self.callback_manager.emit(
+            KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+            calibration_response=calibration_response
         )
         
         # 隐藏当前校准圆圈和清理动画
@@ -569,7 +711,7 @@ class EyeCalibrationApp:
         
         # 通过回调通知后端校准完成
         self.callback_manager.emit(
-            CallbackEvents.CALIBRATION_COMPLETE,
+            KapaCallbackEventTypes.CALIBRATION_COMPLETE,
             calibration_result={"total_points": self.total_points}
         )
         
@@ -675,6 +817,23 @@ class EyeCalibrationApp:
         if self.state == CalibrationState.IDLE:
             self.state = CalibrationState.RUNNING
             self.root.mainloop()
+    
+    def close(self):
+        """关闭应用"""
+        try:
+            if self.root:
+                try:
+                    if self.root.winfo_exists():
+                        self.root.after(0, self.root.destroy)
+                        logger.info("UI 已关闭")
+                except Exception:
+                    # 如果 winfo_exists 失败，直接尝试 destroy
+                    try:
+                        self.root.destroy()
+                    except:
+                        pass
+        except Exception as e:
+            logger.error(f"关闭 UI 时出错: {e}", exc_info=True)
 
 # 使用示例
 def example_usage():
