@@ -1,9 +1,8 @@
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, Any
 import numpy as np
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 import cv2
-from datetime import datetime
 
 # ================= 枚举常量 =================
 class FittingType(Enum):
@@ -273,6 +272,78 @@ class KeyCoordinates:
         return result
 
 
+# ================= Kappa 补偿类型 =================
+@dataclass
+class Kappa:
+    """Kappa (κ) 补偿参数 - 轴角表示（axis-angle）
+    表示从光轴到视轴的旋转，单位：弧度
+    """
+    x: float  # αx (radians)
+    y: float  # αy (radians)
+    z: float  # αz (radians)，通常为 0（lock_roll=True）
+    
+    def to_ndarray(self) -> np.ndarray:
+        """转换为 numpy 数组"""
+        return np.array([self.x, self.y, self.z], dtype=float)
+    
+    @classmethod
+    def from_ndarray(cls, arr: np.ndarray) -> 'Kappa':
+        """从 numpy 数组创建"""
+        arr = np.asarray(arr, dtype=float)
+        if arr.shape != (3,):
+            raise ValueError(f"Kappa 数组必须是形状 (3,)，得到 {arr.shape}")
+        return cls(x=float(arr[0]), y=float(arr[1]), z=float(arr[2]))
+    
+    def to_degrees(self) -> 'Kappa':
+        """转换为度数（返回新的 Kappa 对象）"""
+        return Kappa(
+            x=np.degrees(self.x),
+            y=np.degrees(self.y),
+            z=np.degrees(self.z)
+        )
+    
+    def __str__(self) -> str:
+        return f"Kappa(x={np.degrees(self.x):.2f}°, y={np.degrees(self.y):.2f}°, z={np.degrees(self.z):.2f}°)"
+
+
+@dataclass
+class KappaEstimationResult:
+    """Kappa 估计结果"""
+    kappa: Kappa  # 估计的 kappa 值（弧度）
+    num_samples: int  # 使用的样本数量
+    mean_ang_err_deg: float  # 平均角度误差（度）
+    median_ang_err_deg: float  # 中位数角度误差（度）
+    max_ang_err_deg: float  # 最大角度误差（度）
+    per_sample_err_deg: List[float]  # 每个样本的角度误差（度）
+    
+    @property
+    def kappa_deg(self) -> Kappa:
+        """获取度数的 kappa"""
+        return self.kappa.to_degrees()
+    
+    def __str__(self) -> str:
+        return (f"KappaEstimationResult(kappa={self.kappa}, "
+                f"num_samples={self.num_samples}, "
+                f"mean_err={self.mean_ang_err_deg:.2f}°, "
+                f"median_err={self.median_ang_err_deg:.2f}°, "
+                f"max_err={self.max_ang_err_deg:.2f}°)")
+
+
+@dataclass
+class KappaFitEvaluation:
+    """Kappa 拟合评估结果"""
+    mean_ang_err_deg: float  # 平均角度误差（度）
+    median_ang_err_deg: float  # 中位数角度误差（度）
+    max_ang_err_deg: float  # 最大角度误差（度）
+    num_samples: int  # 评估的样本数量
+    
+    def __str__(self) -> str:
+        return (f"KappaFitEvaluation(num_samples={self.num_samples}, "
+                f"mean_err={self.mean_ang_err_deg:.2f}°, "
+                f"median_err={self.median_ang_err_deg:.2f}°, "
+                f"max_err={self.max_ang_err_deg:.2f}°)")
+
+
 # ================= 拟合模块类型 =================
 @dataclass
 class GazeSamples:
@@ -294,24 +365,50 @@ class GazeSamples:
         if self.target_point is not None:
             return Vector3D.normalize(self.target_point - self.c_eye).to_ndarray()
         return None
-    
+
 
 # ================= 标定前端类型 =================
 @dataclass
-class CalibrationInterface:
-    """标定前端接口"""
+class CalibrationRequest:
+    """标定请求 - FittingScheduler → UI"""
+    frame_id: int
+    eye_type: str  # left/right
     intersection: Point2D
-    background_color: str = "black"  # 背景色字段：black, gray, white
     
-    def to_array(self) -> np.ndarray:
-        return np.array([self.intersection.x, self.intersection.y])
+    def __init__(self, frame_id: int, eye_type: str, intersection: Point2D):
+        self.frame_id = frame_id
+        self.eye_type = eye_type
+        self.intersection = intersection
+        
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "frame_id": self.frame_id,
+            "eye_type": self.eye_type,
+            "intersection": self.intersection.to_dict()
+        }
+        
+        
+@dataclass
+class CalibrationResponse:
+    """标定响应 - UI → FittingScheduler"""
+    frame_id: int
+    eye_type: str  # left/right
+    target_pixel: Point2D
+    background_color: str
     
-    @classmethod
-    def from_array(cls, arr: np.ndarray, background_color: str = "black") -> 'CalibrationInterface':
-        return cls(intersection=Point2D(x=arr[0], y=arr[1]), background_color=background_color)
-    
-    def __str__(self) -> str:
-        return f"CalibrationInterface(intersection={self.intersection}, background_color={self.background_color})"
+    def __init__(self, frame_id: int, eye_type: str, target_pixel: Point2D, background_color: str):
+        self.frame_id = frame_id
+        self.eye_type = eye_type
+        self.target_pixel = target_pixel
+        self.background_color = background_color
+        
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "frame_id": self.frame_id,
+            "eye_type": self.eye_type,
+            "target_pixel": self.target_pixel.to_dict(),
+            "background_color": self.background_color
+        }
 
 # 导出所有类型
 __all__ = [
@@ -323,7 +420,10 @@ __all__ = [
     'Point2D', 'Point3D', 'Vector3D', 'Landmark', 'Point3DWithVisibility',
     # 复合类型
     'KeyCoordinates',
+    # Kappa 类型
+    'Kappa', 'KappaEstimationResult', 'KappaFitEvaluation',
     # 拟合类型
     'GazeSamples',
-    
+    # 标定类型
+    'CalibrationRequest', 'CalibrationResponse',
 ]

@@ -49,6 +49,9 @@ class CameraDataManager:
             self._resolution = None  # 分辨率 (width, height)
             self._camera_params = None  # 相机参数缓存
             self._cap = None  # 摄像头对象
+            # 加载配置用于清理
+            from project.config.settings import FRAME_ID_PERIOD_SECONDS, FRAME_ID_CLEANUP_ENABLED
+            self.cleanup_enabled = FRAME_ID_CLEANUP_ENABLED
             self._initialized = False
     
     # ==================== 相机控制接口 ====================
@@ -222,6 +225,19 @@ class CameraDataManager:
         """清空所有帧数据"""
         self._data_dict.clear()
         logger.info("所有帧数据已清空")
+    
+    def cleanup_old_data(self, threshold: int):
+        """清理时间戳小于阈值的旧数据（与 FrameIdManager 同步）"""
+        if not self.cleanup_enabled:
+            return
+        
+        original_count = len(self._data_dict)
+        # 保留时间戳 >= threshold 的数据
+        self._data_dict = {fid: data for fid, data in self._data_dict.items() if fid >= threshold}
+        removed_count = original_count - len(self._data_dict)
+        
+        if removed_count > 0:
+            logger.debug(f"CameraDataManager 清理: 移除 {removed_count} 个旧数据，保留 {len(self._data_dict)} 个")
     
     # ==================== 私有方法 ====================
     
@@ -547,81 +563,6 @@ class RecgFitDataManager:
 
 CAMERA_DATA_MANAGER = CameraDataManager()
 
-
-class CalibrationDataManager:
-    """标定数据管理器 - 支持按背景色分组存储"""
-    _instance = None
-    _lock = threading.Lock()
-    
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super().__new__(cls)
-        return cls._instance
-                    
-    def __init__(self):
-        if not hasattr(self, '_initialized'):
-            from project.data.data_models import CalibrationInterface
-            from typing import Optional, Union, Dict, List
-            
-            # 按背景色分组存储
-            self.calibration_data: Dict[str, List[CalibrationInterface]] = {
-                "black": [],
-                "gray": [],
-                "white": []
-            }
-            self._data_lock = threading.Lock()
-            self._initialized = True
-        
-    def set_calibration_data(self, calibration_data):
-        """存储校准数据（按背景色分组）"""
-        from project.data.data_models import CalibrationInterface
-        from typing import Optional, Union, Dict, List
-        
-        with self._data_lock:
-            bg_color = calibration_data.background_color
-            if bg_color not in self.calibration_data:
-                logger.warning(f"未知的背景色: {bg_color}，使用默认分组")
-                bg_color = "black"
-            self.calibration_data[bg_color].append(calibration_data)
-            logger.debug(f"存储校准数据: {calibration_data}, 背景色: {bg_color}")
-    
-    def get_calibration_data(self, background_color=None):
-        """获取校准数据
-        
-        Args:
-            background_color: 如果指定，返回该背景色的数据；如果为None，返回所有数据
-            
-        Returns:
-            如果指定background_color，返回该背景色的数据列表
-            如果为None，返回按背景色分组的字典
-        """
-        with self._data_lock:
-            if background_color:
-                return self.calibration_data.get(background_color, []).copy()
-            else:
-                return {k: v.copy() for k, v in self.calibration_data.items()}
-    
-    def get_calibration_data_by_background(self, background_color: str):
-        """根据背景色获取校准数据"""
-        return self.get_calibration_data(background_color)
-    
-    def clear_calibration_data(self, background_color=None):
-        """清空校准数据
-        
-        Args:
-            background_color: 如果指定，只清空该背景色的数据；如果为None，清空所有数据
-        """
-        with self._data_lock:
-            if background_color:
-                if background_color in self.calibration_data:
-                    self.calibration_data[background_color] = []
-                    logger.debug(f"清空背景色 {background_color} 的校准数据")
-            else:
-                for bg_color in self.calibration_data:
-                    self.calibration_data[bg_color] = []
-                logger.debug("清空所有校准数据")
 
 # 导出
 __all__ = ['RecgFitDataManager', 'CameraDataManager', 'CAMERA_DATA_MANAGER']

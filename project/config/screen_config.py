@@ -230,7 +230,7 @@ class ScreenConfig:
         logger.info(f"最终像素坐标: {clipped_point}")
         return clipped_point
     
-    def calculate_gaze_intersection(self, pupil_position: Point3D, eyeball_position: Point3D) -> Point2D:
+    def calculate_gaze_intersection(self, pupil_position: Point3D = None, eyeball_position: Point3D = None, gaze_direction: Vector3D = None) -> Point2D:
         """
         主接口：计算视线与屏幕的交点（像素坐标）
         
@@ -250,16 +250,13 @@ class ScreenConfig:
             注视点像素坐标
         """
         # 计算视线方向
-        gaze_direction = Vector3D(
-            pupil_position.x - eyeball_position.x,
-            pupil_position.y - eyeball_position.y,
-            pupil_position.z - eyeball_position.z
-        )
-        
-        logger.info(f"瞳孔位置: {pupil_position}")
-        logger.info(f"眼球位置: {eyeball_position}")
-        logger.info(f"视线方向: {gaze_direction}")
-        
+        if gaze_direction is None and pupil_position is not None and eyeball_position is not None:
+            gaze_direction = Vector3D(
+                pupil_position.x - eyeball_position.x,
+                pupil_position.y - eyeball_position.y,
+                pupil_position.z - eyeball_position.z
+            )
+
         # 步骤2：射线求交
         intersection_3d = self._ray_plane_intersection(eyeball_position, gaze_direction)
         if intersection_3d is None:

@@ -16,11 +16,11 @@ Solve α so that R(α) v_i ≈ d_i in least squares sense (small-angle lineariza
 Author: ChatGPT
 """
 
-from typing import Iterable, List, Optional, Tuple, Dict
+from typing import Iterable, List, Optional, Tuple, Dict, Union
 import math
 import threading
 import numpy as np
-from project.data.data_models import GazeSamples, Point2D, Point3D
+from project.data.data_models import GazeSamples, Point2D, Point3D, Kappa, KappaEstimationResult, KappaFitEvaluation
 
 
 # ---------- Utilities ----------
@@ -65,7 +65,7 @@ def estimate_kappa(
     lock_roll: bool = True,
     robust_iters: int = 3,
     huber_delta_deg: float = 5.0,
-) -> Tuple[np.ndarray, Dict]:
+) -> Tuple[Kappa, KappaEstimationResult]:
     """
     Estimate small-angle κ = [αx, αy, αz] (radians) via linearization:
       R(α) v ≈ v + α × v  ≈ d
@@ -73,8 +73,8 @@ def estimate_kappa(
     Stack all samples and solve weighted least squares (optionally lock αz=0).
 
     Returns:
-        kappa: (3,) axis-angle in radians
-        info:  dict with residual stats (mean/median angular error in deg, weights, etc.)
+        kappa: Kappa object (axis-angle in radians)
+        result: KappaEstimationResult with statistics
     """
     Vs: List[np.ndarray] = []
     Ds: List[np.ndarray] = []
@@ -152,30 +152,49 @@ def estimate_kappa(
 
     # Final metrics
     err_deg = angle_err_deg(alpha)
-    info = {
-        "num_samples": int(N),
-        "kappa_rad": alpha.copy(),
-        "kappa_deg": np.degrees(alpha),
-        "mean_ang_err_deg": float(np.mean(err_deg)),
-        "median_ang_err_deg": float(np.median(err_deg)),
-        "max_ang_err_deg": float(np.max(err_deg)),
-        "per_sample_err_deg": err_deg.tolist(),
-    }
-    return alpha, info
+    kappa = Kappa.from_ndarray(alpha)
+    result = KappaEstimationResult(
+        kappa=kappa,
+        num_samples=int(N),
+        mean_ang_err_deg=float(np.mean(err_deg)),
+        median_ang_err_deg=float(np.median(err_deg)),
+        max_ang_err_deg=float(np.max(err_deg)),
+        per_sample_err_deg=err_deg.tolist(),
+    )
+    return kappa, result
 
 
-def apply_kappa(vectors: np.ndarray, kappa: np.ndarray) -> np.ndarray:
-    """Rotate a set of vectors (N,3) by κ (3,) using Rodrigues."""
+def apply_kappa(vectors: np.ndarray, kappa: Union[Kappa, np.ndarray]) -> np.ndarray:
+    """Rotate a set of vectors (N,3) by κ using Rodrigues.
+    
+    Args:
+        vectors: (N,3) array of vectors to rotate
+        kappa: Kappa object or (3,) array (axis-angle in radians)
+    
+    Returns:
+        (N,3) array of rotated vectors
+    """
     V = np.asarray(vectors, dtype=float)
-    R = rodrigues(np.asarray(kappa, dtype=float))
+    if isinstance(kappa, Kappa):
+        kappa_arr = kappa.to_ndarray()
+    else:
+        kappa_arr = np.asarray(kappa, dtype=float)
+    R = rodrigues(kappa_arr)
     return (R @ V.T).T
 
 
 def evaluate_fit(
     samples: Iterable[GazeSamples],
-    kappa: np.ndarray,
-) -> Dict:
+    kappa: Union[Kappa, np.ndarray],
+) -> KappaFitEvaluation:
     """Compute angular error for provided samples after applying κ.
+    
+    Args:
+        samples: Iterable of GazeSamples
+        kappa: Kappa object or (3,) array (axis-angle in radians)
+    
+    Returns:
+        KappaFitEvaluation with error statistics
     """
     Vs, Ds = [], []
     for s in samples:
@@ -191,14 +210,12 @@ def evaluate_fit(
     dots = np.clip(np.sum(Vrot * D, axis=1), -1.0, 1.0)
     ang_err = np.degrees(np.arccos(dots))
 
-    out = {
-        "mean_ang_err_deg": float(np.mean(ang_err)),
-        "median_ang_err_deg": float(np.median(ang_err)),
-        "max_ang_err_deg": float(np.max(ang_err)),
-        "N": int(len(ang_err)),
-    }
-
-    return out
+    return KappaFitEvaluation(
+        mean_ang_err_deg=float(np.mean(ang_err)),
+        median_ang_err_deg=float(np.median(ang_err)),
+        max_ang_err_deg=float(np.max(ang_err)),
+        num_samples=int(len(ang_err)),
+    )
 
 
 
@@ -232,7 +249,8 @@ def build_samples_from_arrays(
     return samples
 
 
-class KappaStorage:
+class SamplesStorage:
+    """标定样本存储 - 最简数据结构: {frame_id: {eye: {pupils: [], eyeball: [], pixel: []}}}"""
     _instance = None
     _lock = threading.Lock()
     
@@ -244,75 +262,73 @@ class KappaStorage:
         return cls._instance
     
     def __init__(self):
-        self.kappa_storage: Dict[str, Point3D] = {
-            "left": None,
-            "right": None
-        }
-        self.pixel_storage: Dict[str, List[Point2D]] = {
-            "left": None,
-            "right": None
-        }
+        if hasattr(self, '_initialized'):
+            return
+        # {frame_id: {eye: {pupils: [], eyeball: [], pixel: []}}}
+        self.samples: Dict[int, Dict[str, Dict[str, List]]] = {}
+        self._initialized = True
+    
+    def append(self, frame_id: int, eye: str, pupil: Point3D, eyeball: Point3D, pixel: Point2D):
+        """添加一个标定样本"""
+        if frame_id not in self.samples:
+            self.samples[frame_id] = {"left": {"pupils": [], "eyeball": [], "pixel": []},
+                                      "right": {"pupils": [], "eyeball": [], "pixel": []}}
+        self.samples[frame_id][eye]["pupils"].append(pupil)
+        self.samples[frame_id][eye]["eyeball"].append(eyeball)
+        self.samples[frame_id][eye]["pixel"].append(pixel)
+    
+    def get_all_samples(self) -> Dict[int, Dict[str, Dict[str, List]]]:
+        """获取所有样本"""
+        return self.samples
+    
+    def clear(self):
+        """清空所有样本"""
+        self.samples = {}
+
+
+class KappaStorage:
+    """Kappa 存储 - 只存储已计算出的 kappa"""
+    _instance = None
+    _lock = threading.Lock()
+    
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def __init__(self):
+        if hasattr(self, '_initialized'):
+            return
         
-        self.center_storage: Dict[str, Dict[str, List[Point3D]]] = {
-            "left": {
-                "eyeball": [],
-                "pupil": []
-            },
-            "right": {
-                "eyeball": [],
-                "pupil": []
-            }
+        self.kappa_storage: Dict[str, Optional[Kappa]] = {
+            "left": None,
+            "right": None
         }
+        self._initialized = True
 
-    def set_kappa(self, kappa_left: Point3D, kappa_right: Point3D):
-        self.kappa_storage["left"] = kappa_left
-        self.kappa_storage["right"] = kappa_right
+    def set_kappa(self, eye: str, kappa: Kappa):
+        """设置指定眼睛的 kappa"""
+        self.kappa_storage[eye] = kappa
     
-    def set_pixel(self, pixel_left: List[Point2D], pixel_right: List[Point2D]):
-        self.pixel_storage["left"] = pixel_left
-        self.pixel_storage["right"] = pixel_right
-    
-    def append_center(self, eye: str, type: str, center: Point3D):
-        self.center_storage[eye][type].append(center)
-    
-    def get_center(self, eye: str, type: str) -> List[Point3D]:
-        return self.center_storage[eye][type]
-    
-    def is_center_valid(self) -> bool:
-        return all(self.center_storage[eye] is not None for eye in self.center_storage)
-    
-    def reset_center(self):
-        self.center_storage = {
-            "left": {
-                "eyeball": [],
-                "pupil": []
-            },
-            "right": {
-                "eyeball": [],
-                "pupil": []
-            }
-        }
-
-    
-    def get_kappa(self, eye: str) -> Point3D:
+    def get_kappa(self, eye: str) -> Optional[Kappa]:
+        """获取指定眼睛的 kappa"""
         return self.kappa_storage[eye]
     
-    def get_pixel(self, eye: str) -> List[Point2D]:
-        return self.pixel_storage[eye]
-    
     def is_kappa_valid(self) -> bool:
+        """检查 kappa 是否有效（左右眼都有）"""
         return all(self.kappa_storage[eye] is not None for eye in self.kappa_storage)
     
-    def is_pixel_valid(self) -> bool:
-        return all(self.pixel_storage[eye] is not None for eye in self.pixel_storage)
-    
     def reset_kappa(self):
+        """重置 kappa"""
         self.kappa_storage = {
             "left": None,
             "right": None
         }
 
 KAPPA_STORAGE = KappaStorage()
+SAMPLES_STORAGE = SamplesStorage()
 
 # ---------- Demo / CLI ----------
 
@@ -332,7 +348,7 @@ if __name__ == "__main__":
     pupils = V                           # so that (pupil - eye) == V
 
     samples = build_samples_from_arrays(eyes, pupils, target_points=D)  # using rays as "points"
-    kappa_est, info = estimate_kappa(samples, lock_roll=True)
+    kappa_est, result = estimate_kappa(samples, lock_roll=True)
     print("[Demo] True κ (deg):", kappa_true_deg)
-    print("[Demo] Est.  κ (deg):", np.degrees(kappa_est))
-    print("[Demo] Fit info:", info)
+    print("[Demo] Est.  κ (deg):", kappa_est.to_degrees())
+    print("[Demo] Fit result:", result)

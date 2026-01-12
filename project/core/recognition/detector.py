@@ -1,13 +1,10 @@
 # 人脸检测模块
 import numpy as np
-import cv2
-from typing import Dict, List, Optional, Tuple
-import logging
+from typing import Dict, List, Optional
 from project.data.data_models import (
-    BGRImage, DepthMap, Landmark, KeyCoordinates, Point3DWithVisibility,
+    BGRImage, DepthMap, Landmark, KeyCoordinates,
     FITTING_TYPE, EYE_TYPE
 )
-from project.data.data_manager import RecgFitDataManager
 
 # 配置日志
 from project.config.logging_config import setup_logging, get_logger
