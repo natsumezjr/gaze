@@ -25,6 +25,7 @@ class AnimationEffect:
         
         # 动画状态
         self.is_animating = False
+        self.is_gazing = False  # 是否正在注视
         self.animation_id = None
         self.start_time = None
         
@@ -47,6 +48,9 @@ class AnimationEffect:
         """设置目标标定点"""
         self.target_point = point
         logger.debug(f"目标点已设置: {point}")
+        # 如果回调已设置，启动默认的呼吸动画
+        if self.update_callback and not self.is_animating:
+            self._start_breathing()
     
     def update_rough_gaze(self, gaze_point: Point2D):
         """更新粗略视线位置"""
@@ -54,8 +58,12 @@ class AnimationEffect:
         self._check_and_animate()
     
     def _check_and_animate(self):
-        """检查距离并触发动画"""
+        """检查距离并控制呼吸动画"""
         if not self.target_point or not self.rough_gaze:
+            return
+        
+        # 如果正在注视，不进行任何动画更新，保持完全静止
+        if self.is_gazing:
             return
         
         # 计算距离
@@ -64,28 +72,49 @@ class AnimationEffect:
             (self.target_point.y - self.rough_gaze.y) ** 2
         )
         
-        # 如果在检测范围内，启动动画
+        # 如果在检测范围内，停止呼吸动画（完全静止不动）
         if distance <= self.detection_range:
-            if not self.is_animating:
-                self._start_animation()
+            if not self.is_gazing:
+                self.is_gazing = True
+                self._stop_breathing()
+                logger.debug("检测到注视，点完全静止不动")
         else:
-            if self.is_animating:
-                self._stop_animation()
+            # 如果离开检测范围，恢复呼吸动画
+            if self.is_gazing:
+                self.is_gazing = False
+                self._start_breathing()
+                logger.debug("注视离开，恢复呼吸效果")
+    
+    def _start_breathing(self):
+        """启动呼吸动画（默认状态）"""
+        if not self.is_animating:
+            self.is_animating = True
+            self.start_time = time.time()
+            self._animate()
+            logger.debug("呼吸动画已启动")
+    
+    def _stop_breathing(self):
+        """停止呼吸动画（注视时）- 完全静止不动"""
+        if self.is_animating:
+            self.is_animating = False
+            if self.animation_id:
+                self.canvas.after_cancel(self.animation_id)
+                self.animation_id = None
+            # 恢复到原始大小（scale=1.0），完全静止
+            if self.update_callback:
+                try:
+                    self.update_callback(1.0, 0.0)  # 原始大小，无发光，完全静止
+                except Exception as e:
+                    logger.error(f"恢复原始大小失败: {e}", exc_info=True)
+            logger.debug("呼吸动画已停止（注视中，完全静止）")
     
     def _start_animation(self):
-        """启动动画"""
-        self.is_animating = True
-        self.start_time = time.time()
-        self._animate()
-        logger.debug("动态效果已启动")
+        """启动动画（保留用于兼容性）"""
+        self._start_breathing()
     
     def _stop_animation(self):
-        """停止动画"""
-        self.is_animating = False
-        if self.animation_id:
-            self.canvas.after_cancel(self.animation_id)
-            self.animation_id = None
-        logger.debug("动态效果已停止")
+        """停止动画（保留用于兼容性）"""
+        self._stop_breathing()
     
     def _animate(self):
         """执行动画循环"""
@@ -122,6 +151,9 @@ class AnimationEffect:
     def set_update_callback(self, callback: Callable[[float, float], None]):
         """设置更新回调（用于更新Canvas元素）"""
         self.update_callback = callback
+        # 如果目标点已设置且未在动画中，启动呼吸动画
+        if self.target_point and not self.is_animating:
+            self._start_breathing()
     
     def cleanup(self):
         """清理资源"""

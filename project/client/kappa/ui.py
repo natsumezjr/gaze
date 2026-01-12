@@ -6,16 +6,18 @@ from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
 from project.data.data_models import Point2D
-from project.config.screen_config import _CURRENT_RES_W, _CURRENT_RES_H
 from project.config.logging_config import setup_logging, get_logger
 from project.managers import CALLBACK_MANAGER
 from project.callbacks import CallbackEvents
 from project.client.kappa.ui_config import (
     BackgroundColor, BACKGROUND_COLOR_MAP, TEXT_COLOR_MAP,
-    CALIBRATION_POINT_COLORS, CALIBRATION_POINTS, ANIMATION_CONFIG
+    CALIBRATION_POINT_COLORS, CALIBRATION_POINTS, ANIMATION_CONFIG,
+    SCREEN_MARGIN_RATIO, CIRCLE_SIZE_RATIO
 )
 from project.client.kappa.keyboard_handler import KeyboardHandler
 from project.client.kappa.animation_effect import AnimationEffect
+from project.client.kappa.dotted_surface import DottedSurface
+from project.client.kappa.gooey_text import GooeyText
 setup_logging()
 logger = get_logger(__name__)
 
@@ -66,9 +68,10 @@ class EyeCalibrationApp:
         self.root = tk.Tk()
         self.root.title("眼动校准系统")
         
-        # 使用当前屏幕分辨率
-        self.screen_width = _CURRENT_RES_W if _CURRENT_RES_W > 0 else 1920
-        self.screen_height = _CURRENT_RES_H if _CURRENT_RES_H > 0 else 1080
+        # 使用 Tkinter 跨平台方法获取屏幕分辨率
+        self.root.update_idletasks()  # 确保窗口已初始化
+        self.screen_width = self.root.winfo_screenwidth()
+        self.screen_height = self.root.winfo_screenheight()
         
         self.root.geometry(f"{self.screen_width}x{self.screen_height}")
         
@@ -107,6 +110,12 @@ class EyeCalibrationApp:
         
         # 提示信息
         self.instruction_label = None
+        
+        # 动态点阵背景
+        self.dotted_background = None
+        
+        # GooeyText 文字效果
+        self.gooey_text = None
         
         # 注册回调（接收后端启动请求和粗略视线位置）
         self._register_callbacks()
@@ -156,40 +165,29 @@ class EyeCalibrationApp:
         # 初始背景色（黑色）
         self._set_background_color(BackgroundColor.BLACK)
         
-        # 主标题
-        self.title_label = tk.Label(
+        # 创建动态点阵背景（先创建，确保在最底层）
+        self.dotted_background = DottedSurface(
             self.root,
-            text="眼动校准系统",
-            font=("Arial", 24, "bold"),
-            fg=self.text_color_map[BackgroundColor.BLACK],
-            bg=self.background_color_map[BackgroundColor.BLACK]
+            theme='dark',
+            bg_color='#000000'
         )
-        self.title_label.pack(pady=50)
+        self.dotted_background.place(x=0, y=0, relwidth=1, relheight=1)
         
-        # 开始按钮
-        self.start_button = tk.Button(
-            self.root,
-            text="开始校准",
-            font=("Arial", 16),
-            bg="#4CAF50",
-            fg="white",
-            relief="solid",
-            borderwidth=1,
-            padx=30,
-            pady=15,
-            command=self.start_calibration
-        )
-        self.start_button.pack(pady=20)
+        # 绑定回车键开始校准
+        self.root.bind('<Return>', lambda event: self.start_calibration())
+        self.root.focus_set()  # 确保窗口可以接收键盘事件
         
-        # 状态显示
-        self.status_label = tk.Label(
+        # 创建 GooeyText 文字效果
+        self.gooey_text = GooeyText(
             self.root,
-            text=f"准备就绪 - 屏幕分辨率: {self.screen_width}x{self.screen_height}",
-            font=("Arial", 12),
-            fg=self.text_color_map[BackgroundColor.BLACK],
-            bg=self.background_color_map[BackgroundColor.BLACK]
+            texts=["EyeCalibration"],
+            morph_time=1.0,
+            cooldown_time=0.25,
+            font_size=60,
+            text_color="#FFFFFF",
+            bg_color="transparent"
         )
-        self.status_label.pack(pady=10)
+        self.gooey_text.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         
         # 进度指示器（初始隐藏）
         self.progress_frame = tk.Frame(self.root, bg=self.background_color_map[BackgroundColor.BLACK])
@@ -251,10 +249,6 @@ class EyeCalibrationApp:
     def _update_ui_colors(self, bg_color: str, text_color: str):
         """更新所有UI元素的颜色"""
         # 更新已存在的UI元素
-        if hasattr(self, 'title_label') and self.title_label:
-            self.title_label.config(bg=bg_color, fg=text_color)
-        if hasattr(self, 'status_label') and self.status_label:
-            self.status_label.config(bg=bg_color, fg=text_color)
         if hasattr(self, 'progress_frame') and self.progress_frame:
             self.progress_frame.config(bg=bg_color)
         if hasattr(self, 'progress_label') and self.progress_label:
@@ -281,9 +275,8 @@ class EyeCalibrationApp:
     
     def update_status(self, message: str):
         """更新状态显示"""
-        if self.status_label:
-            self.status_label.config(text=message)
-            self.root.update()
+        # 状态显示已移除，此方法保留用于兼容性
+        self.root.update()
     
     def start_calibration(self):
         """开始校准流程 - UI主动显示第一个点"""
@@ -295,21 +288,29 @@ class EyeCalibrationApp:
         self.current_background_index = 0
         self.current_point_index = 0
         
-        # 隐藏开始按钮和标题
-        self.start_button.pack_forget()
-        self.title_label.pack_forget()
+        # 隐藏并停止动态背景
+        if self.dotted_background:
+            self.dotted_background.stop_animation()
+            self.dotted_background.place_forget()
         
-        # 显示进度指示器
-        if self.progress_frame is None:
-            logger.error("progress_frame 是 None，无法显示进度指示器")
-            return
-        self.progress_frame.pack(pady=20)
+        # 隐藏并停止 GooeyText 文字效果
+        if self.gooey_text:
+            self.gooey_text.stop_animation()
+            self.gooey_text.place_forget()
+        
+        # 隐藏所有文字元素（进度指示器、倒计时、提示信息等）
+        if self.progress_frame:
+            self.progress_frame.pack_forget()
+        if self.countdown_label:
+            self.countdown_label.pack_forget()
+        if self.instruction_label:
+            self.instruction_label.pack_forget()
         
         # 设置第一个背景色（黑色）
         self._set_background_color(self.background_colors[0])
         
-        # 开始倒计时
-        self.start_countdown()
+        # 跳过倒计时，直接开始校准序列
+        self.start_calibration_sequence()
     
     def start_countdown(self):
         """开始倒计时"""
@@ -355,8 +356,7 @@ class EyeCalibrationApp:
         point_percent = self.config.points[point_in_group]
         self._display_calibration_point(point_percent)
         
-        # 更新进度
-        self.update_progress(self.current_point_index + 1, self.total_points)
+        # 不更新进度显示（隐藏所有文字）
     
     def _display_calibration_point(self, point_percent: Tuple[int, int]):
         """显示校准点"""
@@ -370,17 +370,7 @@ class EyeCalibrationApp:
         # 设置状态为等待用户确认
         self.state = CalibrationState.WAITING_FOR_USER_CONFIRM
         
-        # 获取当前背景色名称
-        current_bg_name = self.background_colors[self.current_background_index].value
-        point_num = self.current_point_index + 1
-        group_num = self.current_background_index + 1
-        
-        self._update_instruction(
-            f"背景色: {current_bg_name.upper()} | "
-            f"第 {group_num} 组 | "
-            f"点 {point_num}/{self.total_points}\n"
-            f"请注视校准点，然后按空格键确认"
-        )
+        # 不显示任何文字提示，只保留校准点
     
     def create_calibration_circle(self, point: Tuple[int, int], x: int = None, y: int = None):
         """创建校准圆圈（集成动态效果）"""
@@ -394,39 +384,48 @@ class EyeCalibrationApp:
             x = int((point[0] / 100) * self.screen_width)
             y = int((point[1] / 100) * self.screen_height)
         
-        # 根据屏幕分辨率调整圆圈大小
-        circle_size = max(60, min(100, self.screen_width // 20))
+        # 根据屏幕分辨率调整圆圈大小（使用相对值：屏幕宽度的2%）
+        circle_size = self.screen_width * CIRCLE_SIZE_RATIO
+        # 添加最小/最大限制，防止极端分辨率下过小或过大
+        circle_size = max(30, min(80, circle_size))
         self.original_circle_size = circle_size
         
         # 获取当前背景色
         current_bg = self.background_colors[self.current_background_index]
         bg_color_hex = self.background_color_map[current_bg]
         
+        # 计算Canvas放置位置，确保不会超出屏幕范围
+        canvas_width = circle_size * 2
+        canvas_height = circle_size * 2
+        canvas_x = max(0, min(x - circle_size, self.screen_width - canvas_width))
+        canvas_y = max(0, min(y - circle_size, self.screen_height - canvas_height))
+        
         self.calibration_circle = tk.Canvas(
             self.root,
-            width=circle_size * 2,  # 扩大Canvas以容纳动画效果
-            height=circle_size * 2,
+            width=canvas_width,  # 扩大Canvas以容纳动画效果
+            height=canvas_height,
             bg=bg_color_hex,
             highlightthickness=0
         )
-        self.calibration_circle.place(x=x - circle_size, y=y - circle_size)
+        self.calibration_circle.place(x=canvas_x, y=canvas_y)
         
         # 获取当前点的颜色配置
         point_index = self.current_point_index % 9
         color = self.config.colors[point_index]
         
-        # 计算中心点（在扩大的Canvas中）
-        center_x = circle_size
-        center_y = circle_size
+        # 计算中心点（在Canvas中，相对于Canvas的实际位置）
+        # 如果Canvas位置被调整（边界检查），需要相应调整中心点
+        center_x = x - canvas_x
+        center_y = y - canvas_y
         
-        # 绘制外圈
+        # 绘制外圈（无边框）
         margin = circle_size // 10
         self.outer_circle = self.calibration_circle.create_oval(
             center_x - circle_size + margin, center_y - circle_size + margin,
             center_x + circle_size - margin, center_y + circle_size - margin,
             fill=color[0],
-            outline="white" if current_bg == BackgroundColor.BLACK else "black",
-            width=2,
+            outline="",
+            width=0,
             tags="outer_circle"
         )
         
@@ -473,11 +472,7 @@ class EyeCalibrationApp:
             from project.client.kappa.ui_config import ANIMATION_CONFIG
             glow_color = ANIMATION_CONFIG["glow_color"]
             
-            # 计算混合后的颜色（简化处理，实际可以使用更复杂的颜色混合算法）
-            # 这里使用强度来调整透明度效果，通过改变outline颜色实现
-            outline_color = glow_color if glow_intensity > 0.7 else ("white" if current_bg == BackgroundColor.BLACK else "black")
-            outline_width = int(2 + glow_intensity * 3)  # 根据强度调整边框宽度
-            
+            # 更新外圈大小（无边框）
             self.calibration_circle.coords(
                 self.outer_circle,
                 center_x - new_size + margin, center_y - new_size + margin,
@@ -485,8 +480,8 @@ class EyeCalibrationApp:
             )
             self.calibration_circle.itemconfig(
                 self.outer_circle,
-                outline=outline_color,
-                width=outline_width
+                outline="",
+                width=0
             )
             
             # 更新内圈大小
@@ -538,18 +533,9 @@ class EyeCalibrationApp:
             self._finish_calibration()
     
     def update_progress(self, current: int, total: int):
-        """更新进度显示"""
-        if self.progress_bar:
-            self.progress_bar.config(value=(current / total) * 100)
-        if self.progress_text:
-            # 计算当前组和点
-            group_num = self.current_background_index + 1
-            point_in_group = (current - 1) % 9 + 1
-            bg_name = self.background_colors[self.current_background_index].value.upper()
-            self.progress_text.config(
-                text=f"{current} / {total} | {bg_name} 组 | 点 {point_in_group}/9"
-            )
-        self.update_status(f"校准进度: {current}/{total} - 背景色: {self.background_colors[self.current_background_index].value}")
+        """更新进度显示（已禁用，不显示任何文字）"""
+        # 不显示任何进度信息，只保留校准点
+        pass
     
     def _finish_calibration(self):
         """完成校准"""
@@ -666,6 +652,7 @@ class EyeCalibrationApp:
             self.calibration_circle = None
         
         # 重新显示开始界面
+        # 注意：这里会销毁窗口并重新初始化，背景会在 setup_ui() 中重新创建
         self.root.destroy()
         self.__init__(callback_manager=self.callback_manager)
         self.root.mainloop()
