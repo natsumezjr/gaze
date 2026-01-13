@@ -183,8 +183,9 @@ class RecognitionManager:
                 depth_map = self.camera_manager.get_depth(frame_id)
                 
                 self._check_data_availability(image, depth_map)
-                self._check_face_detection(image, depth_map)
                 
+                # 尝试检测人脸，但即使失败也继续显示摄像头画面
+                self._check_face_detection(image, depth_map)
                 logger.info("人脸检测成功")
                 key_coordinates = self.face_detector.get_fitting_data()
 
@@ -198,17 +199,22 @@ class RecognitionManager:
                     cv2.waitKey(1)  # 非阻塞等待，允许其他处理继续
                 logger.debug(f"识别完成: frame_id={frame_id}")
                 self._cycle_update()
+                
             except KeyboardInterrupt:
                 raise KeyboardInterrupt
                 
             except RecognitionWarning as w:
-                if not self.error_handler.handle_warning(w):
-                    self.running = False
-                    break          
+                # 处理其他警告（如帧读取失败等），但继续循环
+                self.error_handler.handle_warning(w)
+                continue
             except RecognitionError as e:
                 if not self.error_handler.handle_error(e):
                     self.running = False
                     break
+            except Exception as e:
+                logger.error(f"识别循环中发生未预期的异常: {e}", exc_info=True)
+                # 继续循环，不终止
+                continue
         # 识别线程退出时清理资源（在识别线程中执行，避免阻塞事件处理器）
         logger.info("识别线程主循环停止")
         if hasattr(self, 'cap') and self.cap is not None:

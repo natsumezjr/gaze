@@ -8,7 +8,7 @@ from datetime import datetime
 from project.data.data_models import Point2D
 from project.config.logging_config import setup_logging, get_logger
 from project.managers import CALLBACK_MANAGER
-from project.events.event_types import KapaCallbackEventTypes
+from project.events.event_types import KapaCallbackEventTypes, CALIBRATION_START_REQUEST, ROUGH_GAZE_UPDATE, CALIBRATION_POINT_SUBMIT, CALIBRATION_COMPLETE
 from project.client.kappa.ui_config import (
     BackgroundColor, BACKGROUND_COLOR_MAP, TEXT_COLOR_MAP,
     CALIBRATION_POINT_COLORS, CALIBRATION_POINTS, ANIMATION_CONFIG,
@@ -18,6 +18,7 @@ from project.client.kappa.keyboard_handler import KeyboardHandler
 from project.client.kappa.animation_effect import AnimationEffect
 from project.client.kappa.dotted_surface import DottedSurface
 from project.client.kappa.gooey_text import GooeyText
+from project.data.data_models import CalibrationRequest, CalibrationResponse
 setup_logging()
 logger = get_logger(__name__)
 
@@ -125,19 +126,19 @@ class EyeCalibrationApp:
         # 提示信息
         self.instruction_label = None
         
-<<<<<<< HEAD
+
         # 动态点阵背景
         self.dotted_background = None
         
         # GooeyText 文字效果
         self.gooey_text = None
-=======
+
         # 实现点显示相关（需要在 setup_ui 之前初始化，因为 setup_ui 会调用 _redraw_gaze_points）
         self.gaze_points_canvas = None  # 用于显示实现点的 Canvas
         self.gaze_points: List[Tuple[Point2D, str]] = []  # 存储实现点 (point, color)
         self.gaze_point_color = "#0000FF"  # 默认蓝色
         self.gaze_point_size = 8  # 实现点大小（半径），增大以便更容易看到
->>>>>>> 0b1f7797e455ff950b5dc0742a4c9bff2060246c
+
         
         # 注册回调（接收后端启动请求和粗略视线位置）
         self._register_callbacks()
@@ -162,11 +163,11 @@ class EyeCalibrationApp:
     def _register_callbacks(self):
         """注册回调函数"""
         self.callback_manager.register(
-            KapaCallbackEventTypes.CALIBRATION_START_REQUEST,
+            CALIBRATION_START_REQUEST,
             self._on_calibration_start_request
         )
         self.callback_manager.register(
-            KapaCallbackEventTypes.ROUGH_GAZE_UPDATE,
+            ROUGH_GAZE_UPDATE,
             self._on_rough_gaze_update
         )
         logger.info("回调函数已注册")
@@ -656,7 +657,7 @@ class EyeCalibrationApp:
         
         # 通过回调发送 CalibrationResponse 给后端
         self.callback_manager.emit(
-            KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT,
+            CALIBRATION_POINT_SUBMIT,
             calibration_response=calibration_response
         )
         
@@ -699,7 +700,7 @@ class EyeCalibrationApp:
         
         # 通过回调通知后端校准完成
         self.callback_manager.emit(
-            KapaCallbackEventTypes.CALIBRATION_COMPLETE,
+            CALIBRATION_COMPLETE,
             calibration_result={"total_points": self.total_points}
         )
         
