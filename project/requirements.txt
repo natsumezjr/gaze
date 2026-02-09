@@ -26,3 +26,4 @@ pywin32>=306; platform_system == "Windows"
 # 客户端依赖
 tkinter>=8.0.0
 flask>=2.0.0
+websockets>=12.0

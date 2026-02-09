@@ -104,9 +104,16 @@ class Point2D:
     def to_ndarray(self) -> np.ndarray:
         return np.array([self.x, self.y])
     
+    def to_dict(self) -> Dict[str, float]:
+        return {"x": self.x, "y": self.y}
+    
     @classmethod
     def from_ndarray(cls, arr: np.ndarray) -> 'Point2D':
         return cls(x=arr[0], y=arr[1])
+    
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> 'Point2D':
+        return cls(x=float(d["x"]), y=float(d["y"]))
     
     def __str__(self) -> str:
         return f"Point2D({self.x:.6f}, {self.y:.6f})"
@@ -409,6 +416,16 @@ class CalibrationResponse:
             "target_pixel": self.target_pixel.to_dict(),
             "background_color": self.background_color
         }
+    
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> 'CalibrationResponse':
+        target_pixel = Point2D.from_dict(d["target_pixel"])
+        return cls(
+            frame_id=int(d["frame_id"]),
+            eye_type=str(d["eye_type"]),
+            target_pixel=target_pixel,
+            background_color=str(d["background_color"])
+        )
 
 # 导出所有类型
 __all__ = [

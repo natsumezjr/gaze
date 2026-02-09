@@ -8,7 +8,16 @@ from datetime import datetime
 from project.data.data_models import Point2D
 from project.config.logging_config import setup_logging 
 from project.managers import CALLBACK_MANAGER
-from project.events.event_types import KapaCallbackEventTypes, CALIBRATION_START_REQUEST, ROUGH_GAZE_UPDATE, CALIBRATION_POINT_SUBMIT, CALIBRATION_COMPLETE
+from project.events.event_types import (
+    KapaCallbackEventTypes,
+    CALIBRATION_START_REQUEST,
+    ROUGH_GAZE_UPDATE,
+    CALIBRATION_POINT_SUBMIT,
+    CALIBRATION_COMPLETE,
+    GAZE_POINT_UPDATE,
+    REQUEST_CALIBRATION_UI_CLOSE,
+)
+from project.events import SYSTEM_STOP
 from project.client.kappa.ui_config import (
     BackgroundColor, BACKGROUND_COLOR_MAP, TEXT_COLOR_MAP,
     CALIBRATION_POINT_COLORS, CALIBRATION_POINTS, ANIMATION_CONFIG,
@@ -18,6 +27,7 @@ from project.client.kappa.keyboard_handler import KeyboardHandler
 from project.client.kappa.animation_effect import AnimationEffect
 from project.client.kappa.dotted_surface import DottedSurface
 from project.client.kappa.gooey_text import GooeyText
+from project.client.frontend_adapter import FrontendAdapter
 from project.data.data_models import CalibrationRequest, CalibrationResponse
 logger = setup_logging(__name__)
 
@@ -51,8 +61,8 @@ class CalibrationState(Enum):
     WAITING_FOR_USER_CONFIRM = "waiting_for_user_confirm"  # 等待用户按键确认
     COMPLETED = "completed"
 
-class EyeCalibrationApp:
-    """眼动校准应用 - UI主动发送点位，支持多背景色系统（单例模式）"""
+class EyeCalibrationApp(FrontendAdapter):
+    """眼动校准应用 - 实现 FrontendAdapter，UI 主动发送点位，支持多背景色系统（单例模式）"""
     
     _instance = None
     _lock = threading.Lock()
@@ -170,23 +180,26 @@ class EyeCalibrationApp:
             ROUGH_GAZE_UPDATE,
             self._on_rough_gaze_update
         )
+        self.callback_manager.register(
+            GAZE_POINT_UPDATE,
+            self._on_gaze_point_update
+        )
+        self.callback_manager.register(
+            REQUEST_CALIBRATION_UI_CLOSE,
+            self._on_request_calibration_ui_close
+        )
+        self.callback_manager.register(SYSTEM_STOP, self._on_system_stop_requested)
         logger.info("回调函数已注册")
     
     def _on_rough_gaze_update(self, calibration_request: CalibrationRequest):
         """接收粗略视线位置更新（包含 CalibrationRequest）"""
-        # 存储当前的 calibration_request（包含 frame_id 和 eye_type）
-        self.current_calibration_request = calibration_request
-        
-        if self.animation_effect:
-            # 在主线程中更新粗略视线位置
-            self.root.after(0, lambda: self.animation_effect.update_rough_gaze(calibration_request.intersection))
+        self.root.after(0, lambda cr=calibration_request: self.update_rough_gaze(cr))
     
     def _on_calibration_start_request(self, frame_id: int = None):
         """收到校准启动请求（从后端回调）"""
         logger.info(f"收到校准启动请求，frame_id: {frame_id}")
         if self.state == CalibrationState.IDLE:
-            # 在主线程中启动校准
-            self.root.after(0, self.start_calibration)
+            self.root.after(0, lambda: self.show_calibration_start(frame_id))
     
     def setup_ui(self):
         """设置用户界面"""
@@ -315,20 +328,56 @@ class EyeCalibrationApp:
     
     def add_gaze_point(self, point: Point2D, color: Optional[str] = None):
         """
-        添加实现点（实际注视点）到 UI 上显示
-        
-        Args:
-            point: 实现点坐标 (Point2D)
-            color: 点的颜色（十六进制字符串，如 "#0000FF"），默认为蓝色
+        添加实现点（实际注视点）到 UI 上显示。仅调度到主线程，保证仅主线程写 gaze_points 与控件。
         """
         if color is None:
             color = self.gaze_point_color
-        
-        # 存储点
+        self.root.after(0, lambda p=point, c=color: self._add_and_draw_gaze_point(p, c))
+    
+    def _add_and_draw_gaze_point(self, point: Point2D, color: str):
+        """仅主线程调用：追加到 gaze_points 并绘制"""
         self.gaze_points.append((point, color))
-        
-        # 在主线程中绘制点
-        self.root.after(0, lambda: self._draw_gaze_point(point, color))
+        self._draw_gaze_point(point, color)
+    
+    def _on_gaze_point_update(self, point: Point2D, color: str = "#0000FF"):
+        """收到视线点更新事件时，调度到主线程显示"""
+        self.root.after(0, lambda p=point, c=color: self.show_gaze_point(p, c))
+    
+    def _on_request_calibration_ui_close(self):
+        """收到标定完成/请求关闭标定 UI 时，在主线程关闭"""
+        self.root.after(0, self.request_close)
+    
+    def _do_request_calibration_ui_close(self):
+        """仅主线程：执行关闭标定窗口"""
+        try:
+            self.root.quit()
+        except Exception as e:
+            logger.error(f"标定 UI root.quit 失败: {e}", exc_info=True)
+        try:
+            self.close()
+        except Exception as e:
+            logger.error(f"标定 UI close 失败: {e}", exc_info=True)
+        logger.info("标定 UI 已关闭")
+    
+    def _on_system_stop_requested(self):
+        """收到系统停止时，在主线程关闭 UI"""
+        self.root.after(0, self.request_close)
+    
+    # ---------- FrontendAdapter 实现 ----------
+    def show_calibration_start(self, frame_id: Optional[int] = None) -> None:
+        if self.state == CalibrationState.IDLE:
+            self.start_calibration()
+    
+    def update_rough_gaze(self, calibration_request: CalibrationRequest) -> None:
+        self.current_calibration_request = calibration_request
+        if self.animation_effect:
+            self.animation_effect.update_rough_gaze(calibration_request.intersection)
+    
+    def show_gaze_point(self, point: Point2D, color: str = "#0000FF") -> None:
+        self._add_and_draw_gaze_point(point, color)
+    
+    def request_close(self) -> None:
+        self._do_request_calibration_ui_close()
     
     def _draw_gaze_point(self, point: Point2D, color: str):
         """在 Canvas 上绘制单个实现点"""
@@ -808,8 +857,18 @@ class EyeCalibrationApp:
             self.state = CalibrationState.RUNNING
             self.root.mainloop()
     
+    def _unregister_callbacks(self):
+        """注销事件回调，避免关闭后仍被触发"""
+        self.callback_manager.unregister(CALIBRATION_START_REQUEST, self._on_calibration_start_request)
+        self.callback_manager.unregister(ROUGH_GAZE_UPDATE, self._on_rough_gaze_update)
+        self.callback_manager.unregister(GAZE_POINT_UPDATE, self._on_gaze_point_update)
+        self.callback_manager.unregister(REQUEST_CALIBRATION_UI_CLOSE, self._on_request_calibration_ui_close)
+        self.callback_manager.unregister(SYSTEM_STOP, self._on_system_stop_requested)
+        logger.debug("标定 UI 已注销事件回调")
+    
     def close(self):
         """关闭应用"""
+        self._unregister_callbacks()
         try:
             if self.root:
                 try:

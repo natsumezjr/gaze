@@ -1,9 +1,11 @@
 from project.data.data_manager import RecgFitDataManager
 from project.core.fitting.fitting_strategy import fit_all_eyes
 from project.config.screen_config import SCREEN_CONFIG
-from project.config.logging_config import setup_logging 
+from project.config.logging_config import setup_logging
 from project.data.data_models import Point3D
 from project.core.fitting.kappa_calibrator import KAPPA_STORAGE, apply_kappa
+from project.managers import CALLBACK_MANAGER
+from project.events.event_types import GAZE_POINT_UPDATE
 import numpy as np
 logger = setup_logging(__name__)
 
@@ -65,15 +67,9 @@ class FittingManager:
                 logger.info(f"-----------------------------------------------")
                 logger.info(f"{eye} 视线焦点: {pixel_intersection}")
                 logger.info(f"-----------------------------------------------")
-                
-                # 在 UI 上显示实现点（蓝色）
-                try:
-                    from project.client.kappa.ui import EyeCalibrationApp
-                    ui = EyeCalibrationApp.get_instance()
-                    if ui:
-                        ui.add_gaze_point(pixel_intersection, color="#0000FF")  # 蓝色
-                except Exception as e:
-                    logger.debug(f"显示实现点失败: {e}")
+                # 通过事件通知前端显示视线点，不直接依赖 UI 实现
+                if pixel_intersection:
+                    CALLBACK_MANAGER.emit(GAZE_POINT_UPDATE, point=pixel_intersection, color="#0000FF")
                 
         except Exception as e:
             logger.error(f"拟合过程中发生异常: {e}")
