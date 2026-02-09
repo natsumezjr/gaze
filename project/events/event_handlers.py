@@ -10,9 +10,8 @@ from project.events import (
     SYSTEM_STOP,
     ERROR_OCCURRED,
 )
-from project.config.logging_config import get_logger
-
-logger = get_logger(__name__)
+from project.config.logging_config import setup_logging
+logger = setup_logging(__name__)
 
 
 class EventDrivenModule:

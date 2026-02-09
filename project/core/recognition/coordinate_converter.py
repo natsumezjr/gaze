@@ -9,9 +9,9 @@ from project.data.data_models import (
 )
 
 # 配置日志
-from project.config.logging_config import setup_logging, get_logger
-setup_logging()
-logger = get_logger(__name__)
+from project.config.logging_config import setup_logging 
+logger = setup_logging(__name__)
+
 
 # 默认参数
 DEPTH_VALIDATION_THRESHOLD = 0.1

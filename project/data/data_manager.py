@@ -6,16 +6,16 @@ import os
 import threading
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Tuple
 from project.data.data_models import (
     Point3DWithVisibility, KeyCoordinates, FITTING_TYPE, EYE_TYPE, DepthMap, BGRImage
 )
 from project.config.settings import CAMERA_PARAMS_PATH
 
 # 配置日志
-from project.config.logging_config import setup_logging, get_logger
-setup_logging()
-logger = get_logger(__name__)
+from project.config.logging_config import setup_logging
+logger = setup_logging(__name__)
+
 
 import cv2
 import numpy as np
@@ -40,7 +40,7 @@ class CameraDataManager:
                     cls._instance = super().__new__(cls)
         return cls._instance
     
-    def __init__(self, config_file_path: Optional[str] = None, rgb_d: bool = False):
+    def __init__(self, config_file_path: Optional[str] = None, rgb_d: bool = True):
         """初始化（只在第一次创建时执行）"""
         if not hasattr(self, '_initialized'):
             self._rgb_d = rgb_d
@@ -48,7 +48,9 @@ class CameraDataManager:
             self._data_dict = {}  # 帧数据存储：{frame_id: frame_data}
             self._resolution = None  # 分辨率 (width, height)
             self._camera_params = None  # 相机参数缓存
-            self._cap = None  # 摄像头对象
+            ok = self.initialize_camera()
+            if not ok:
+                self._cap = None
             # 加载配置用于清理
             from project.config.settings import FRAME_ID_PERIOD_SECONDS, FRAME_ID_CLEANUP_ENABLED
             self.cleanup_enabled = FRAME_ID_CLEANUP_ENABLED
@@ -60,12 +62,14 @@ class CameraDataManager:
         """获取摄像头对象"""
         return self._cap
     
-    def _initialize_camera(self) -> bool:
+    def initialize_camera(self) -> bool:
         """初始化摄像头"""
         try:
             if self._rgb_d:
+                logger.info("初始化RGB-D摄像头")
                 self._cap = self._open_rgb_d()
             else:
+                logger.info("初始化RGB摄像头")
                 self._cap = cv2.VideoCapture(0)
             
             if self._cap is None or not self._cap.isOpened():
@@ -75,7 +79,7 @@ class CameraDataManager:
             logger.info(f"摄像头初始化成功，RGB-D模式: {self._rgb_d}")
             return True
         except Exception as e:
-            logger.error(f"摄像头初始化失败: {e}")
+            logger.error(f"摄像头初始化失败: {e}", exc_info=True)
             return False
     
     def release_camera(self):
@@ -111,7 +115,7 @@ class CameraDataManager:
             return config
             
         except Exception as e:
-            logger.error(f"加载相机参数失败: {e}")
+            logger.error(f"加载相机参数失败: {e}", exc_info=True)
             return self._get_default_config()
     
     def get_image_resolution(self) -> Tuple[int, int]:
@@ -187,7 +191,6 @@ class CameraDataManager:
         
         # 存储数据
         self._data_dict[frame_id] = frame_data
-        logger.debug(f"添加帧数据: frame_id={frame_id}, bgr_image: {bgr_image}, depth_map: {depth_map}")
     
     def get_image(self, frame_id: int) -> Optional[BGRImage]:
         """
@@ -237,36 +240,44 @@ class CameraDataManager:
         removed_count = original_count - len(self._data_dict)
         
         if removed_count > 0:
-            logger.debug(f"CameraDataManager 清理: 移除 {removed_count} 个旧数据，保留 {len(self._data_dict)} 个")
+            pass
     
     # ==================== 私有方法 ====================
     
-    
-    def initialize_camera(self):
-        """初始化摄像头（内部方法）"""
-        if not self._initialized:
-            self._initialize_camera()
-            self._initialized = True
-    
     def _open_rgb_d(self) -> Optional[cv2.VideoCapture]:
-        """打开RGB-D摄像头"""
+        """打开 RGB-D 摄像头，优先 1080P（双目 3840x1080 或单路 1920x1080）"""
+        import platform
         try:
-            cap = cv2.VideoCapture(0)
-            if cap.isOpened():
-                logger.info("RGB-D摄像头打开成功")
-                return cap
+            if platform.system() == "Windows":
+                cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
             else:
+                cap = cv2.VideoCapture(1)
+            if not cap.isOpened():
                 logger.warning("RGB-D摄像头打开失败")
                 return None
+            # 设置 1080P：双目并排 3840x1080 或单路 1920x1080
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+            actual_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            if actual_w < 2000:  # 相机可能不支持 3840，尝试单路 1080P
+                cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+            actual_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            actual_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            logger.info(f"RGB-D摄像头打开成功，分辨率 {actual_w}x{actual_h}")
+            return cap
         except Exception as e:
-            logger.error(f"打开RGB-D摄像头失败: {e}")
+            logger.error(f"打开RGB-D摄像头失败: {e}", exc_info=True)
             return None
         
     def _read_depth_map_from_rgb_d(self, bgr_image: np.ndarray) -> np.ndarray:
         """从RGB-D摄像头读取深度图"""
         if self._rgb_d:
-            logger.info("RGB-D摄像头，使用深度图")
-            pass
+            # RGB-D 双目相机输出 3840x1080，暂无可用的深度 API 时使用占位深度图
+            h, w = bgr_image.shape[:2]
+            depth_scale = self.get_depth_scale()
+            depth_map = np.ones((h, w), dtype=np.float32) * (0.4 / depth_scale)
+            return depth_map
         else:
             logger.warning("非RGB-D摄像头，使用默认深度图")
             h, w = bgr_image.shape[:2]
@@ -376,10 +387,8 @@ class RecgFitDataManager:
         """将坐标从米转换为毫米"""
 
         if not self._convert2mm:
-            logger.debug("跳过坐标转换（convert2mm=False）")
             return
         
-        logger.debug("开始坐标转换：米 -> 毫米")
         conversion_count = 0
         
         for eye in EYE_TYPE:
@@ -395,8 +404,8 @@ class RecgFitDataManager:
                             return
                         
                         # 记录转换前的坐标
-                        if self._debug_log and conversion_count < 5:  # 只记录前5个点的转换
-                            logger.debug(f"转换前: x={point.x:.6f}, y={point.y:.6f}, z={point.z:.6f}")
+                        if self._debug_log and conversion_count < 5:
+                            pass
                         
                         converted_point = Point3DWithVisibility(
                             x=point.x * 1000,  # 米转毫米
@@ -407,7 +416,7 @@ class RecgFitDataManager:
                         
                         # 记录转换后的坐标
                         if self._debug_log and conversion_count < 5:
-                            logger.debug(f"转换后: x={converted_point.x:.3f}, y={converted_point.y:.3f}, z={converted_point.z:.3f}")
+                            pass
                         
                         converted_points.append(converted_point)
                         conversion_count += 1
@@ -415,7 +424,6 @@ class RecgFitDataManager:
                     # 更新坐标
                     self._key_coordinates.set_points(eye, fitting_type, converted_points)
         
-        logger.debug(f"坐标转换完成，共转换 {conversion_count} 个点")
     
     # ==================== Getter方法 ====================    
     def get_key_coordinates(self) -> KeyCoordinates:
@@ -529,24 +537,8 @@ class RecgFitDataManager:
         return eye in EYE_TYPE
         
     def _log_debug(self) -> None:
-        """输出调试日志"""
-        logger.debug("_log_debug() 方法被调用")
-        if not self._debug_log:
-            logger.debug("debug_log为False，跳过调试输出")
-            return
-        
-        logger.debug("开始输出关键点调试信息")
-        for eye in EYE_TYPE:
-            for fitting_type in FITTING_TYPE:
-                points = self.get_coordinate_point(eye, fitting_type)
-                if points:
-                    logger.debug(f"{eye}眼{fitting_type}: {len(points)} 个点")
-                    for i, point in enumerate(points[:10]):  # 只显示前10个点
-                        logger.debug(f"  点{i}: x={point.x:.6f}mm, y={point.y:.6f}mm, z={point.z:.6f}mm, v={point.visibility:.2f}")
-                    if len(points) > 10:
-                        logger.debug(f"  ... 还有 {len(points)-10} 个点")
-                else:
-                    logger.debug(f"{eye}眼{fitting_type}: 无数据")
+        """输出调试日志（已禁用）"""
+        pass
     
     def __str__(self) -> str:
         """字符串表示"""

@@ -3,11 +3,11 @@ import math
 import time
 from typing import Optional, Tuple, Callable
 from project.data.data_models import Point2D
-from project.config.logging_config import setup_logging, get_logger
+from project.config.logging_config import setup_logging 
 from project.client.kappa.ui_config import ANIMATION_CONFIG
 
-setup_logging()
-logger = get_logger(__name__)
+logger = setup_logging(__name__)
+
 
 class AnimationEffect:
     """动态效果管理器"""

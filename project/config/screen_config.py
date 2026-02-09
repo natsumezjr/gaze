@@ -2,10 +2,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from project.data.data_models import Vector3D, Point3D, Point2D
 import numpy as np
-from project.config.logging_config import setup_logging, get_logger
+from project.config.logging_config import setup_logging
 import logging
-setup_logging(level=logging.DEBUG)
-logger = get_logger(__name__)
+
+logger = setup_logging(__name__)
+
 
 
 DEFAULT_SCREEN_WIDTH_M: float = 0.30
@@ -438,8 +439,8 @@ def get_current_resolution_px() -> tuple[int, int]:
         height = int(win32api.GetSystemMetrics(1))  # SM_CYSCREEN
         if width > 0 and height > 0:
             return width, height
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"win32api 获取屏幕分辨率失败: {e}", exc_info=True)
     # 方案二：ctypes（不依赖 pywin32）
     try:
         import ctypes
@@ -448,8 +449,8 @@ def get_current_resolution_px() -> tuple[int, int]:
         height = int(user32.GetSystemMetrics(1))
         if width > 0 and height > 0:
             return width, height
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"ctypes 获取屏幕分辨率失败: {e}", exc_info=True)
     return (0, 0)
 
 

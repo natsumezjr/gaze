@@ -1,9 +1,9 @@
 """键盘事件处理模块 - 可独立配置和修改"""
 from typing import Callable, Optional, Dict
-from project.config.logging_config import setup_logging, get_logger
+from project.config.logging_config import setup_logging 
 
-setup_logging()
-logger = get_logger(__name__)
+logger = setup_logging(__name__)
+
 
 class KeyboardHandler:
     """键盘事件处理器 - 可独立配置和修改"""

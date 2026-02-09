@@ -1,0 +1,176 @@
+2026-02-07 00:01:32,397 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-02-07 00:01:33,610 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-02-07 00:01:33,611 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-02-07 00:01:33,961 - project.data.data_manager - INFO - 从配置文件加载参数: project/config/camera_params.json
+2026-02-07 00:01:33,961 - project.core.recognition.detector - INFO - FaceDetector初始化完成，RGB-D模式: True
+2026-02-07 00:01:33,961 - project.main - INFO - 在主线程中创建 kappa UI...
+2026-02-07 00:01:33,961 - project.main - INFO - 事件驱动拟合调度器已启动
+2026-02-07 00:01:34,160 - project.client.kappa.ui - INFO - 回调函数已注册
+2026-02-07 00:01:34,160 - project.client.kappa.ui - INFO - 背景色切换为: black
+2026-02-07 00:01:34,214 - project.client.kappa.keyboard_handler - INFO - 键盘处理器已初始化
+2026-02-07 00:01:34,215 - project.client.kappa.ui - INFO - 屏幕分辨率: 1707x1067
+2026-02-07 00:01:34,215 - project.client.kappa.ui - INFO - 校准点数量: 9 × 3组 = 27个点
+2026-02-07 00:01:34,215 - project.main - INFO - 系统运行中... (按 Ctrl+C 停止)
+2026-02-07 00:01:34,336 - project.main - WARNING - 检测到识别线程异常退出
+2026-02-07 00:01:34,345 - project.main - WARNING - 检测到识别线程异常退出
+2026-02-07 00:01:34,345 - project.main - INFO - 等待所有模块完成资源清理...
+2026-02-07 00:01:34,345 - project.main - INFO - 程序结束，关闭 kappa UI...
+2026-02-07 00:01:34,345 - project.client.kappa.ui - INFO - UI 已关闭
+2026-02-07 00:01:34,446 - project.main - INFO - 正在关闭线程池...
+2026-02-07 00:01:34,446 - project.main - INFO - 线程池已关闭
+2026-02-07 00:01:34,446 - project.main - INFO - 程序结束
+2026-02-07 00:14:50,575 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-02-07 00:14:51,677 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-02-07 00:14:51,677 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-02-07 00:14:51,708 - project.data.data_manager - INFO - 从配置文件加载参数: project/config/camera_params.json
+2026-02-07 00:14:51,708 - project.core.recognition.detector - INFO - FaceDetector初始化完成，RGB-D模式: True
+2026-02-07 00:14:51,708 - project.main - INFO - 在主线程中创建 kappa UI...
+2026-02-07 00:14:51,708 - project.main - INFO - 事件驱动拟合调度器已启动
+2026-02-07 00:14:51,882 - project.client.kappa.ui - INFO - 回调函数已注册
+2026-02-07 00:14:51,883 - project.client.kappa.ui - INFO - 背景色切换为: black
+2026-02-07 00:14:51,931 - project.client.kappa.keyboard_handler - INFO - 键盘处理器已初始化
+2026-02-07 00:14:51,931 - project.client.kappa.ui - INFO - 屏幕分辨率: 1707x1067
+2026-02-07 00:14:51,932 - project.client.kappa.ui - INFO - 校准点数量: 9 × 3组 = 27个点
+2026-02-07 00:14:51,932 - project.main - INFO - 系统运行中... (按 Ctrl+C 停止)
+2026-02-07 00:14:52,754 - project.data.data_manager - INFO - RGB-D摄像头，使用深度图
+2026-02-07 00:14:52,756 - project.data.data_manager - WARNING - 获取深度图数据失败: frame_id=1770394491688649
+2026-02-07 00:14:52,756 - project.core.recognition.main - WARNING - 警告 1/10: 无法获取图像或深度图
+2026-02-07 00:14:52,802 - project.main - WARNING - 检测到识别线程异常退出
+2026-02-07 00:14:52,808 - project.main - WARNING - 检测到识别线程异常退出
+2026-02-07 00:14:52,808 - project.main - INFO - 等待所有模块完成资源清理...
+2026-02-07 00:14:52,808 - project.main - INFO - 程序结束，关闭 kappa UI...
+2026-02-07 00:14:52,808 - project.client.kappa.ui - INFO - UI 已关闭
+2026-02-07 00:14:52,909 - project.main - INFO - 正在关闭线程池...
+2026-02-07 00:14:52,909 - project.main - INFO - 线程池已关闭
+2026-02-07 00:14:52,909 - project.main - INFO - 程序结束
+2026-02-07 01:34:08,450 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-02-07 01:34:09,614 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-02-07 01:34:09,615 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-02-07 01:39:19,405 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-02-07 01:39:20,525 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-02-07 01:39:20,526 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-02-07 01:39:20,569 - project.data.data_manager - INFO - 从配置文件加载参数: project/config/camera_params.json
+2026-02-07 01:39:20,569 - project.core.recognition.detector - INFO - FaceDetector初始化完成，RGB-D模式: True
+2026-02-07 01:39:20,569 - project.main - INFO - 在主线程中创建 kappa UI...
+2026-02-07 01:39:20,570 - project.main - INFO - 事件驱动拟合调度器已启动
+2026-02-07 01:39:20,757 - project.client.kappa.ui - INFO - 回调函数已注册
+2026-02-07 01:39:20,757 - project.client.kappa.ui - INFO - 背景色切换为: black
+2026-02-07 01:39:20,824 - project.client.kappa.keyboard_handler - INFO - 键盘处理器已初始化
+2026-02-07 01:39:20,824 - project.client.kappa.ui - INFO - 屏幕分辨率: 1707x1067
+2026-02-07 01:39:20,825 - project.client.kappa.ui - INFO - 校准点数量: 9 × 3组 = 27个点
+2026-02-07 01:39:20,825 - project.main - INFO - 系统运行中... (按 Ctrl+C 停止)
+2026-02-07 01:39:22,233 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-02-07 01:39:22,233 - project.core.recognition.detector - WARNING - 人脸检测失败或关键点无效
+2026-02-07 01:39:22,234 - project.core.recognition.main - WARNING - 警告 1/10: 人脸检测失败
+2026-02-07 01:39:22,288 - project.main - ERROR - 识别线程异常退出：RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 177, in run
+    self._check_face_detection(image, depth_map)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 148, in _check_face_detection
+    raise RecognitionWarning("人脸检测失败", "FACE_DETECTION_FAILED", sleep_duration=self.interval)
+project.core.recognition.main.RecognitionWarning: 人脸检测失败
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 196, in run
+    self.error_handler.handle_warning(w)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 66, in handle_warning
+    self.on_warning(warning.sleep_duration)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+2026-02-07 01:39:22,295 - project.main - ERROR - 识别线程异常退出：RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 177, in run
+    self._check_face_detection(image, depth_map)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 148, in _check_face_detection
+    raise RecognitionWarning("人脸检测失败", "FACE_DETECTION_FAILED", sleep_duration=self.interval)
+project.core.recognition.main.RecognitionWarning: 人脸检测失败
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 196, in run
+    self.error_handler.handle_warning(w)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 66, in handle_warning
+    self.on_warning(warning.sleep_duration)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+2026-02-07 01:39:22,296 - project.main - INFO - 等待所有模块完成资源清理...
+2026-02-07 01:39:22,296 - project.main - INFO - 程序结束，关闭 kappa UI...
+2026-02-07 01:39:22,296 - project.client.kappa.ui - INFO - UI 已关闭
+2026-02-07 01:39:22,397 - project.main - INFO - 正在关闭线程池...
+2026-02-07 01:39:22,398 - project.main - INFO - 线程池已关闭
+2026-02-07 01:39:22,398 - project.main - INFO - 程序结束
+2026-02-07 01:41:31,202 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-02-07 01:41:32,344 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-02-07 01:41:32,344 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-02-07 01:41:32,373 - project.data.data_manager - INFO - 从配置文件加载参数: project/config/camera_params.json
+2026-02-07 01:41:32,373 - project.core.recognition.detector - INFO - FaceDetector初始化完成，RGB-D模式: True
+2026-02-07 01:41:32,373 - project.main - INFO - 在主线程中创建 kappa UI...
+2026-02-07 01:41:32,374 - project.main - INFO - 事件驱动拟合调度器已启动
+2026-02-07 01:41:32,534 - project.client.kappa.ui - INFO - 回调函数已注册
+2026-02-07 01:41:32,534 - project.client.kappa.ui - INFO - 背景色切换为: black
+2026-02-07 01:41:32,584 - project.client.kappa.keyboard_handler - INFO - 键盘处理器已初始化
+2026-02-07 01:41:32,585 - project.client.kappa.ui - INFO - 屏幕分辨率: 1707x1067
+2026-02-07 01:41:32,585 - project.client.kappa.ui - INFO - 校准点数量: 9 × 3组 = 27个点
+2026-02-07 01:41:32,585 - project.main - INFO - 系统运行中... (按 Ctrl+C 停止)
+2026-02-07 01:41:34,012 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-02-07 01:41:34,012 - project.core.recognition.detector - WARNING - 人脸检测失败或关键点无效
+2026-02-07 01:41:34,012 - project.core.recognition.main - WARNING - 警告 1/10: 人脸检测失败
+2026-02-07 01:41:34,114 - project.main - ERROR - 识别线程异常退出：RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 177, in run
+    self._check_face_detection(image, depth_map)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 148, in _check_face_detection
+    raise RecognitionWarning("人脸检测失败", "FACE_DETECTION_FAILED", sleep_duration=self.interval)
+project.core.recognition.main.RecognitionWarning: 人脸检测失败
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 196, in run
+    self.error_handler.handle_warning(w)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 66, in handle_warning
+    self.on_warning(warning.sleep_duration)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+2026-02-07 01:41:34,122 - project.main - ERROR - 识别线程异常退出：RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 177, in run
+    self._check_face_detection(image, depth_map)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 148, in _check_face_detection
+    raise RecognitionWarning("人脸检测失败", "FACE_DETECTION_FAILED", sleep_duration=self.interval)
+project.core.recognition.main.RecognitionWarning: 人脸检测失败
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 196, in run
+    self.error_handler.handle_warning(w)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 66, in handle_warning
+    self.on_warning(warning.sleep_duration)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+2026-02-07 01:41:34,123 - project.main - INFO - 等待所有模块完成资源清理...
+2026-02-07 01:41:34,123 - project.main - INFO - 程序结束，关闭 kappa UI...
+2026-02-07 01:41:34,124 - project.client.kappa.ui - INFO - UI 已关闭
+2026-02-07 01:41:34,224 - project.main - INFO - 正在关闭线程池...
+2026-02-07 01:41:34,225 - project.main - INFO - 线程池已关闭
+2026-02-07 01:41:34,225 - project.main - INFO - 程序结束

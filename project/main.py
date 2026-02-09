@@ -9,7 +9,7 @@ import threading
 from typing import Optional
 from project.config.settings import MAX_FITTING_THREADS
 from concurrent.futures import ThreadPoolExecutor
-from project.config.logging_config import setup_logging, get_logger
+from project.config.logging_config import setup_logging
 import logging
 from project.managers import DATA_PIPELINE_MANAGER
 from project.core.fitting.kappa_calibrator import KAPPA_STORAGE, SAMPLES_STORAGE, build_samples_from_arrays, estimate_kappa
@@ -19,8 +19,8 @@ from project.data.data_models import Point3D, Point2D, CalibrationRequest, Calib
 from project.data.data_models import EYE_TYPE
 from project.client.kappa.ui import EyeCalibrationApp
 # 设置统一的日志配置
-setup_logging(level=logging.DEBUG, log_to_file=True)
-logger = get_logger(__name__)
+logger = setup_logging(__name__)
+
 
 
 class FittingScheduler:
@@ -48,7 +48,6 @@ class FittingScheduler:
         CALLBACK_MANAGER.register(CALIBRATION_POINT_SUBMIT,self._on_calibration_point_submit)
         CALLBACK_MANAGER.register(CALIBRATION_COMPLETE,self._on_calibration_complete)
         
-        logger.debug("拟合调度器事件处理器已注册")
     
     def _on_recognition_complete(self, frame_id: int):
         """识别完成事件处理 - 自动触发拟合"""
@@ -69,14 +68,13 @@ class FittingScheduler:
                     # 添加到拟合列表
                     FRAME_ID_MANAGER.add_fitting_frame_id(frame_id)
             else:
-                logger.debug(f"frame_id {frame_id} 不在已识别列表中，可能已被处理")
+                pass
             
             # 检查 kappa 是否 valid
             if not KAPPA_STORAGE.is_kappa_valid():
                 logger.info(f"kappa 未有效，发送标定启动请求，frame_id: {frame_id}")
                 CALLBACK_MANAGER.emit(CALIBRATION_START_REQUEST, frame_id=frame_id)
                 # 执行拟合获取 intersection
-                logger.debug(f"执行拟合以获取 intersection，frame_id: {frame_id}")
                 fitting_results = fit_all_eyes(data)
                 
                 # 为每个眼睛发送 CalibrationRequest
@@ -100,7 +98,7 @@ class FittingScheduler:
                             if ui:
                                 ui.add_gaze_point(intersection, color="#0000FF")  # 蓝色
                         except Exception as e:
-                            logger.debug(f"显示实现点失败: {e}")
+                            logger.error(f"显示实现点失败: {e}", exc_info=True)
                         
                         # 发送 CalibrationRequest 给 UI
                         calibration_request = CalibrationRequest(
@@ -109,7 +107,6 @@ class FittingScheduler:
                             intersection=intersection
                         )
                         CALLBACK_MANAGER.emit(ROUGH_GAZE_UPDATE, calibration_request=calibration_request)
-                        logger.debug(f"发送 CalibrationRequest: frame_id={frame_id}, eye={eye}, intersection={intersection}")
                 
                 return
             
@@ -122,7 +119,6 @@ class FittingScheduler:
             
             # 发送拟合开始事件
             CALLBACK_MANAGER.emit(FITTING_START, frame_id)
-            logger.debug(f"拟合任务已提交: frame_id={frame_id}")
             
         except Exception as e:
             logger.error(f"处理识别完成事件时出错: {e}", exc_info=True)
@@ -160,7 +156,6 @@ class FittingScheduler:
             
             # 保存到 SamplesStorage
             SAMPLES_STORAGE.append(frame_id, eye_type, pupil_center, eyeball_center, target_pixel)
-            logger.debug(f"保存标定点: frame_id={frame_id}, eye={eye_type}, target_pixel={target_pixel}, background_color={background_color}")
                 
         except Exception as e:
             logger.error(f"处理标定点提交事件时出错: {e}", exc_info=True)
@@ -220,12 +215,12 @@ class FittingScheduler:
                 logger.info("标定完成，关闭 kappa UI...")
                 try:
                     calibration_ui.root.quit()
-                except:
-                    pass
+                except Exception as e:
+                    logger.error(f"关闭 kappa UI root.quit 失败: {e}", exc_info=True)
                 try:
                     calibration_ui.close()
-                except:
-                    pass
+                except Exception as e:
+                    logger.error(f"关闭 kappa UI close 失败: {e}", exc_info=True)
                 logger.info("kappa UI 已关闭")
             
         except Exception as e:
@@ -240,12 +235,12 @@ class FittingScheduler:
         if calibration_ui is not None:
             try:
                 calibration_ui.root.quit()
-            except:
-                pass
+            except Exception as e:
+                logger.error(f"system_stop 关闭 UI root.quit 失败: {e}", exc_info=True)
             try:
                 calibration_ui.close()
-            except:
-                pass
+            except Exception as e:
+                logger.error(f"system_stop 关闭 UI close 失败: {e}", exc_info=True)
         
         CALLBACK_MANAGER.unregister(RECOGNITION_COMPLETE, self._on_recognition_complete)
         CALLBACK_MANAGER.unregister(SYSTEM_STOP, self._on_system_stop)
@@ -272,7 +267,7 @@ def request_system_stop():
 
 def main():
     """主函数 - 纯事件驱动架构，所有停止逻辑由各模块的 _on_system_stop() 处理"""
-    rgb_d = False
+    rgb_d = True
     recognition_manager = RecognitionManager(FRAME_ID_MANAGER, rgb_d=rgb_d)
     thread_pool = ThreadPoolExecutor(max_workers=MAX_FITTING_THREADS)
     
@@ -288,9 +283,7 @@ def main():
         fitting_scheduler.start()
         
         # 启动识别线程（在 thread_pool 中运行）
-        logger.debug("启动识别线程...")
         recognition_future = thread_pool.submit(recognition_manager.run)
-        logger.debug(f"识别线程已提交: {recognition_future}")
         
         def check_system_status():
             """检查系统状态（定期调用）"""
@@ -301,27 +294,28 @@ def main():
             
             # 检查线程是否还在运行
             if recognition_future.done():
-                logger.warning("检测到识别线程异常退出")
+                exc = recognition_future.exception()
+                if exc is not None:
+                    logger.error("识别线程异常退出：%s", exc, exc_info=(type(exc), exc, exc.__traceback__))
+                else:
+                    logger.warning("检测到识别线程退出")
                 try:
                     ui.root.quit()
-                except:
-                    pass
+                except Exception as e:
+                    logger.error(f"check_system_status UI quit 失败: {e}", exc_info=True)
                 return
             
             # 如果还没停止，继续调度
             if not stop_event.is_set():
                 try:
-                    # UI 存在，使用 UI 的 after 来调度
                     ui.root.after(100, check_system_status)
-                except:
-                    # UI 可能已被关闭，不再调度
-                    pass
+                except Exception as e:
+                    logger.error(f"check_system_status after 调度失败: {e}", exc_info=True)
             else:
-                # 停止事件已设置，退出 UI
                 try:
                     ui.root.quit()
-                except:
-                    pass
+                except Exception as e:
+                    logger.error(f"check_system_status 停止时 UI quit 失败: {e}", exc_info=True)
                 
         calibration_ui = EyeCalibrationApp.get_instance()
         # 启动检查循环
@@ -332,13 +326,17 @@ def main():
         try:
             calibration_ui.root.mainloop()
         except Exception as e:
-            logger.error(f"UI mainloop 异常: {e}")
+            logger.error(f"UI mainloop 异常: {e}", exc_info=True)
         
         # mainloop 退出后，等待停止事件
         while not stop_event.is_set():
             # 检查线程是否还在运行
             if recognition_future.done():
-                logger.warning("检测到识别线程异常退出")
+                exc = recognition_future.exception()
+                if exc is not None:
+                    logger.error("识别线程异常退出：%s", exc, exc_info=(type(exc), exc, exc.__traceback__))
+                else:
+                    logger.warning("检测到识别线程退出")
                 break
             stop_event.wait(timeout=0.1)
         
@@ -358,8 +356,8 @@ def main():
             logger.info("程序结束，关闭 kappa UI...")
             try:
                 calibration_ui.close()
-            except:
-                pass
+            except Exception as e:
+                logger.error(f"finally 关闭 UI 失败: {e}", exc_info=True)
         
         # 给事件处理一些时间完成
         import time

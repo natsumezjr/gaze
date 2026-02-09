@@ -127,48 +127,38 @@ def test_face_detection_with_debug(rgb_image, depth_map):
         return False
 
 def test_mediapipe_directly(rgb_image):
-    """直接测试MediaPipe人脸检测"""
+    """直接测试 MediaPipe FaceLandmarker 人脸检测"""
     try:
+        from project.core.recognition.landmark_extractor import _get_face_landmarker
         import mediapipe as mp
-        
-        logger.info("初始化MediaPipe FaceMesh...")
-        mp_face_mesh = mp.solutions.face_mesh
-        face_mesh = mp_face_mesh.FaceMesh(
-            static_image_mode=True,
-            max_num_faces=1,
-            refine_landmarks=True,
-            min_detection_confidence=0.5
-        )
-        
-        # 转换为RGB
+
+        logger.info("初始化 MediaPipe FaceLandmarker...")
+        landmarker = _get_face_landmarker()
+
         rgb_converted = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
         logger.info(f"RGB转换后图像尺寸: {rgb_converted.shape}")
-        
-        # 处理图像
-        results = face_mesh.process(rgb_converted)
-        face_mesh.close()
-        
-        if results.multi_face_landmarks:
-            logger.info(f"✓ MediaPipe检测到 {len(results.multi_face_landmarks)} 个人脸")
-            
-            # 分析第一个检测到的人脸
-            face_landmarks = results.multi_face_landmarks[0]
-            logger.debug(f"关键点数量: {len(face_landmarks.landmark)} (期望: 478个)")
-            
-            # 检查前几个关键点
-            for i in range(min(5, len(face_landmarks.landmark))):
-                landmark = face_landmarks.landmark[i]
+
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_converted)
+        result = landmarker.detect(mp_image)
+
+        if result.face_landmarks:
+            logger.info(f"✓ MediaPipe 检测到 {len(result.face_landmarks)} 个人脸")
+
+            face_landmarks = result.face_landmarks[0]
+            logger.debug(f"关键点数量: {len(face_landmarks)} (期望: 478个)")
+
+            for i in range(min(5, len(face_landmarks))):
+                landmark = face_landmarks[i]
                 logger.info(f"关键点 {i}: x={landmark.x:.3f}, y={landmark.y:.3f}, z={landmark.z:.3f}")
         else:
-            logger.warning("✗ MediaPipe未检测到人脸")
-            
-            # 保存图像用于调试
+            logger.warning("✗ MediaPipe 未检测到人脸")
+
             debug_filename = "debug_frame.jpg"
             cv2.imwrite(debug_filename, rgb_image)
             logger.info(f"调试图像已保存为: {debug_filename}")
-            
+
     except Exception as e:
-        logger.error(f"MediaPipe直接测试失败: {e}")
+        logger.error(f"MediaPipe 直接测试失败: {e}")
         import traceback
         logger.error(f"详细错误: {traceback.format_exc()}")
 

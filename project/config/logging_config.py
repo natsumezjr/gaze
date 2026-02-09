@@ -1,9 +1,42 @@
 # project/config/logging_config.py
+import copy
 import logging
 import os
 from datetime import datetime
 
-def setup_logging(level=logging.INFO, log_to_file=True):
+# ANSI 颜色码（终端彩色输出）
+_COLORS = {
+    "RESET": "\033[0m",
+    "GRAY": "\033[90m",
+    "RED": "\033[31m",
+    "YELLOW": "\033[33m",
+    "GREEN": "\033[32m",
+    "CYAN": "\033[36m",
+    "MAGENTA": "\033[35m",
+}
+
+# 各级别对应颜色
+_LEVEL_COLORS = {
+    logging.DEBUG: _COLORS["CYAN"],
+    logging.INFO: _COLORS["GREEN"],
+    logging.WARNING: _COLORS["YELLOW"],
+    logging.ERROR: _COLORS["RED"],
+    logging.CRITICAL: _COLORS["RED"],
+}
+
+
+class ColoredFormatter(logging.Formatter):
+    """控制台彩色日志格式化器（不修改原 record，避免污染文件日志）"""
+
+    def format(self, record):
+        record = copy.copy(record)
+        color = _LEVEL_COLORS.get(record.levelno, _COLORS["RESET"])
+        record.levelname = f"{color}{record.levelname}{_COLORS['RESET']}"
+        record.name = f"{_COLORS['GRAY']}{record.name}{_COLORS['RESET']}"
+        return super().format(record)
+
+
+def setup_logging(name: str, level=logging.INFO, log_to_file=True):
     """
     设置日志配置
     
@@ -21,17 +54,19 @@ def setup_logging(level=logging.INFO, log_to_file=True):
     )
     
     # 获取根logger
-    root_logger = logging.getLogger()
+    root_logger = logging.getLogger(name)
     root_logger.setLevel(level)
     
     # 清除现有的handlers
     for handler in root_logger.handlers[:]:
         root_logger.removeHandler(handler)
     
-    # 控制台输出
+    # 控制台输出（彩色）
     console_handler = logging.StreamHandler()
     console_handler.setLevel(level)
-    console_handler.setFormatter(formatter)
+    console_handler.setFormatter(ColoredFormatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    ))
     root_logger.addHandler(console_handler)
     
     # 文件输出
@@ -59,15 +94,3 @@ def setup_logging(level=logging.INFO, log_to_file=True):
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
     
     return root_logger
-
-def get_logger(name: str) -> logging.Logger:
-    """
-    获取指定名称的logger
-    
-    Args:
-        name: logger名称
-        
-    Returns:
-        logging.Logger: logger对象
-    """
-    return logging.getLogger(name)

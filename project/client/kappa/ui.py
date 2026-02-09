@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
 from project.data.data_models import Point2D
-from project.config.logging_config import setup_logging, get_logger
+from project.config.logging_config import setup_logging 
 from project.managers import CALLBACK_MANAGER
 from project.events.event_types import KapaCallbackEventTypes, CALIBRATION_START_REQUEST, ROUGH_GAZE_UPDATE, CALIBRATION_POINT_SUBMIT, CALIBRATION_COMPLETE
 from project.client.kappa.ui_config import (
@@ -19,8 +19,8 @@ from project.client.kappa.animation_effect import AnimationEffect
 from project.client.kappa.dotted_surface import DottedSurface
 from project.client.kappa.gooey_text import GooeyText
 from project.data.data_models import CalibrationRequest, CalibrationResponse
-setup_logging()
-logger = get_logger(__name__)
+logger = setup_logging(__name__)
+
 
 # 配置类
 @dataclass
@@ -816,12 +816,12 @@ class EyeCalibrationApp:
                     if self.root.winfo_exists():
                         self.root.after(0, self.root.destroy)
                         logger.info("UI 已关闭")
-                except Exception:
-                    # 如果 winfo_exists 失败，直接尝试 destroy
+                except Exception as e:
+                    logger.error(f"UI winfo_exists/destroy 失败: {e}", exc_info=True)
                     try:
                         self.root.destroy()
-                    except:
-                        pass
+                    except Exception as e2:
+                        logger.error(f"UI destroy 失败: {e2}", exc_info=True)
         except Exception as e:
             logger.error(f"关闭 UI 时出错: {e}", exc_info=True)
 

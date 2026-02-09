@@ -8,9 +8,9 @@ from project.data.data_manager import RecgFitDataManager
 from project.core.visualization import KeypointVisualizer
 from project.events import RECOGNITION_COMPLETE
 # 配置日志
-from project.config.logging_config import setup_logging, get_logger
-setup_logging()
-logger = get_logger(__name__)
+from project.config.logging_config import setup_logging
+logger = setup_logging(__name__)
+
 
 
 class RecognitionException(Exception):
@@ -88,7 +88,7 @@ class ErrorHandler:
         self.retry_count = 0
 
 class RecognitionManager:
-    def __init__(self, frame_id_manager: FrameIdManager = FRAME_ID_MANAGER, rgb_d=False):
+    def __init__(self, frame_id_manager: FrameIdManager = FRAME_ID_MANAGER, rgb_d=True):
         self.rgb_d = rgb_d
         self.camera_manager = CameraDataManager(rgb_d=rgb_d)
         self.face_detector = FaceDetector(self.camera_manager.get_camera_params(), rgb_d=rgb_d)
@@ -110,13 +110,11 @@ class RecognitionManager:
         """设置事件处理器"""
         from project.events import SYSTEM_STOP
         CALLBACK_MANAGER.register(SYSTEM_STOP, self._on_system_stop)
-        logger.debug("RecognitionManager 事件处理器已注册")
     
     def _cleanup_event_handlers(self):
         """清理事件处理器"""
         from project.events import SYSTEM_STOP
         CALLBACK_MANAGER.unregister(SYSTEM_STOP, self._on_system_stop)
-        logger.debug("RecognitionManager 事件处理器已注销")
     
     def _handle_warning(self):
         """警告时的睡眠处理"""
@@ -131,7 +129,7 @@ class RecognitionManager:
         self.cap = self.camera_manager.get_cap()
         if self.cap is None or not self.cap.isOpened():
             # 如果摄像头对象无效，尝试重新初始化
-            if not self.camera_manager._initialize_camera():
+            if not self.camera_manager.initialize_camera():
                 raise RecognitionError("摄像头初始化失败", "CAM_INIT_FAILED")
     
     def _check_frame_reading(self, ret, frame):
@@ -151,29 +149,21 @@ class RecognitionManager:
     
     def run(self):
         """主运行循环"""
-        logger.debug("RecognitionManager.run() 开始执行")
         self.running = True
         
         try:
-            logger.debug("检查摄像头初始化...")
             self._check_camera_initialization()
-            logger.debug("摄像头初始化检查完成")
             self.cap = self.camera_manager.get_cap()
-            logger.debug("获取摄像头对象成功")
             
         except RecognitionError as e:
-            logger.error(f"摄像头初始化失败: {e}")
+            logger.error(f"摄像头初始化失败: {e}", exc_info=True)
             self.error_handler.handle_error(e)
             return
     
 
-        logger.debug("开始主循环...")
-
         while self.running:
             try:
-                logger.debug("开始新的识别周期...")
                 frame_id = self._cycle_start()
-                logger.debug(f"读取帧，frame_id: {frame_id}")
                 ret, frame = self.cap.read()
                 self._check_frame_reading(ret, frame)
                 
@@ -181,7 +171,6 @@ class RecognitionManager:
                 
                 image = self.camera_manager.get_image(frame_id)
                 depth_map = self.camera_manager.get_depth(frame_id)
-                
                 self._check_data_availability(image, depth_map)
                 
                 # 尝试检测人脸，但即使失败也继续显示摄像头画面
@@ -197,7 +186,6 @@ class RecognitionManager:
                     visualized_frame = self.visualizer.draw_keypoints(frame, key_coordinates)
                     cv2.imshow('眼动追踪系统 - 摄像头画面', visualized_frame)
                     cv2.waitKey(1)  # 非阻塞等待，允许其他处理继续
-                logger.debug(f"识别完成: frame_id={frame_id}")
                 self._cycle_update()
                 
             except KeyboardInterrupt:
@@ -208,6 +196,7 @@ class RecognitionManager:
                 self.error_handler.handle_warning(w)
                 continue
             except RecognitionError as e:
+                logger.error(f"识别模块严重错误: {e}", exc_info=True)
                 if not self.error_handler.handle_error(e):
                     self.running = False
                     break
@@ -240,10 +229,8 @@ class RecognitionManager:
         """循环更新 - 发送事件而不是信号量"""
         frame_id = self.frame_id_manager.get_recognizing_frame_id()
         self.frame_id_manager.add_recognized_frame_id(frame_id)
-        logger.debug(f"添加已识别frame_id: {frame_id}")
         # 发送识别完成事件（非阻塞）
         CALLBACK_MANAGER.emit(RECOGNITION_COMPLETE, frame_id)
-        logger.debug(f"发送识别完成事件: frame_id={frame_id}")
         
         self.frame_id_manager.generate_recognizing_frame_id()
         # 使用可中断的sleep，检查running标志

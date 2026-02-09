@@ -24,8 +24,11 @@
 # 安装依赖
 poetry install
 
-# 激活虚拟环境
-poetry shell
+# 激活虚拟环境（Poetry 2.x）
+poetry env activate
+# 按输出的命令执行，例如：
+# & "path/to/venv/Scripts/activate.ps1"  (Windows PowerShell)
+# source path/to/venv/bin/activate       (Linux/macOS)
 ```
 
 ### 使用 pip
@@ -35,8 +38,10 @@ poetry shell
 python -m venv venv
 
 # 激活虚拟环境
-# Windows:
-venv\Scripts\activate
+# Windows PowerShell:
+.\venv\Scripts\Activate.ps1
+# Windows CMD:
+venv\Scripts\activate.bat
 # Linux/macOS:
 source venv/bin/activate
 
@@ -49,18 +54,15 @@ pip install -r project/requirements.txt
 ### 使用 Poetry（推荐）
 
 ```bash
-# 1. 更新锁文件
-poetry lock
-
-# 2. 安装所有依赖（包括项目本身的可编辑安装）
+# 1. 安装所有依赖（包括项目本身的可编辑安装）
 poetry install
 
-
-# 3. 运行程序
+# 2. 运行程序（无需激活虚拟环境）
 poetry run python run.py
 
-# 或
-poetry shell
+# 或先激活虚拟环境再运行
+poetry env activate
+# 执行输出的激活命令后：
 python run.py
 ```
 
@@ -80,19 +82,22 @@ python run.py
 ## 项目结构
 
 ```
-gaze-refactor/
+gaze/
 ├── project/              # 主项目目录（Python 包）
 │   ├── core/            # 核心算法模块
 │   │   ├── recognition/ # 识别模块
 │   │   ├── fitting/     # 拟合模块
-│   │   └── track/       # 追踪模块
+│   │   ├── track/       # 追踪模块
+│   │   └── visualization/ # 可视化
 │   ├── config/          # 配置文件
 │   ├── data/            # 数据管理
 │   ├── client/          # 客户端应用
-│   └── utils/           # 工具函数
+│   ├── events/          # 事件处理
+│   ├── utils/           # 工具函数
+│   └── main.py          # 主程序入口
 ├── run.py               # 启动脚本（推荐使用）
 ├── pyproject.toml       # Poetry 配置
-└── README.md           # 项目说明
+└── README.md            # 项目说明
 ```
 
 ## 依赖库
@@ -101,7 +106,11 @@ gaze-refactor/
 - mediapipe: 人脸和关键点检测
 - numpy, scipy: 数值计算
 - pandas: 数据处理
-- pytest: 单元测试
+- Pillow, matplotlib: 图像处理与可视化
+- flask: Web 服务
+- psutil: 系统监控
+- pywin32: Windows 平台支持（仅 Windows）
+- pytest, pytest-cov: 单元测试
 
 ## 开发
 

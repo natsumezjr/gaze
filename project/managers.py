@@ -3,10 +3,10 @@
 import threading
 import time
 from project.data.data_manager import RecgFitDataManager
-from project.config.logging_config import setup_logging, get_logger
+from project.config.logging_config import setup_logging
 from project.config.settings import FRAME_ID_PERIOD_SECONDS, FRAME_ID_CLEANUP_ENABLED
-setup_logging()
-logger = get_logger(__name__)
+logger = setup_logging(__name__)
+
 
 class FrameIdManager:
     _instance = None
@@ -144,14 +144,14 @@ class FrameIdManager:
         try:
             DATA_PIPELINE_MANAGER.cleanup_old_data(cleanup_threshold)
         except Exception as e:
-            logger.warning(f"清理 DataPipelineManager 时出错: {e}")
+            logger.error(f"清理 DataPipelineManager 时出错: {e}", exc_info=True)
         
         try:
             from project.data.data_manager import CameraDataManager
             camera_manager = CameraDataManager()
             camera_manager.cleanup_old_data(cleanup_threshold)
         except Exception as e:
-            logger.warning(f"清理 CameraDataManager 时出错: {e}")
+            logger.error(f"清理 CameraDataManager 时出错: {e}", exc_info=True)
         
         logger.debug(f"数据清理完成，阈值: {cleanup_threshold} (当前时间: {current_time})")
     

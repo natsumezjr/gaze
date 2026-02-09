@@ -7,9 +7,9 @@ from project.data.data_models import (
 )
 
 # 配置日志
-from project.config.logging_config import setup_logging, get_logger
-setup_logging()
-logger = get_logger(__name__)
+from project.config.logging_config import setup_logging 
+logger = setup_logging(__name__)
+
 
 class FaceDetector:
     """人脸检测器核心类"""
@@ -77,7 +77,7 @@ class FaceDetector:
             return False
                 
         except Exception as e:
-            logger.error(f"人脸检测失败: {e}")
+            logger.error(f"人脸检测失败: {e}", exc_info=True)
             self._detection_success = False
             self._landmarks = []
             self._depth_map = None
@@ -127,7 +127,7 @@ class FaceDetector:
             return key_coordinates
             
         except Exception as e:
-            logger.error(f"获取拟合数据失败: {e}")
+            logger.error(f"获取拟合数据失败: {e}", exc_info=True)
             return KeyCoordinates()
     
     def get_landmarks(self) -> List[Landmark]:

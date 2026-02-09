@@ -1,0 +1,84 @@
+2026-02-07 01:39:22,288 - project.main - ERROR - 识别线程异常退出：RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 177, in run
+    self._check_face_detection(image, depth_map)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 148, in _check_face_detection
+    raise RecognitionWarning("人脸检测失败", "FACE_DETECTION_FAILED", sleep_duration=self.interval)
+project.core.recognition.main.RecognitionWarning: 人脸检测失败
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 196, in run
+    self.error_handler.handle_warning(w)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 66, in handle_warning
+    self.on_warning(warning.sleep_duration)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+2026-02-07 01:39:22,295 - project.main - ERROR - 识别线程异常退出：RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 177, in run
+    self._check_face_detection(image, depth_map)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 148, in _check_face_detection
+    raise RecognitionWarning("人脸检测失败", "FACE_DETECTION_FAILED", sleep_duration=self.interval)
+project.core.recognition.main.RecognitionWarning: 人脸检测失败
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 196, in run
+    self.error_handler.handle_warning(w)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 66, in handle_warning
+    self.on_warning(warning.sleep_duration)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+2026-02-07 01:41:34,114 - project.main - ERROR - 识别线程异常退出：RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 177, in run
+    self._check_face_detection(image, depth_map)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 148, in _check_face_detection
+    raise RecognitionWarning("人脸检测失败", "FACE_DETECTION_FAILED", sleep_duration=self.interval)
+project.core.recognition.main.RecognitionWarning: 人脸检测失败
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 196, in run
+    self.error_handler.handle_warning(w)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 66, in handle_warning
+    self.on_warning(warning.sleep_duration)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+2026-02-07 01:41:34,122 - project.main - ERROR - 识别线程异常退出：RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 177, in run
+    self._check_face_detection(image, depth_map)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 148, in _check_face_detection
+    raise RecognitionWarning("人脸检测失败", "FACE_DETECTION_FAILED", sleep_duration=self.interval)
+project.core.recognition.main.RecognitionWarning: 人脸检测失败
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 196, in run
+    self.error_handler.handle_warning(w)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "D:\my_projects\gaze\project\core\recognition\main.py", line 66, in handle_warning
+    self.on_warning(warning.sleep_duration)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RecognitionManager._handle_warning() takes 1 positional argument but 2 were given
