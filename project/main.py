@@ -17,9 +17,36 @@ from project.core.fitting.fitting_strategy import fit_all_eyes
 from project.config.screen_config import SCREEN_CONFIG
 from project.data.data_models import Point3D, Point2D, CalibrationRequest, CalibrationResponse
 from project.data.data_models import EYE_TYPE
+from project.events.event_types import GAZE_POINT_UPDATE, REQUEST_CALIBRATION_UI_CLOSE
 from project.client.kappa.ui import EyeCalibrationApp
 # 设置统一的日志配置
 logger = setup_logging(__name__)
+
+
+def _run_calibration_fitting_and_emit(frame_id: int, data):
+    """在拟合池中执行标定路径的拟合，并发送 ROUGH_GAZE_UPDATE / GAZE_POINT_UPDATE（供调度器提交，避免阻塞识别线程）"""
+    try:
+        fitting_results = fit_all_eyes(data)
+        for eye in EYE_TYPE:
+            if eye not in fitting_results:
+                continue
+            result = fitting_results[eye]
+            eyeball_center = Point3D.from_ndarray(result.parameters.center)
+            pupil_points = data.get_coordinate_point(eye, "pupil")
+            if not pupil_points:
+                continue
+            pupil_center = Point3D(pupil_points[0].x, pupil_points[0].y, pupil_points[0].z)
+            intersection = SCREEN_CONFIG.calculate_gaze_intersection(pupil_center, eyeball_center)
+            if intersection:
+                CALLBACK_MANAGER.emit(GAZE_POINT_UPDATE, point=intersection, color="#0000FF")
+                calibration_request = CalibrationRequest(
+                    frame_id=frame_id,
+                    eye_type=eye,
+                    intersection=intersection,
+                )
+                CALLBACK_MANAGER.emit(ROUGH_GAZE_UPDATE, calibration_request=calibration_request)
+    except Exception as e:
+        logger.error(f"标定路径拟合或发送事件失败: {e}", exc_info=True)
 
 
 
@@ -74,40 +101,12 @@ class FittingScheduler:
             if not KAPPA_STORAGE.is_kappa_valid():
                 logger.info(f"kappa 未有效，发送标定启动请求，frame_id: {frame_id}")
                 CALLBACK_MANAGER.emit(CALIBRATION_START_REQUEST, frame_id=frame_id)
-                # 执行拟合获取 intersection
-                fitting_results = fit_all_eyes(data)
-                
-                # 为每个眼睛发送 CalibrationRequest
-                for eye in EYE_TYPE:
-                    if eye not in fitting_results:
-                        continue
-                    
-                    result = fitting_results[eye]
-                    eyeball_center = Point3D.from_ndarray(result.parameters.center)
-                    pupil_points = data.get_coordinate_point(eye, "pupil")
-                    if not pupil_points:
-                        continue
-                    
-                    pupil_center = Point3D(pupil_points[0].x, pupil_points[0].y, pupil_points[0].z)
-                    intersection = SCREEN_CONFIG.calculate_gaze_intersection(pupil_center, eyeball_center)
-                    
-                    if intersection:
-                        # 在 UI 上显示实现点（蓝色）
-                        try:
-                            ui = EyeCalibrationApp.get_instance()
-                            if ui:
-                                ui.add_gaze_point(intersection, color="#0000FF")  # 蓝色
-                        except Exception as e:
-                            logger.error(f"显示实现点失败: {e}", exc_info=True)
-                        
-                        # 发送 CalibrationRequest 给 UI
-                        calibration_request = CalibrationRequest(
-                            frame_id=frame_id,
-                            eye_type=eye,
-                            intersection=intersection
-                        )
-                        CALLBACK_MANAGER.emit(ROUGH_GAZE_UPDATE, calibration_request=calibration_request)
-                
+                # 将标定路径的拟合提交到拟合池，避免阻塞识别线程
+                self.thread_pool_executor.submit(
+                    _run_calibration_fitting_and_emit,
+                    frame_id=frame_id,
+                    data=data,
+                )
                 return
             
             # kappa valid，正常提交拟合任务
@@ -208,40 +207,16 @@ class FittingScheduler:
             # 清空样本存储
             SAMPLES_STORAGE.clear()
             logger.info("标定完成，kappa 已保存")
-            
-            # 直接关闭 UI（使用单例）
-            calibration_ui = EyeCalibrationApp.get_instance()
-            if calibration_ui is not None:
-                logger.info("标定完成，关闭 kappa UI...")
-                try:
-                    calibration_ui.root.quit()
-                except Exception as e:
-                    logger.error(f"关闭 kappa UI root.quit 失败: {e}", exc_info=True)
-                try:
-                    calibration_ui.close()
-                except Exception as e:
-                    logger.error(f"关闭 kappa UI close 失败: {e}", exc_info=True)
-                logger.info("kappa UI 已关闭")
+            # 通过事件请求前端关闭标定 UI，不直接依赖具体前端实现
+            CALLBACK_MANAGER.emit(REQUEST_CALIBRATION_UI_CLOSE)
+            logger.info("已发送标定 UI 关闭请求")
             
         except Exception as e:
             logger.error(f"处理标定完成事件时出错: {e}", exc_info=True)
     
     def _on_system_stop(self):
-        """系统停止事件处理 - 只负责停止调度器，不关闭线程池"""
+        """系统停止事件处理 - 只负责停止调度器，不关闭线程池；UI 自行监听 SYSTEM_STOP 并关闭"""
         self.running = False
-        
-        # 直接关闭 UI（使用单例）
-        calibration_ui = EyeCalibrationApp.get_instance()
-        if calibration_ui is not None:
-            try:
-                calibration_ui.root.quit()
-            except Exception as e:
-                logger.error(f"system_stop 关闭 UI root.quit 失败: {e}", exc_info=True)
-            try:
-                calibration_ui.close()
-            except Exception as e:
-                logger.error(f"system_stop 关闭 UI close 失败: {e}", exc_info=True)
-        
         CALLBACK_MANAGER.unregister(RECOGNITION_COMPLETE, self._on_recognition_complete)
         CALLBACK_MANAGER.unregister(SYSTEM_STOP, self._on_system_stop)
         CALLBACK_MANAGER.unregister(CALIBRATION_POINT_SUBMIT,self._on_calibration_point_submit)
@@ -282,30 +257,22 @@ def main():
         # 启动拟合调度器（注册事件处理器）
         fitting_scheduler.start()
         
-        # 启动识别线程（在 thread_pool 中运行）
-        recognition_future = thread_pool.submit(recognition_manager.run)
+        # 识别独占一线程，不再与拟合共用线程池
+        recognition_thread = threading.Thread(target=recognition_manager.run, name="RecognitionThread")
+        recognition_thread.start()
         
         def check_system_status():
             """检查系统状态（定期调用）"""
-            # 获取 UI 单例
             ui = EyeCalibrationApp.get_instance()
             if ui is None:
                 return
-            
-            # 检查线程是否还在运行
-            if recognition_future.done():
-                exc = recognition_future.exception()
-                if exc is not None:
-                    logger.error("识别线程异常退出：%s", exc, exc_info=(type(exc), exc, exc.__traceback__))
-                else:
-                    logger.warning("检测到识别线程退出")
+            if not recognition_thread.is_alive():
+                logger.warning("检测到识别线程退出")
                 try:
                     ui.root.quit()
                 except Exception as e:
                     logger.error(f"check_system_status UI quit 失败: {e}", exc_info=True)
                 return
-            
-            # 如果还没停止，继续调度
             if not stop_event.is_set():
                 try:
                     ui.root.after(100, check_system_status)
@@ -316,9 +283,8 @@ def main():
                     ui.root.quit()
                 except Exception as e:
                     logger.error(f"check_system_status 停止时 UI quit 失败: {e}", exc_info=True)
-                
+        
         calibration_ui = EyeCalibrationApp.get_instance()
-        # 启动检查循环
         calibration_ui.root.after(100, check_system_status)
         
         # 主线程运行 UI 的 mainloop
@@ -330,13 +296,8 @@ def main():
         
         # mainloop 退出后，等待停止事件
         while not stop_event.is_set():
-            # 检查线程是否还在运行
-            if recognition_future.done():
-                exc = recognition_future.exception()
-                if exc is not None:
-                    logger.error("识别线程异常退出：%s", exc, exc_info=(type(exc), exc, exc.__traceback__))
-                else:
-                    logger.warning("检测到识别线程退出")
+            if not recognition_thread.is_alive():
+                logger.warning("检测到识别线程退出")
                 break
             stop_event.wait(timeout=0.1)
         
@@ -363,11 +324,14 @@ def main():
         import time
         time.sleep(0.1)
         
-        # 主线程负责关闭线程池（等待所有任务完成，包括识别线程）
+        # 主线程负责关闭拟合线程池（识别已在独立线程中，由 SYSTEM_STOP 驱动退出）
         if 'thread_pool' in locals() and thread_pool is not None:
-            logger.info("正在关闭线程池...")
+            logger.info("正在关闭拟合线程池...")
             thread_pool.shutdown(wait=True)
-            logger.info("线程池已关闭")
+            logger.info("拟合线程池已关闭")
+        if 'recognition_thread' in locals() and recognition_thread is not None and recognition_thread.is_alive():
+            logger.info("等待识别线程结束...")
+            recognition_thread.join(timeout=2.0)
         
         logger.info("程序结束")
 

@@ -20,9 +20,8 @@ class KapaCallbackEventTypes(Enum):
     CALIBRATION_POINT_SUBMIT = "calibration_point_submit"
     CALIBRATION_COMPLETE = "calibration_complete"
     ROUGH_GAZE_UPDATE = "rough_gaze_update"
-
-    
-          
+    GAZE_POINT_UPDATE = "gaze_point_update"
+    REQUEST_CALIBRATION_UI_CLOSE = "request_calibration_ui_close"
 
 
 # 事件类型常量（字符串形式，便于使用）
@@ -37,6 +36,8 @@ CALIBRATION_START_REQUEST = KapaCallbackEventTypes.CALIBRATION_START_REQUEST.val
 CALIBRATION_POINT_SUBMIT = KapaCallbackEventTypes.CALIBRATION_POINT_SUBMIT.value
 CALIBRATION_COMPLETE = KapaCallbackEventTypes.CALIBRATION_COMPLETE.value
 ROUGH_GAZE_UPDATE = KapaCallbackEventTypes.ROUGH_GAZE_UPDATE.value
+GAZE_POINT_UPDATE = KapaCallbackEventTypes.GAZE_POINT_UPDATE.value
+REQUEST_CALIBRATION_UI_CLOSE = KapaCallbackEventTypes.REQUEST_CALIBRATION_UI_CLOSE.value
 
 # 事件描述字典
 EVENTS: Dict[str, str] = {
