@@ -12,14 +12,14 @@
     ],
     "K": [
       [
-        606.415327550281,
+        598.2982808297589,
         0.0,
-        965.318186727759
+        968.2449626977584
       ],
       [
         0.0,
-        603.5111067148329,
-        536.4803650900203
+        597.7738440665172,
+        555.6782942335703
       ],
       [
         0.0,
@@ -28,16 +28,16 @@
       ]
     ],
     "dist": [
-      -0.016959243099880283,
-      0.0236120649056923,
-      -0.004082530758050481,
-      -0.0016179076216304752,
-      -0.01694341202790389
+      -0.03837467955150475,
+      0.04137368493364067,
+      -0.0008686338395072317,
+      0.0004763522104895745,
+      -0.027625534272419924
     ],
-    "reprojection_error_train": 1.1354111952199546,
-    "reprojection_error_test": 1.3387015220216991,
-    "used_images": 47,
-    "used_train": 37,
+    "reprojection_error_train": 1.0847059966692365,
+    "reprojection_error_test": 0.9094843651698882,
+    "used_images": 49,
+    "used_train": 39,
     "used_test": 10
   },
   "right": {
@@ -48,14 +48,14 @@
     ],
     "K": [
       [
-        597.4944913315474,
+        595.8089496676739,
         0.0,
-        950.8449236223308
+        957.5272504051126
       ],
       [
         0.0,
-        595.2502648913727,
-        476.89946058597775
+        595.0487991690061,
+        497.1549676050123
       ],
       [
         0.0,
@@ -64,121 +64,121 @@
       ]
     ],
     "dist": [
-      -0.025418766133412284,
-      0.041978977768017636,
-      -0.004014133663731218,
-      -0.0014981591662339897,
-      -0.03015962270342568
+      -0.034883566335776585,
+      0.03290943754146192,
+      0.00019316768566386502,
+      0.00021463498207157478,
+      -0.021266234300501664
     ],
-    "reprojection_error_train": 1.158048764287379,
-    "reprojection_error_test": 1.2632027818516132,
-    "used_images": 47,
-    "used_train": 37,
+    "reprojection_error_train": 1.0905588066259717,
+    "reprojection_error_test": 0.9356448505413344,
+    "used_images": 49,
+    "used_train": 39,
     "used_test": 10
   },
   "stereo": {
-    "rms": 1.0832572863966983,
+    "rms": 1.2175276384874083,
     "R": [
       [
-        0.999880033204409,
-        0.0020916923775545922,
-        0.015347443505276366
+        0.9999674608205162,
+        0.0002583957052475112,
+        0.008062910878132738
       ],
       [
-        -0.0021346001887754353,
-        0.9999938577603807,
-        0.002779914305431619
+        -0.00026608605836244407,
+        0.9999995107465319,
+        0.0009527354859829601
       ],
       [
-        -0.015341534512037886,
-        -0.0028123414638239613,
-        0.9998783566285985
+        -0.008062660750567814,
+        -0.0009548499129264715,
+        0.9999670403384628
       ]
     ],
     "T": [
-      -64.25395277232421,
-      0.18955969039049939,
-      -2.0642490262175985
+      -64.03231722461383,
+      -0.004092440157331321,
+      0.16337547931079754
     ],
     "E": [
       [
-        -0.007314482893260657,
-        2.063703240528291,
-        0.19527506710863404
+        7.646789395344795e-05,
+        -0.1633714917126498,
+        -0.004247958888567746
       ],
       [
-        -3.049755618868086,
-        -0.1850218295497078,
-        64.21445575957242
+        -0.3529006876480483,
+        -0.061099037004206054,
+        64.03152402304003
       ],
       [
-        -0.052380449804498824,
-        -64.25395460970927,
-        -0.1815297391314576
+        0.021130413890797645,
+        -64.0322848391116,
+        -0.06097286388934487
       ]
     ],
     "F": [
       [
-        -4.874888352270167e-09,
-        1.3820163914882225e-06,
-        -0.0006577968529084794
+        4.150128542416112e-11,
+        -8.874411041080139e-08,
+        4.789362342951607e-05
       ],
       [
-        -2.0402359393368913e-06,
-        -1.243721744274501e-07,
-        0.028086836009982123
+        -1.917738394214165e-07,
+        -3.3231662646394275e-08,
+        0.02102260306092317
       ],
       [
-        0.0009567641289254084,
-        -0.026964630480643393,
+        0.00010213435843698686,
+        -0.020622298787770315,
         1.0
       ]
     ],
     "R1": [
       [
-        0.9988737784885622,
-        -0.0009483104447012527,
-        0.047437067313265704
+        0.9999847583734229,
+        0.00032474297606060077,
+        0.005511584422492333
       ],
       [
-        0.0008806303356489965,
-        0.9999985644518514,
-        0.0014476133627966934
+        -0.0003273697951586183,
+        0.9999998332672746,
+        0.00047570415222548837
       ],
       [
-        -0.04743837200194338,
-        -0.0014042085089769926,
-        0.998873179668104
+        -0.0055114290219487215,
+        -0.0004775012279838319,
+        0.9999846979542804
       ]
     ],
     "R2": [
       [
-        0.9994800009390744,
-        -0.002948629794043,
-        0.03210970733540751
+        0.9999967430160754,
+        6.391189646458691e-05,
+        -0.0025514451807578708
       ],
       [
-        0.0029944312283810585,
-        0.9999945666684649,
-        -0.001378410377031043
+        -6.512792046626105e-05,
+        0.9999998843426532,
+        -0.00047652180894425006
       ],
       [
-        -0.032105468450815924,
-        0.0014738439153087262,
-        0.9994833999020027
+        0.002551414430251975,
+        0.00047668642723918287,
+        0.9999966315215543
       ]
     ],
     "P1": [
       [
-        593.4990878737491,
+        596.2821132372806,
         0.0,
-        873.4570693969727,
+        959.7362213134766,
         0.0
       ],
       [
         0.0,
-        593.4990878737491,
-        506.2484588623047,
+        596.2821132372806,
+        526.3511734008789,
         0.0
       ],
       [
@@ -190,15 +190,15 @@
     ],
     "P2": [
       [
-        593.4990878737491,
+        596.2821132372806,
         0.0,
-        873.4570693969727,
-        -38154.50266821492
+        959.7362213134766,
+        -38181.449786540834
       ],
       [
         0.0,
-        593.4990878737491,
-        506.2484588623047,
+        596.2821132372806,
+        526.3511734008789,
         0.0
       ],
       [
@@ -213,78 +213,92 @@
         1.0,
         0.0,
         0.0,
-        -873.4570693969727
+        -959.7362213134766
       ],
       [
         0.0,
         1.0,
         0.0,
-        -506.2484588623047
+        -526.3511734008789
       ],
       [
         0.0,
         0.0,
         0.0,
-        593.4990878737491
+        596.2821132372806
       ],
       [
         0.0,
         0.0,
-        0.015555151983888151,
+        0.015617063169965674,
         -0.0
       ]
     ],
     "roi1": [
-      23,
-      16,
-      1889,
-      987
+      7,
+      0,
+      1911,
+      1044
     ],
     "roi2": [
       0,
-      50,
-      1905,
-      1023
+      30,
+      1916,
+      1050
     ],
     "image_size": [
       1920,
       1080
     ],
-    "num_pairs_total": 47,
-    "num_pairs_accepted": 22,
+    "num_pairs_total": 49,
+    "num_pairs_accepted": 36,
     "rejected": {
       "no_corners": 0,
-      "area": 2,
-      "blur": 23,
+      "area": 13,
+      "blur": 0,
       "area_ratio_min": 0.05,
-      "blur_var_min": 70.0
+      "blur_var_min": 80.0
     },
     "rectify": {
       "alpha": 0.3,
-      "dy_rms": 0.6881023443320948,
-      "dy_max_abs": 3.223052978515625,
-      "used_pairs_for_dy": 19
+      "dy_rms": 0.7034773409336431,
+      "dy_max_abs": 2.4268798828125,
+      "used_pairs_for_dy": 33
     },
     "used_pair_paths": [
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0003.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0004.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0005.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0006.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0007.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0008.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0009.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0010.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0011.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0013.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0014.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0015.png",
       "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0016.png",
       "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0017.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0018.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0019.png",
       "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0020.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0021.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0022.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0023.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0024.png",
       "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0025.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0036.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0037.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0026.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0027.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0028.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0029.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0030.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0031.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0032.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0033.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0035.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0038.png",
       "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0039.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0040.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0041.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0042.png",
       "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0043.png",
-      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0044.png"
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0044.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0045.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0046.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0047.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0048.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0049.png"
     ],
     "debug_dirs": {
       "pairs": "D:\\my_projects\\gaze\\project\\config\\calibration\\debug_stereo",
@@ -294,30 +308,30 @@
       "enabled": true,
       "drop_top_k": 3,
       "keep_min_pairs": 12,
-      "before_pairs": 22,
-      "after_pairs": 19,
+      "before_pairs": 36,
+      "after_pairs": 33,
       "dropped": [
         {
-          "file": "stereo_0015.png",
-          "dy_rms": 1.4779440376593436,
-          "dy_max_abs": 2.6385955810546875
+          "file": "stereo_0042.png",
+          "dy_rms": 1.2721424103607757,
+          "dy_max_abs": 2.6171875
         },
         {
-          "file": "stereo_0030.png",
-          "dy_rms": 1.4292245611209178,
-          "dy_max_abs": 3.870574951171875
+          "file": "stereo_0012.png",
+          "dy_rms": 1.1703247854594783,
+          "dy_max_abs": 2.463531494140625
         },
         {
-          "file": "stereo_0038.png",
-          "dy_rms": 1.3541674297778412,
-          "dy_max_abs": 2.385498046875
+          "file": "stereo_0036.png",
+          "dy_rms": 1.0918845835681437,
+          "dy_max_abs": 2.4118804931640625
         }
       ],
       "second_pass": {
-        "rms": 1.0832572863966983,
-        "dy_rms": 0.6881023443320948,
-        "dy_max_abs": 3.223052978515625,
-        "used_pairs_for_dy": 19
+        "rms": 1.2175276384874083,
+        "dy_rms": 0.7034773409336431,
+        "dy_max_abs": 2.4268798828125,
+        "used_pairs_for_dy": 33
       },
       "accepted_second_pass": true
     }

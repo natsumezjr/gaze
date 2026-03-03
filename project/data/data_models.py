@@ -23,6 +23,26 @@ class EyeType(Enum):
 FITTING_TYPE = [ft.value for ft in FittingType]
 EYE_TYPE = [et.value for et in EyeType]
 
+# MediaPipe Face Landmarker 拟合点索引（与 FittingType 一一对应，便于维护与扩展）
+FITTING_LANDMARK_INDICES: Dict[str, Dict[str, List[int]]] = {
+    "left": {
+        "pupil": [468],
+        "iris": [469, 470, 471, 472],
+        "inner_canthus": [133],
+        "upper_eyelid": [157, 158, 159, 160, 173],
+        "lower_eyelid": [145, 153, 154, 155, 161],
+        "outer_canthus": [246],
+    },
+    "right": {
+        "pupil": [473],
+        "iris": [474, 475, 476, 477],
+        "inner_canthus": [362],
+        "upper_eyelid": [384, 385, 386, 387, 398],
+        "lower_eyelid": [374, 380, 381, 382, 390],
+        "outer_canthus": [466],
+    },
+}
+
 # ================= 识别模块图像类型 =================
 @dataclass
 class BGRImage:
@@ -430,7 +450,7 @@ class CalibrationResponse:
 # 导出所有类型
 __all__ = [
     # 枚举
-    'FittingType', 'EyeType', 'FITTING_TYPE', 'EYE_TYPE',
+    'FittingType', 'EyeType', 'FITTING_TYPE', 'EYE_TYPE', 'FITTING_LANDMARK_INDICES',
     # 图像类型
     'BGRImage', 'DepthMap',
     # 基础类型

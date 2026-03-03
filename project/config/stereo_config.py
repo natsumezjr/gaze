@@ -15,7 +15,7 @@ DEFAULT_DEPTH_SCALE = 0.001
 
 # StereoSGBM 立体匹配参数（numDisparities 须为 16 的整数倍）
 SGBM_MIN_DISPARITY = 0
-SGBM_NUM_DISPARITIES = 16 * 6  # 96
+SGBM_NUM_DISPARITIES = 16 * 16  # 256
 SGBM_BLOCK_SIZE = 5
 SGBM_P1 = 8 * 3 * 5 ** 2
 SGBM_P2 = 32 * 3 * 5 ** 2

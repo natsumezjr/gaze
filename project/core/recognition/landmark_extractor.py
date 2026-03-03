@@ -7,7 +7,7 @@ from typing import List, Dict, Optional
 import logging
 from project.data.data_models import (
     Landmark, KeyCoordinates, FITTING_TYPE,
-    EYE_TYPE, BGRImage, Point3DWithVisibility
+    EYE_TYPE, BGRImage, Point3DWithVisibility, FITTING_LANDMARK_INDICES,
 )
 
 # 配置日志
@@ -175,25 +175,8 @@ def extract_landmarks(bgr_image: BGRImage) -> List[Landmark]:
 
 
 def get_landmark_indices() -> Dict[str, Dict[str, List[int]]]:
-    """返回 MediaPipe Face Landmarker 拟合所需的关键点索引映射（与 Face Mesh 兼容）"""
-    return {
-        "left": {
-            "pupil": [468],
-            "iris": [469, 470, 471, 472],
-            "inner_canthus": [133],
-            "upper_eyelid": [157, 158, 159, 160, 173],
-            "lower_eyelid": [145, 153, 154, 155, 161],
-            "outer_canthus": [246]
-        },
-        "right": {
-            "pupil": [473],
-            "iris": [474, 475, 476, 477],
-            "inner_canthus": [362],
-            "upper_eyelid": [384, 385, 386, 387, 398],
-            "lower_eyelid": [374, 380, 381, 382, 390],
-            "outer_canthus": [466]
-        }
-    }
+    """返回 MediaPipe Face Landmarker 拟合所需的关键点索引映射（数据源在 data_models.FITTING_LANDMARK_INDICES，便于维护）"""
+    return FITTING_LANDMARK_INDICES
 
 
 def get_fitting_landmarks(landmarks: List[Landmark]) -> KeyCoordinates:

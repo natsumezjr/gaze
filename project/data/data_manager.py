@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from project.data.data_models import (
-    Point3DWithVisibility, KeyCoordinates, FITTING_TYPE, EYE_TYPE, DepthMap, BGRImage
+    Point3DWithVisibility, KeyCoordinates, FITTING_TYPE, EYE_TYPE, BGRImage
 )
 from project.config.settings import CAMERA_PARAMS_PATH
 from project.config.stereo_config import (
@@ -30,6 +30,21 @@ from project.config.stereo_config import (
 # 配置日志
 from project.config.logging_config import setup_logging
 logger = setup_logging(__name__)
+
+
+def _median_filter_nan_safe(depth: np.ndarray, ksize: int = 5) -> np.ndarray:
+    """对深度图做 ksize×ksize 中值滤波，nan 不参与中值，输出保持 float32。"""
+    from numpy.lib.stride_tricks import sliding_window_view
+    pad = ksize // 2
+    padded = np.pad(
+        depth.astype(np.float64),
+        ((pad, pad), (pad, pad)),
+        mode="constant",
+        constant_values=np.nan,
+    )
+    windows = sliding_window_view(padded, (ksize, ksize))
+    out = np.nanmedian(windows, axis=(-2, -1)).astype(np.float32)
+    return out
 
 
 import cv2
@@ -132,8 +147,6 @@ class CameraDataManager:
             else:
                 logger.warning("配置文件不存在，使用默认参数")
                 config = self._get_default_config()
-            if self._rgb_d:
-                config = self._adapt_stereo_config(config)
             # 缓存参数
             self._camera_params = config
             return config
@@ -141,30 +154,6 @@ class CameraDataManager:
         except Exception as e:
             logger.error(f"加载相机参数失败: {e}", exc_info=True)
             return self._get_default_config()
-    
-    def get_image_resolution(self) -> Tuple[int, int]:
-        """
-        获取图像分辨率
-        
-        Returns:
-            Tuple[int, int]: (width, height) 元组
-        """
-        if self._cap is None or not self._cap.isOpened():
-            return (640, 480)  # 默认分辨率
-        
-        width = int(self._cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(self._cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        return (width, height)
-    
-    def get_intrinsics(self) -> Dict:
-        """
-        获取相机内参
-        
-        Returns:
-            Dict: 内参字典 {"fx": float, "fy": float, "cx": float, "cy": float}
-        """
-        config = self.load_camera_params()
-        return config.get("intrinsic_params", {})
     
     def get_depth_scale(self) -> float:
         """
@@ -184,20 +173,43 @@ class CameraDataManager:
             Dict: 完整的相机参数字典
         """
         return self.load_camera_params()
+
+    # 识别模块 2D→3D 固定深度默认值（mm），不做单位换算
+    DEFAULT_FACE_DEPTH_MM = 500
+
+    def pixel_to_xy_mm(self, u: float, v: float, z_mm: float) -> Tuple[float, float]:
+        """
+        像素坐标 + 深度(Z, mm) → 相机坐标系下的 X,Y（单位 mm）。
+        内参来自 load_camera_params：若有 intrinsic_params 则用，否则从 JSON 的 stereo.P1 直接解析，不依赖 rgb_d。
+        """
+        config = self.load_camera_params()
+        fx = fy = cx = cy = None
+        stereo = config.get("stereo", {})
+        if isinstance(stereo.get("P1"), list) and len(stereo["P1"]) >= 2:
+            P1 = stereo["P1"]
+            fx = float(P1[0][0])
+            fy = float(P1[1][1])
+            cx = float(P1[0][2])
+            cy = float(P1[1][2])
+        if fx is None or fy is None or cx is None or cy is None or fx <= 0 or fy <= 0:
+            return (float("nan"), float("nan"))
+        x_mm = (u - cx) * z_mm / fx
+        y_mm = (v - cy) * z_mm / fy
+        return (x_mm, y_mm)
     
     # ==================== 图像数据管理接口 ====================
     
-    def add_frame(self, frame_id: int, bgr_image: np.ndarray, 
+    def add_frame(self, frame_id: int, bgr_image: np.ndarray,
                   depth_map: np.ndarray = None) -> None:
         """
-        添加一帧数据
-        
+        添加一帧数据。
+
         Args:
             frame_id: 帧ID
             bgr_image: BGR格式的图像数据 (H, W, 3)
-            depth_map: 深度图数据 (H, W)，可选
+            depth_map: 深度图数据 (H, W)，可选；仅当 store_depth=True 时写入
+            store_depth: 是否计算/存储深度图。识别路径传 False 即可只存图像，不触发立体深度
         """
-        # 自动设置分辨率（使用第一帧的分辨率）
         if self._resolution is None:
             h, w = bgr_image.shape[:2]
             self._resolution = (w, h)
@@ -206,23 +218,21 @@ class CameraDataManager:
             result = self._compute_stereo_depth(bgr_image)
             if result is not None:
                 rect_left, _rect_right, depth_mm = result
-                frame_data = {
+                self._data_dict[frame_id] = {
                     "bgr_image": rect_left,
                     "depth_map": depth_mm,
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
                 }
-                self._data_dict[frame_id] = frame_data
                 return
 
         if depth_map is None:
             depth_map = self._set_default_depth_map(bgr_image)
 
-        frame_data = {
+        self._data_dict[frame_id] = {
             "bgr_image": bgr_image,
             "depth_map": depth_map,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
-        self._data_dict[frame_id] = frame_data
     
     def get_image(self, frame_id: int) -> Optional[BGRImage]:
         """
@@ -239,22 +249,57 @@ class CameraDataManager:
             return BGRImage(data=frame_data["bgr_image"])
         logger.warning(f"获取帧数据失败: frame_id={frame_id}")
         return None
-    
-    def get_depth(self, frame_id: int) -> Optional[DepthMap]:
+
+    def get_depth_at_pixel(self, frame_id: int, u: float, v: float) -> Optional[float]:
         """
-        获取指定帧的深度图
-        
-        Args:
-            frame_id: 帧ID
-            
-        Returns:
-            Optional[DepthMap]: 深度图对象，如果不存在则返回None
+        获取指定帧在像素 (u, v) 处的深度（毫米）。与 get_image 同帧的 depth_map 对齐。
+        无深度图、越界或无效时返回 None。
         """
         frame_data = self._data_dict.get(frame_id)
-        if frame_data and "depth_map" in frame_data and frame_data["depth_map"] is not None:
-            return DepthMap(data=frame_data["depth_map"], unit="camera_unit")
-        logger.warning(f"获取深度图数据失败: frame_id={frame_id}")
-        return None
+        if not frame_data or "depth_map" not in frame_data:
+            return None
+        depth_mm = frame_data["depth_map"]
+        h, w = depth_mm.shape[:2]
+        x, y = int(round(u)), int(round(v))
+        if x < 0 or x >= w or y < 0 or y >= h:
+            return None
+        val = float(depth_mm[y, x])
+        return val if np.isfinite(val) and val > 0 else None
+
+    def get_depth_neighborhood_median(
+        self,
+        frame_id: int,
+        u: float,
+        v: float,
+        half_win: int = 1,
+        z_min_mm: float = 200.0,
+        z_max_mm: float = 1500.0,
+    ) -> Optional[float]:
+        """
+        取像素 (u,v) 邻域内有效深度的中值（用于替代单点无效时的 fallback）。
+        邻域为 (2*half_win+1)×(2*half_win+1)，默认 3×3。只考虑 [z_min_mm, z_max_mm] 内的值。
+        若无有效值则返回 NaN。
+        """
+        frame_data = self._data_dict.get(frame_id)
+        if not frame_data or "depth_map" not in frame_data:
+            return np.nan
+        depth_mm = frame_data["depth_map"]
+        h, w = depth_mm.shape[:2]
+        cx, cy = int(round(u)), int(round(v))
+        y0 = max(0, cy - half_win)
+        y1 = min(h, cy + half_win + 1)
+        x0 = max(0, cx - half_win)
+        x1 = min(w, cx + half_win + 1)
+        region = depth_mm[y0:y1, x0:x1]
+        valid = (
+            np.isfinite(region)
+            & (region >= z_min_mm)
+            & (region <= z_max_mm)
+            & (region > 0)
+        )
+        if not np.any(valid):
+            return np.nan
+        return float(np.median(region[valid]))
 
     def clear_data(self):
         """清空所有帧数据"""
@@ -356,8 +401,16 @@ class CameraDataManager:
         disp_safe[invalid_disp] = 0.0
         points_3d = cv2.reprojectImageTo3D(disp_safe, self._stereo_Q)
         depth_mm = points_3d[:, :, 2].astype(np.float32)
-        invalid = invalid_disp | ~np.isfinite(depth_mm) | (depth_mm <= 0)
-        depth_mm[invalid] = np.nan
+        # 优先级1：限制有效深度范围，人脸典型 300~1200mm，消灭极远野值（如 67830）
+        depth_invalid = (
+            invalid_disp
+            | ~np.isfinite(depth_mm)
+            | (depth_mm <= 200)
+            | (depth_mm >= 1500)
+        )
+        depth_mm[depth_invalid] = np.nan
+        # 优先级3：轻量 5×5 中值平滑（保留边界、抗野值），nan 不参与中值
+        depth_mm = _median_filter_nan_safe(depth_mm, ksize=5)
         # [深度调试] 立体输出 Z（已按 Q16 换算视差后 reproject），单位由 Q 决定（标定为 mm）
         valid = np.isfinite(depth_mm) & (depth_mm > 0)
         if np.any(valid):
@@ -366,9 +419,9 @@ class CameraDataManager:
             center_z = depth_mm[h_d // 2, w_d // 2]
             center_disp = float(disp[h_d // 2, w_d // 2]) if disp[h_d // 2, w_d // 2] > 0 else float("nan")
             logger.info(
-                "[深度调试] 立体输出 Z: min=%.3f max=%.3f mean=%.3f | nan占比=%.1f%% | 中心Z=%.3f 中心disp=%.2f (disp≤0 已置 nan)",
+                "[深度调试] 立体输出 Z: min=%.3f max=%.3f mean=%.3f | nan占比=%.1f%% | 中心Z=%.3f 中心disp=%.2f (200~1500mm+中值平滑)",
                 float(np.min(v)), float(np.max(v)), float(np.mean(v)),
-                100.0 * np.sum(invalid) / depth_mm.size,
+                100.0 * (depth_mm.size - np.sum(valid)) / depth_mm.size,
                 float(center_z) if np.isfinite(center_z) else float("nan"),
                 center_disp,
             )
@@ -429,23 +482,7 @@ class CameraDataManager:
             "depth_scale": DEFAULT_DEPTH_SCALE
         }
 
-    def _adapt_stereo_config(self, config: Dict) -> Dict:
-        """若存在 stereo/left/right，则从 P1 派生 intrinsic_params 并设置 depth_scale，供 detector 使用。"""
-        if "stereo" not in config or "left" not in config or "right" not in config:
-            return config
-        stereo = config["stereo"]
-        if "P1" not in stereo:
-            return config
-        P1 = stereo["P1"]
-        config = dict(config)
-        config["intrinsic_params"] = {
-            "fx": float(P1[0][0]),
-            "fy": float(P1[1][1]),
-            "cx": float(P1[0][2]),
-            "cy": float(P1[1][2]),
-        }
-        config["depth_scale"] = DEFAULT_DEPTH_SCALE
-        return config
+
 
     def _check_required_fields(self, config: Dict) -> Dict:
         """检查必需字段"""
@@ -492,81 +529,31 @@ class RecgFitDataManager:
             cls._instance = super(RecgFitDataManager, cls).__new__(cls)
         return cls._instance
     
-    def __init__(self, key_coordinates: KeyCoordinates = None, 
-                 debug_log: bool = True, convert2mm: bool = True):
+    def __init__(self, key_coordinates: KeyCoordinates = None, debug_log: bool = True):
         """
-        初始化数据管理器
-        
+        初始化数据管理器。输入 KeyCoordinates 约定为 mm，不做单位换算。
+
         Args:
-            key_coordinates: 关键点坐标数据
+            key_coordinates: 关键点坐标数据（x,y,z 单位 mm）
             debug_log: 是否启用调试日志
-            convert2mm: 是否转换为毫米单位
         """
         try:
-            # 更新参数（单例模式，每次调用都会更新）
             self._key_coordinates = key_coordinates
             self._debug_log = debug_log
-            self._convert2mm = convert2mm
-            
-            # 添加调试信息
+
             logger.info(f"RecgFitDataManager初始化 - debug_log: {self._debug_log}, key_coordinates: {key_coordinates is not None}")
 
             if key_coordinates is not None:
-                self._convert_coords_2mm()
-                
                 logger.info("RecgFitDataManager初始化完成")
-                
                 if self._debug_log:
                     self._log_debug()
             else:
                 logger.info("RecgFitDataManager初始化完成（无关键点数据）")
-            
+
         except Exception as e:
             logger.error(f"RecgFitDataManager初始化失败: {e}")
             raise
-        
-    def _convert_coords_2mm(self) -> None:
-        """将坐标从米转换为毫米"""
 
-        if not self._convert2mm:
-            return
-        
-        conversion_count = 0
-        
-        for eye in EYE_TYPE:
-            for fitting_type in FITTING_TYPE:
-                points = self._key_coordinates.get_points(eye, fitting_type)
-                if points:
-                    # 转换每个点的坐标（前3维）为毫米
-                    converted_points = []
-
-                    for point in points:
-                        if point.z > 5:
-                            logger.warning(f"检测到异常z值: {point.z}，跳过转换")
-                            return
-                        
-                        # 记录转换前的坐标
-                        if self._debug_log and conversion_count < 5:
-                            pass
-                        
-                        converted_point = Point3DWithVisibility(
-                            x=point.x * 1000,  # 米转毫米
-                            y=point.y * 1000,
-                            z=point.z * 1000,
-                            visibility=point.visibility  # 可见性不变
-                        )
-                        
-                        # 记录转换后的坐标
-                        if self._debug_log and conversion_count < 5:
-                            pass
-                        
-                        converted_points.append(converted_point)
-                        conversion_count += 1
-                    
-                    # 更新坐标
-                    self._key_coordinates.set_points(eye, fitting_type, converted_points)
-        
-    
     # ==================== Getter方法 ====================    
     def get_key_coordinates(self) -> KeyCoordinates:
         """获取完整的关键点坐标数据"""
@@ -654,13 +641,12 @@ class RecgFitDataManager:
     
     def add_key_coordinates(self, key_coordinates: KeyCoordinates) -> None:
         """
-        添加完整的关键点坐标数据
-        
+        添加完整的关键点坐标数据（约定 x,y,z 单位 mm，不做单位换算）。
+
         Args:
             key_coordinates: 关键点坐标数据
         """
         self._key_coordinates = key_coordinates
-        self._convert_coords_2mm()
         self._log_debug()
     
 

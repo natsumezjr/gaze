@@ -839,7 +839,7 @@ def main():
     # 下面这些参数你可以按实际情况调
     parser.add_argument("--alpha", type=float, default=0.3, help="stereoRectify alpha（0裁剪多，0.3~0.5更保视野）")
     parser.add_argument("--area-ratio-min", type=float, default=0.05, help="棋盘面积占比阈值")
-    parser.add_argument("--blur-var-min", type=float, default=70.0, help="清晰度阈值（Laplacian 方差）")
+    parser.add_argument("--blur-var-min", type=float, default=80.0, help="清晰度阈值（Laplacian 方差）")
     parser.add_argument("--no-prune", action="store_true", help="关闭离群剔除")
     parser.add_argument("--prune-drop-k", type=int, default=3, help="离群剔除：丢掉最差K对")
     parser.add_argument("--prune-keep-min", type=int, default=12, help="离群剔除：至少保留这么多对")
