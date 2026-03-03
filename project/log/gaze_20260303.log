@@ -1,0 +1,1256 @@
+2026-03-03 16:18:46,783 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.165 max=1497.312 mean=649.167 | nan占比=62.9% | 中心Z=567.227 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:18:46,792 - __main__ - INFO - [显示参数] 图像尺寸 h=1080 w=1920 显示尺寸 1280x720 宽高比=1.778 (窗口将固定为该尺寸)
+2026-03-03 16:18:47,790 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:18:47,791 - __main__ - WARNING - 警告 1/10: 人脸检测失败
+2026-03-03 16:18:47,893 - __main__ - INFO - 尝试重试 (1/3)
+2026-03-03 16:18:51,930 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=644.848 | nan占比=60.1% | 中心Z=nan 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:18:51,955 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:18:51,956 - __main__ - WARNING - 警告 2/10: 人脸检测失败
+2026-03-03 16:18:52,057 - __main__ - INFO - 尝试重试 (2/3)
+2026-03-03 16:18:55,823 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.067 max=1497.312 mean=639.207 | nan占比=58.7% | 中心Z=547.895 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:18:55,859 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:18:55,859 - __main__ - WARNING - 警告 3/10: 人脸检测失败
+2026-03-03 16:18:55,961 - __main__ - INFO - 尝试重试 (3/3)
+2026-03-03 16:18:59,697 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.165 max=1497.312 mean=634.864 | nan占比=60.0% | 中心Z=522.586 中心disp=73.06 (200~1500mm+中值平滑)
+2026-03-03 16:18:59,724 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:18:59,724 - __main__ - WARNING - 警告 4/10: 人脸检测失败
+2026-03-03 16:19:03,584 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.099 max=1497.312 mean=606.703 | nan占比=58.2% | 中心Z=467.767 中心disp=81.38 (200~1500mm+中值平滑)
+2026-03-03 16:19:03,618 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:19:03,619 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:19:03,619 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:19:03,619 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=pupil idx=0 x=15.479 y=-33.561 z=423.944 v=1.000
+2026-03-03 16:19:03,620 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=iris idx=0 x=21.341 y=-33.712 z=423.356 v=1.000
+2026-03-03 16:19:03,620 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=iris idx=1 x=15.233 y=-39.940 z=430.214 v=1.000
+2026-03-03 16:19:03,620 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=iris idx=2 x=9.555 y=-33.268 z=423.944 v=1.000
+2026-03-03 16:19:03,620 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=iris idx=3 x=16.052 y=-27.808 z=428.403 v=1.000
+2026-03-03 16:19:03,621 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=inner_canthus idx=0 x=29.303 y=-32.109 z=424.828 v=1.000
+2026-03-03 16:19:03,621 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=upper_eyelid idx=0 x=24.835 y=-36.542 z=434.188 v=1.000
+2026-03-03 16:19:03,621 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=upper_eyelid idx=1 x=19.933 y=-37.946 z=432.039 v=1.000
+2026-03-03 16:19:03,621 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=upper_eyelid idx=2 x=15.088 y=-38.183 z=432.345 v=1.000
+2026-03-03 16:19:03,621 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=upper_eyelid idx=3 x=10.207 y=-36.965 z=432.345 v=1.000
+2026-03-03 16:19:03,622 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=upper_eyelid idx=4 x=27.688 y=-33.536 z=425.420 v=1.000
+2026-03-03 16:19:03,622 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=lower_eyelid idx=0 x=15.894 y=-29.202 z=419.576 v=1.000
+2026-03-03 16:19:03,622 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=lower_eyelid idx=1 x=20.686 y=-30.530 z=428.704 v=1.000
+2026-03-03 16:19:03,622 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=lower_eyelid idx=2 x=24.771 y=-31.144 z=425.124 v=1.000
+2026-03-03 16:19:03,623 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=lower_eyelid idx=3 x=27.822 y=-31.548 z=424.828 v=1.000
+2026-03-03 16:19:03,623 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=lower_eyelid idx=4 x=7.022 y=-35.220 z=431.434 v=1.000
+2026-03-03 16:19:03,623 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=left type=outer_canthus idx=0 x=4.981 y=-33.451 z=428.854 v=1.000
+2026-03-03 16:19:03,623 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=pupil idx=0 x=79.892 y=-30.878 z=427.504 v=1.000
+2026-03-03 16:19:03,624 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=iris idx=0 x=85.988 y=-30.800 z=428.103 v=1.000
+2026-03-03 16:19:03,624 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=iris idx=1 x=80.194 y=-36.831 z=429.913 v=1.000
+2026-03-03 16:19:03,624 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=iris idx=2 x=73.711 y=-31.047 z=426.906 v=1.000
+2026-03-03 16:19:03,625 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=iris idx=3 x=80.127 y=-25.276 z=429.307 v=1.000
+2026-03-03 16:19:03,625 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=inner_canthus idx=0 x=65.776 y=-28.155 z=424.533 v=1.000
+2026-03-03 16:19:03,625 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=upper_eyelid idx=0 x=71.220 y=-32.706 z=425.420 v=1.000
+2026-03-03 16:19:03,625 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=upper_eyelid idx=1 x=76.069 y=-34.509 z=424.386 v=1.000
+2026-03-03 16:19:03,625 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=upper_eyelid idx=2 x=81.248 y=-34.777 z=425.124 v=1.000
+2026-03-03 16:19:03,625 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=upper_eyelid idx=3 x=85.598 y=-33.582 z=424.828 v=1.000
+2026-03-03 16:19:03,626 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=upper_eyelid idx=4 x=67.778 y=-30.117 z=425.717 v=1.000
+2026-03-03 16:19:03,626 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=lower_eyelid idx=0 x=80.922 y=-26.266 z=429.005 v=1.000
+2026-03-03 16:19:03,626 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=lower_eyelid idx=1 x=75.999 y=-26.768 z=429.005 v=1.000
+2026-03-03 16:19:03,626 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=lower_eyelid idx=2 x=71.012 y=-27.220 z=426.013 v=1.000
+2026-03-03 16:19:03,626 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=lower_eyelid idx=3 x=67.755 y=-27.681 z=425.124 v=1.000
+2026-03-03 16:19:03,627 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=lower_eyelid idx=4 x=88.344 y=-27.054 z=429.307 v=1.000
+2026-03-03 16:19:03,627 - __main__ - DEBUG - 坐标 frame_id=1772525906612792 eye=right type=outer_canthus idx=0 x=90.986 y=-30.299 z=428.704 v=1.000
+2026-03-03 16:19:03,627 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:19:03,627 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:19:07,460 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=591.584 | nan占比=58.7% | 中心Z=433.572 中心disp=88.06 (200~1500mm+中值平滑)
+2026-03-03 16:19:07,493 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:19:07,493 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:19:07,494 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:19:07,494 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=pupil idx=0 x=18.015 y=-24.318 z=388.863 v=1.000
+2026-03-03 16:19:07,495 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=iris idx=0 x=24.491 y=-25.054 z=393.370 v=1.000
+2026-03-03 16:19:07,495 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=iris idx=1 x=17.576 y=-29.555 z=388.863 v=1.000
+2026-03-03 16:19:07,495 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=iris idx=2 x=12.031 y=-24.234 z=393.877 v=1.000
+2026-03-03 16:19:07,495 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=iris idx=3 x=18.731 y=-19.181 z=393.750 v=1.000
+2026-03-03 16:19:07,495 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=inner_canthus idx=0 x=32.330 y=-23.661 z=391.856 v=1.000
+2026-03-03 16:19:07,496 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=upper_eyelid idx=0 x=26.739 y=-26.690 z=392.359 v=1.000
+2026-03-03 16:19:07,496 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=upper_eyelid idx=1 x=21.115 y=-27.159 z=387.629 v=1.000
+2026-03-03 16:19:07,496 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=upper_eyelid idx=2 x=16.386 y=-26.864 z=387.875 v=1.000
+2026-03-03 16:19:07,496 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=upper_eyelid idx=3 x=12.123 y=-25.894 z=390.603 v=1.000
+2026-03-03 16:19:07,497 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=upper_eyelid idx=4 x=30.517 y=-24.905 z=391.103 v=1.000
+2026-03-03 16:19:07,497 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=lower_eyelid idx=0 x=18.648 y=-21.436 z=401.910 v=1.000
+2026-03-03 16:19:07,497 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=lower_eyelid idx=1 x=22.973 y=-21.732 z=393.877 v=1.000
+2026-03-03 16:19:07,497 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=lower_eyelid idx=2 x=27.591 y=-22.760 z=394.131 v=1.000
+2026-03-03 16:19:07,498 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=lower_eyelid idx=3 x=30.738 y=-23.147 z=392.107 v=1.000
+2026-03-03 16:19:07,498 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=lower_eyelid idx=4 x=9.505 y=-24.970 z=395.663 v=1.000
+2026-03-03 16:19:07,498 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=left type=outer_canthus idx=0 x=7.683 y=-23.741 z=393.370 v=1.000
+2026-03-03 16:19:07,498 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=pupil idx=0 x=80.095 y=-28.099 z=392.611 v=1.000
+2026-03-03 16:19:07,499 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=iris idx=0 x=86.069 y=-28.284 z=390.853 v=1.000
+2026-03-03 16:19:07,499 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=iris idx=1 x=78.287 y=-32.901 z=385.185 v=1.000
+2026-03-03 16:19:07,499 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=iris idx=2 x=73.580 y=-27.965 z=392.611 v=1.000
+2026-03-03 16:19:07,499 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=iris idx=3 x=79.255 y=-22.423 z=388.368 v=1.000
+2026-03-03 16:19:07,499 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=inner_canthus idx=0 x=65.867 y=-24.827 z=389.855 v=1.000
+2026-03-03 16:19:07,500 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=upper_eyelid idx=0 x=71.418 y=-29.115 z=391.605 v=1.000
+2026-03-03 16:19:07,500 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=upper_eyelid idx=1 x=77.107 y=-30.927 z=393.623 v=1.000
+2026-03-03 16:19:07,500 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=upper_eyelid idx=2 x=82.113 y=-31.231 z=392.738 v=1.000
+2026-03-03 16:19:07,500 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=upper_eyelid idx=3 x=86.385 y=-30.631 z=392.107 v=1.000
+2026-03-03 16:19:07,500 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=upper_eyelid idx=4 x=67.677 y=-26.673 z=390.603 v=1.000
+2026-03-03 16:19:07,500 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=lower_eyelid idx=0 x=80.284 y=-23.586 z=389.358 v=1.000
+2026-03-03 16:19:07,500 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=lower_eyelid idx=1 x=75.524 y=-23.831 z=390.853 v=1.000
+2026-03-03 16:19:07,500 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=lower_eyelid idx=2 x=71.258 y=-24.418 z=392.864 v=1.000
+2026-03-03 16:19:07,500 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=lower_eyelid idx=3 x=67.702 y=-24.546 z=390.353 v=1.000
+2026-03-03 16:19:07,501 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=lower_eyelid idx=4 x=88.311 y=-25.148 z=391.856 v=1.000
+2026-03-03 16:19:07,501 - __main__ - DEBUG - 坐标 frame_id=1772525943636210 eye=right type=outer_canthus idx=0 x=92.248 y=-28.941 z=396.948 v=0.932
+2026-03-03 16:19:07,501 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:19:07,501 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:19:11,291 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=595.700 | nan占比=55.5% | 中心Z=373.185 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:19:11,318 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:19:11,319 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:19:11,319 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:19:11,319 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=pupil idx=0 x=19.275 y=-25.837 z=347.994 v=1.000
+2026-03-03 16:19:11,319 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=iris idx=0 x=25.286 y=-26.085 z=346.513 v=1.000
+2026-03-03 16:19:11,319 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=iris idx=1 x=18.470 y=-30.521 z=340.906 v=1.000
+2026-03-03 16:19:11,320 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=iris idx=2 x=13.185 y=-25.446 z=347.301 v=1.000
+2026-03-03 16:19:11,320 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=iris idx=3 x=19.440 y=-20.054 z=343.011 v=1.000
+2026-03-03 16:19:11,320 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=inner_canthus idx=0 x=33.148 y=-23.596 z=343.204 v=1.000
+2026-03-03 16:19:11,320 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=upper_eyelid idx=0 x=27.612 y=-27.027 z=344.171 v=1.000
+2026-03-03 16:19:11,321 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=upper_eyelid idx=1 x=22.116 y=-27.920 z=341.860 v=1.000
+2026-03-03 16:19:11,321 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=upper_eyelid idx=2 x=17.067 y=-27.272 z=336.957 v=1.000
+2026-03-03 16:19:11,321 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=upper_eyelid idx=3 x=12.676 y=-25.793 z=333.645 v=1.000
+2026-03-03 16:19:11,321 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=upper_eyelid idx=4 x=31.461 y=-25.038 z=343.977 v=1.000
+2026-03-03 16:19:11,321 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=lower_eyelid idx=0 x=20.071 y=-21.907 z=347.895 v=1.000
+2026-03-03 16:19:11,322 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=lower_eyelid idx=1 x=24.591 y=-22.567 z=346.907 v=1.000
+2026-03-03 16:19:11,322 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=lower_eyelid idx=2 x=28.959 y=-23.289 z=346.317 v=1.000
+2026-03-03 16:19:11,322 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=lower_eyelid idx=3 x=31.772 y=-23.290 z=343.397 v=1.000
+2026-03-03 16:19:11,322 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=lower_eyelid idx=4 x=10.520 y=-25.550 z=348.291 v=1.000
+2026-03-03 16:19:11,322 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=left type=outer_canthus idx=0 x=8.811 y=-24.346 z=347.895 v=1.000
+2026-03-03 16:19:11,323 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=pupil idx=0 x=81.630 y=-28.083 z=343.783 v=1.000
+2026-03-03 16:19:11,323 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=iris idx=0 x=87.939 y=-28.275 z=344.365 v=1.000
+2026-03-03 16:19:11,323 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=iris idx=1 x=78.506 y=-32.353 z=331.472 v=1.000
+2026-03-03 16:19:11,323 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=iris idx=2 x=75.139 y=-28.003 z=343.011 v=1.000
+2026-03-03 16:19:11,323 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=iris idx=3 x=81.624 y=-22.595 z=343.977 v=1.000
+2026-03-03 16:19:11,323 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=inner_canthus idx=0 x=67.231 y=-24.285 z=342.627 v=1.000
+2026-03-03 16:19:11,324 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=upper_eyelid idx=0 x=72.835 y=-28.791 z=343.397 v=1.000
+2026-03-03 16:19:11,324 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=upper_eyelid idx=1 x=77.710 y=-30.426 z=341.477 v=1.000
+2026-03-03 16:19:11,324 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=upper_eyelid idx=2 x=82.900 y=-30.808 z=341.860 v=1.000
+2026-03-03 16:19:11,324 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=upper_eyelid idx=3 x=87.023 y=-30.072 z=341.096 v=1.000
+2026-03-03 16:19:11,324 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=upper_eyelid idx=4 x=69.287 y=-26.243 z=343.977 v=1.000
+2026-03-03 16:19:11,325 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=lower_eyelid idx=0 x=81.702 y=-23.539 z=345.143 v=1.000
+2026-03-03 16:19:11,325 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=lower_eyelid idx=1 x=76.567 y=-23.771 z=344.365 v=1.000
+2026-03-03 16:19:11,325 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=lower_eyelid idx=2 x=72.144 y=-24.163 z=344.753 v=1.000
+2026-03-03 16:19:11,325 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=lower_eyelid idx=3 x=68.891 y=-24.162 z=343.204 v=1.000
+2026-03-03 16:19:11,325 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=lower_eyelid idx=4 x=89.084 y=-24.516 z=344.171 v=1.000
+2026-03-03 16:19:11,325 - __main__ - DEBUG - 坐标 frame_id=1772525947506909 eye=right type=outer_canthus idx=0 x=93.006 y=-28.235 z=347.104 v=1.000
+2026-03-03 16:19:11,325 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:19:11,326 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:19:15,089 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=565.045 | nan占比=55.3% | 中心Z=nan 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:19:15,119 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:19:15,120 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:19:15,120 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:19:15,120 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=pupil idx=0 x=14.148 y=-17.746 z=306.064 v=1.000
+2026-03-03 16:19:15,121 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=iris idx=0 x=20.281 y=-18.256 z=307.450 v=1.000
+2026-03-03 16:19:15,121 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=iris idx=1 x=13.408 y=-22.237 z=298.002 v=1.000
+2026-03-03 16:19:15,121 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=iris idx=2 x=8.188 y=-17.438 z=306.987 v=1.000
+2026-03-03 16:19:15,121 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=iris idx=3 x=14.544 y=-12.475 z=305.604 v=1.000
+2026-03-03 16:19:15,121 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=inner_canthus idx=0 x=28.054 y=-16.177 z=304.690 v=1.000
+2026-03-03 16:19:15,122 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=upper_eyelid idx=0 x=22.522 y=-19.530 z=306.371 v=1.000
+2026-03-03 16:19:15,122 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=upper_eyelid idx=1 x=16.896 y=-20.229 z=303.328 v=1.000
+2026-03-03 16:19:15,122 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=upper_eyelid idx=2 x=11.965 y=-19.835 z=302.278 v=1.000
+2026-03-03 16:19:15,122 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=upper_eyelid idx=3 x=7.693 y=-18.848 z=305.146 v=1.000
+2026-03-03 16:19:15,122 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=upper_eyelid idx=4 x=26.231 y=-17.506 z=303.932 v=1.000
+2026-03-03 16:19:15,122 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=lower_eyelid idx=0 x=14.753 y=-14.043 z=307.450 v=1.000
+2026-03-03 16:19:15,122 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=lower_eyelid idx=1 x=19.421 y=-14.848 z=307.915 v=1.000
+2026-03-03 16:19:15,122 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=lower_eyelid idx=2 x=23.774 y=-15.666 z=306.371 v=1.000
+2026-03-03 16:19:15,123 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=lower_eyelid idx=3 x=26.613 y=-15.840 z=303.932 v=1.000
+2026-03-03 16:19:15,123 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=lower_eyelid idx=4 x=5.003 y=-17.621 z=305.604 v=1.000
+2026-03-03 16:19:15,123 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=left type=outer_canthus idx=0 x=3.309 y=-16.580 z=305.452 v=1.000
+2026-03-03 16:19:15,123 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=pupil idx=0 x=75.748 y=-21.337 z=302.727 v=1.000
+2026-03-03 16:19:15,123 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=iris idx=0 x=81.777 y=-21.584 z=302.278 v=1.000
+2026-03-03 16:19:15,123 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=iris idx=1 x=73.199 y=-25.815 z=293.421 v=1.000
+2026-03-03 16:19:15,124 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=iris idx=2 x=69.579 y=-21.210 z=303.027 v=1.000
+2026-03-03 16:19:15,124 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=iris idx=3 x=75.255 y=-15.893 z=300.789 v=1.000
+2026-03-03 16:19:15,124 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=inner_canthus idx=0 x=61.698 y=-17.807 z=300.938 v=1.000
+2026-03-03 16:19:15,125 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=upper_eyelid idx=0 x=66.821 y=-22.167 z=300.789 v=1.000
+2026-03-03 16:19:15,125 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=upper_eyelid idx=1 x=72.685 y=-24.098 z=303.328 v=1.000
+2026-03-03 16:19:15,125 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=upper_eyelid idx=2 x=77.861 y=-24.438 z=303.027 v=1.000
+2026-03-03 16:19:15,125 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=upper_eyelid idx=3 x=82.112 y=-23.786 z=302.278 v=1.000
+2026-03-03 16:19:15,125 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=upper_eyelid idx=4 x=63.837 y=-19.787 z=303.178 v=1.000
+2026-03-03 16:19:15,125 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=lower_eyelid idx=0 x=75.518 y=-16.705 z=300.789 v=1.000
+2026-03-03 16:19:15,126 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=lower_eyelid idx=1 x=70.692 y=-17.042 z=301.532 v=1.000
+2026-03-03 16:19:15,126 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=lower_eyelid idx=2 x=66.454 y=-17.587 z=302.727 v=1.000
+2026-03-03 16:19:15,126 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=lower_eyelid idx=3 x=63.381 y=-17.712 z=301.979 v=1.000
+2026-03-03 16:19:15,126 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=lower_eyelid idx=4 x=83.460 y=-18.078 z=301.830 v=1.000
+2026-03-03 16:19:15,126 - __main__ - DEBUG - 坐标 frame_id=1772525951331710 eye=right type=outer_canthus idx=0 x=85.436 y=-21.470 z=298.147 v=1.000
+2026-03-03 16:19:15,126 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:19:15,127 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:19:18,852 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.823 max=1497.312 mean=571.593 | nan占比=54.7% | 中心Z=292.578 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:19:18,877 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:19:18,878 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:19:18,879 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:19:18,882 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=pupil idx=0 x=10.414 y=-13.763 z=294.128 v=1.000
+2026-03-03 16:19:18,884 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=iris idx=0 x=16.644 y=-14.176 z=293.986 v=1.000
+2026-03-03 16:19:18,884 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=iris idx=1 x=9.689 y=-18.293 z=282.172 v=1.000
+2026-03-03 16:19:18,884 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=iris idx=2 x=4.272 y=-13.340 z=292.578 v=1.000
+2026-03-03 16:19:18,884 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=iris idx=3 x=10.839 y=-8.354 z=294.980 v=1.000
+2026-03-03 16:19:18,885 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=inner_canthus idx=0 x=25.051 y=-11.850 z=291.461 v=1.000
+2026-03-03 16:19:18,885 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=upper_eyelid idx=0 x=19.241 y=-15.622 z=292.999 v=1.000
+2026-03-03 16:19:18,886 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=upper_eyelid idx=1 x=13.185 y=-16.194 z=283.745 v=1.000
+2026-03-03 16:19:18,886 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=upper_eyelid idx=2 x=8.283 y=-15.994 z=284.671 v=1.000
+2026-03-03 16:19:18,886 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=upper_eyelid idx=3 x=4.001 y=-15.304 z=292.298 v=1.000
+2026-03-03 16:19:18,886 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=upper_eyelid idx=4 x=23.147 y=-13.346 z=290.629 v=1.000
+2026-03-03 16:19:18,887 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=lower_eyelid idx=0 x=11.617 y=-9.604 z=294.980 v=1.000
+2026-03-03 16:19:18,887 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=lower_eyelid idx=1 x=16.399 y=-10.426 z=295.122 v=1.000
+2026-03-03 16:19:18,887 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=lower_eyelid idx=2 x=20.863 y=-11.311 z=292.999 v=1.000
+2026-03-03 16:19:18,888 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=lower_eyelid idx=3 x=23.747 y=-11.549 z=290.906 v=1.000
+2026-03-03 16:19:18,888 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=lower_eyelid idx=4 x=1.376 y=-14.094 z=293.703 v=1.000
+2026-03-03 16:19:18,888 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=left type=outer_canthus idx=0 x=-0.137 y=-13.052 z=293.703 v=1.000
+2026-03-03 16:19:18,888 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=pupil idx=0 x=71.873 y=-17.076 z=288.843 v=1.000
+2026-03-03 16:19:18,889 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=iris idx=0 x=78.196 y=-17.433 z=289.390 v=1.000
+2026-03-03 16:19:18,889 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=iris idx=1 x=69.175 y=-21.677 z=279.079 v=1.000
+2026-03-03 16:19:18,889 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=iris idx=2 x=65.485 y=-16.875 z=288.707 v=1.000
+2026-03-03 16:19:18,890 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=iris idx=3 x=71.502 y=-11.631 z=287.349 v=1.000
+2026-03-03 16:19:18,890 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=inner_canthus idx=0 x=57.447 y=-13.455 z=288.298 v=1.000
+2026-03-03 16:19:18,890 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=upper_eyelid idx=0 x=62.851 y=-17.988 z=288.570 v=1.000
+2026-03-03 16:19:18,890 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=upper_eyelid idx=1 x=67.899 y=-19.696 z=286.944 v=1.000
+2026-03-03 16:19:18,891 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=upper_eyelid idx=2 x=73.702 y=-20.217 z=288.980 v=1.000
+2026-03-03 16:19:18,891 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=upper_eyelid idx=3 x=78.245 y=-19.702 z=289.253 v=1.000
+2026-03-03 16:19:18,891 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=upper_eyelid idx=4 x=59.440 y=-15.426 z=289.802 v=1.000
+2026-03-03 16:19:18,891 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=lower_eyelid idx=0 x=71.661 y=-12.624 z=288.980 v=1.000
+2026-03-03 16:19:18,891 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=lower_eyelid idx=1 x=66.366 y=-12.830 z=288.162 v=1.000
+2026-03-03 16:19:18,892 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=lower_eyelid idx=2 x=62.331 y=-13.376 z=290.906 v=1.000
+2026-03-03 16:19:18,892 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=lower_eyelid idx=3 x=58.951 y=-13.392 z=288.843 v=1.000
+2026-03-03 16:19:18,892 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=lower_eyelid idx=4 x=79.842 y=-14.146 z=290.629 v=1.000
+2026-03-03 16:19:18,893 - __main__ - DEBUG - 坐标 frame_id=1772525955137121 eye=right type=outer_canthus idx=0 x=82.594 y=-17.805 z=288.980 v=1.000
+2026-03-03 16:19:18,893 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:19:18,893 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:19:22,642 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=548.742 | nan占比=54.9% | 中心Z=nan 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:19:22,668 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:19:22,669 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:19:22,669 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:19:22,669 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=pupil idx=0 x=11.458 y=-7.734 z=275.058 v=1.000
+2026-03-03 16:19:22,670 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=iris idx=0 x=17.581 y=-7.975 z=276.052 v=1.000
+2026-03-03 16:19:22,670 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=iris idx=1 x=10.614 y=-12.123 z=259.187 v=1.000
+2026-03-03 16:19:22,671 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=iris idx=2 x=5.467 y=-7.605 z=275.306 v=1.000
+2026-03-03 16:19:22,671 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=iris idx=3 x=11.896 y=-2.539 z=279.974 v=1.000
+2026-03-03 16:19:22,671 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=inner_canthus idx=0 x=25.573 y=-5.319 z=272.299 v=1.000
+2026-03-03 16:19:22,671 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=upper_eyelid idx=0 x=20.315 y=-9.109 z=274.687 v=1.000
+2026-03-03 16:19:22,672 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=upper_eyelid idx=1 x=14.945 y=-10.435 z=274.563 v=1.000
+2026-03-03 16:19:22,672 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=upper_eyelid idx=2 x=9.810 y=-10.255 z=271.031 v=1.000
+2026-03-03 16:19:22,672 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=upper_eyelid idx=3 x=5.368 y=-9.365 z=271.271 v=1.000
+2026-03-03 16:19:22,673 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=upper_eyelid idx=4 x=23.850 y=-6.764 z=271.875 v=1.000
+2026-03-03 16:19:22,673 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=lower_eyelid idx=0 x=12.797 y=-3.635 z=275.803 v=1.000
+2026-03-03 16:19:22,673 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=lower_eyelid idx=1 x=17.444 y=-4.262 z=275.927 v=1.000
+2026-03-03 16:19:22,673 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=lower_eyelid idx=2 x=21.730 y=-4.973 z=274.440 v=1.000
+2026-03-03 16:19:22,673 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=lower_eyelid idx=3 x=24.378 y=-5.119 z=272.117 v=1.000
+2026-03-03 16:19:22,674 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=lower_eyelid idx=4 x=2.679 y=-8.497 z=279.718 v=1.000
+2026-03-03 16:19:22,674 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=left type=outer_canthus idx=0 x=0.900 y=-7.450 z=277.305 v=1.000
+2026-03-03 16:19:22,674 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=pupil idx=0 x=72.864 y=-9.951 z=271.151 v=1.000
+2026-03-03 16:19:22,674 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=iris idx=0 x=78.800 y=-10.118 z=270.551 v=1.000
+2026-03-03 16:19:22,674 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=iris idx=1 x=69.834 y=-14.642 z=260.624 v=1.000
+2026-03-03 16:19:22,675 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=iris idx=2 x=66.529 y=-9.879 z=270.670 v=1.000
+2026-03-03 16:19:22,675 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=iris idx=3 x=72.818 y=-4.639 z=271.031 v=1.000
+2026-03-03 16:19:22,675 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=inner_canthus idx=0 x=58.345 y=-6.409 z=269.239 v=1.000
+2026-03-03 16:19:22,675 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=upper_eyelid idx=0 x=63.930 y=-10.910 z=271.031 v=1.000
+2026-03-03 16:19:22,676 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=upper_eyelid idx=1 x=69.267 y=-12.789 z=270.971 v=1.000
+2026-03-03 16:19:22,676 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=upper_eyelid idx=2 x=74.798 y=-13.249 z=271.875 v=1.000
+2026-03-03 16:19:22,676 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=upper_eyelid idx=3 x=78.809 y=-12.685 z=270.670 v=1.000
+2026-03-03 16:19:22,676 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=upper_eyelid idx=4 x=60.455 y=-8.264 z=271.271 v=1.000
+2026-03-03 16:19:22,677 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=lower_eyelid idx=0 x=72.183 y=-5.410 z=270.790 v=1.000
+2026-03-03 16:19:22,677 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=lower_eyelid idx=1 x=66.760 y=-5.694 z=269.120 v=1.000
+2026-03-03 16:19:22,677 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=lower_eyelid idx=2 x=62.357 y=-6.176 z=269.239 v=1.000
+2026-03-03 16:19:22,677 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=lower_eyelid idx=3 x=59.712 y=-6.340 z=269.714 v=1.000
+2026-03-03 16:19:22,677 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=lower_eyelid idx=4 x=80.062 y=-6.814 z=270.910 v=1.000
+2026-03-03 16:19:22,677 - __main__ - DEBUG - 坐标 frame_id=1772525958898654 eye=right type=outer_canthus idx=0 x=83.605 y=-10.849 z=271.996 v=1.000
+2026-03-03 16:19:22,678 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:19:22,678 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:19:22,795 - __main__ - INFO - 识别线程主循环停止
+2026-03-03 16:19:23,068 - __main__ - INFO - 摄像头资源已释放
+2026-03-03 16:19:23,114 - __main__ - INFO - OpenCV窗口已关闭
+2026-03-03 16:19:23,198 - project.data.data_manager - INFO - 摄像头资源已释放
+2026-03-03 16:19:51,857 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-03-03 16:19:53,545 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-03-03 16:19:53,546 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-03-03 16:19:53,555 - project.core.recognition.detector - INFO - FaceDetector 初始化完成（依赖 CameraDataManager）
+2026-03-03 16:19:53,556 - project.data.data_manager - INFO - 从配置文件加载参数: project/config/camera_params.json
+2026-03-03 16:20:13,968 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=612.441 | nan占比=63.0% | 中心Z=487.358 中心disp=78.31 (200~1500mm+中值平滑)
+2026-03-03 16:20:13,981 - __main__ - INFO - [显示参数] 图像尺寸 h=1080 w=1920 显示尺寸 1280x720 宽高比=1.778 (窗口将固定为该尺寸)
+2026-03-03 16:20:15,021 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:20:15,021 - __main__ - WARNING - 警告 1/10: 人脸检测失败
+2026-03-03 16:20:15,123 - __main__ - INFO - 尝试重试 (1/3)
+2026-03-03 16:20:19,722 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=615.363 | nan占比=63.5% | 中心Z=nan 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:20:19,766 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:20:19,766 - __main__ - WARNING - 警告 2/10: 人脸检测失败
+2026-03-03 16:20:19,868 - __main__ - INFO - 尝试重试 (2/3)
+2026-03-03 16:20:23,788 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=607.540 | nan占比=64.4% | 中心Z=477.641 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:20:23,851 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:20:23,851 - __main__ - WARNING - 警告 3/10: 人脸检测失败
+2026-03-03 16:20:23,952 - __main__ - INFO - 尝试重试 (3/3)
+2026-03-03 16:20:27,724 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.625 max=1497.312 mean=608.716 | nan占比=61.3% | 中心Z=489.114 中心disp=78.06 (200~1500mm+中值平滑)
+2026-03-03 16:20:27,747 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:20:27,748 - __main__ - WARNING - 警告 4/10: 人脸检测失败
+2026-03-03 16:20:31,593 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.165 max=1497.312 mean=606.532 | nan占比=62.0% | 中心Z=469.564 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:20:31,614 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:20:31,615 - __main__ - WARNING - 警告 5/10: 人脸检测失败
+2026-03-03 16:20:35,406 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=609.497 | nan占比=61.6% | 中心Z=443.004 中心disp=86.00 (200~1500mm+中值平滑)
+2026-03-03 16:20:35,429 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:20:35,429 - __main__ - WARNING - 警告 6/10: 人脸检测失败
+2026-03-03 16:20:39,259 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.559 max=1497.312 mean=616.850 | nan占比=61.1% | 中心Z=482.165 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:20:39,281 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:20:39,281 - __main__ - WARNING - 警告 7/10: 人脸检测失败
+2026-03-03 16:20:43,119 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=619.771 | nan占比=60.1% | 中心Z=436.048 中心disp=87.56 (200~1500mm+中值平滑)
+2026-03-03 16:20:43,140 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:20:43,141 - __main__ - WARNING - 警告 8/10: 人脸检测失败
+2026-03-03 16:20:46,834 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.099 max=1497.312 mean=601.098 | nan占比=61.2% | 中心Z=438.552 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:20:46,870 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:20:46,871 - project.core.recognition.detector - WARNING - 拟合点未全部有效（缺失或 x/y/z 为 nan）
+2026-03-03 16:20:46,871 - __main__ - WARNING - 警告 9/10: 人脸检测失败
+2026-03-03 16:20:50,615 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=597.114 | nan占比=61.0% | 中心Z=414.453 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:20:50,644 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:20:50,645 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:20:50,645 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:20:50,645 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=pupil idx=0 x=138.343 y=7.599 z=458.292 v=1.000
+2026-03-03 16:20:50,646 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=iris idx=0 x=144.853 y=6.021 z=460.017 v=1.000
+2026-03-03 16:20:50,646 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=iris idx=1 x=135.540 y=1.761 z=454.541 v=1.000
+2026-03-03 16:20:50,646 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=iris idx=2 x=129.890 y=8.743 z=451.184 v=1.000
+2026-03-03 16:20:50,646 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=iris idx=3 x=140.323 y=13.548 z=459.326 v=1.000
+2026-03-03 16:20:50,646 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=inner_canthus idx=0 x=34.975 y=-14.114 z=416.147 v=1.000
+2026-03-03 16:20:50,646 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=upper_eyelid idx=0 x=29.865 y=-15.889 z=419.288 v=1.000
+2026-03-03 16:20:50,646 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=upper_eyelid idx=1 x=23.656 y=-15.926 z=421.022 v=1.000
+2026-03-03 16:20:50,647 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=upper_eyelid idx=2 x=17.704 y=-15.454 z=423.650 v=1.000
+2026-03-03 16:20:50,647 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=upper_eyelid idx=3 x=12.109 y=-14.750 z=424.238 v=1.000
+2026-03-03 16:20:50,647 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=upper_eyelid idx=4 x=33.305 y=-14.840 z=416.430 v=1.000
+2026-03-03 16:20:50,647 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=lower_eyelid idx=0 x=19.185 y=-11.519 z=423.944 v=1.000
+2026-03-03 16:20:50,647 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=lower_eyelid idx=1 x=25.019 y=-12.279 z=422.770 v=1.000
+2026-03-03 16:20:50,648 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=lower_eyelid idx=2 x=30.705 y=-13.357 z=417.854 v=1.000
+2026-03-03 16:20:50,648 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=lower_eyelid idx=3 x=33.859 y=-13.837 z=416.147 v=1.000
+2026-03-03 16:20:50,648 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=lower_eyelid idx=4 x=8.736 y=-14.426 z=423.944 v=1.000
+2026-03-03 16:20:50,648 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=left type=outer_canthus idx=0 x=6.396 y=-14.354 z=423.944 v=1.000
+2026-03-03 16:20:50,648 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=pupil idx=0 x=149.683 y=2.703 z=460.364 v=1.000
+2026-03-03 16:20:50,648 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=iris idx=0 x=156.804 y=1.440 z=460.017 v=1.000
+2026-03-03 16:20:50,649 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=iris idx=1 x=148.406 y=-3.264 z=459.326 v=1.000
+2026-03-03 16:20:50,649 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=iris idx=2 x=141.876 y=3.598 z=457.605 v=1.000
+2026-03-03 16:20:50,649 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=iris idx=3 x=151.615 y=8.481 z=462.105 v=1.000
+2026-03-03 16:20:50,649 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=inner_canthus idx=0 x=66.410 y=-12.835 z=415.298 v=1.000
+2026-03-03 16:20:50,650 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=upper_eyelid idx=0 x=71.775 y=-15.342 z=419.001 v=1.000
+2026-03-03 16:20:50,650 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=upper_eyelid idx=1 x=78.011 y=-15.453 z=423.063 v=1.000
+2026-03-03 16:20:50,650 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=upper_eyelid idx=2 x=82.179 y=-14.328 z=415.016 v=1.000
+2026-03-03 16:20:50,650 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=upper_eyelid idx=3 x=87.377 y=-13.205 z=413.891 v=1.000
+2026-03-03 16:20:50,650 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=upper_eyelid idx=4 x=68.111 y=-14.057 z=416.430 v=1.000
+2026-03-03 16:20:50,651 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=lower_eyelid idx=0 x=81.051 y=-9.249 z=416.147 v=1.000
+2026-03-03 16:20:50,651 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=lower_eyelid idx=1 x=75.327 y=-10.143 z=414.453 v=1.000
+2026-03-03 16:20:50,651 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=lower_eyelid idx=2 x=71.024 y=-11.695 z=417.569 v=1.000
+2026-03-03 16:20:50,651 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=lower_eyelid idx=3 x=67.822 y=-12.512 z=415.580 v=1.000
+2026-03-03 16:20:50,651 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=lower_eyelid idx=4 x=90.089 y=-9.937 z=413.891 v=1.000
+2026-03-03 16:20:50,651 - __main__ - DEBUG - 坐标 frame_id=1772525993551081 eye=right type=outer_canthus idx=0 x=92.777 y=-11.983 z=412.215 v=1.000
+2026-03-03 16:20:50,652 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:20:50,652 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:20:50,769 - __main__ - INFO - 识别线程主循环停止
+2026-03-03 16:20:51,051 - __main__ - INFO - 摄像头资源已释放
+2026-03-03 16:20:51,089 - __main__ - INFO - OpenCV窗口已关闭
+2026-03-03 16:20:51,156 - project.data.data_manager - INFO - 摄像头资源已释放
+2026-03-03 16:21:45,556 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-03-03 16:21:47,295 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-03-03 16:21:47,296 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-03-03 16:21:47,305 - project.core.recognition.detector - INFO - FaceDetector 初始化完成（依赖 CameraDataManager）
+2026-03-03 16:21:47,306 - project.data.data_manager - INFO - 从配置文件加载参数: project/config/camera_params.json
+2026-03-03 16:22:07,378 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=202.085 max=1497.312 mean=631.187 | nan占比=62.1% | 中心Z=523.482 中心disp=72.88 (200~1500mm+中值平滑)
+2026-03-03 16:22:07,386 - __main__ - INFO - [显示参数] 图像尺寸 h=1080 w=1920 显示尺寸 1280x720 宽高比=1.778 (窗口将固定为该尺寸)
+2026-03-03 16:22:08,382 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:22:08,382 - __main__ - WARNING - 警告 1/10: 人脸检测失败
+2026-03-03 16:22:08,484 - __main__ - INFO - 尝试重试 (1/3)
+2026-03-03 16:22:12,440 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.757 max=1497.312 mean=632.222 | nan占比=61.6% | 中心Z=523.482 中心disp=73.00 (200~1500mm+中值平滑)
+2026-03-03 16:22:12,475 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:22:12,476 - __main__ - WARNING - 警告 2/10: 人脸检测失败
+2026-03-03 16:22:12,577 - __main__ - INFO - 尝试重试 (2/3)
+2026-03-03 16:22:16,496 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=607.618 | nan占比=60.1% | 中心Z=500.740 中心disp=76.62 (200~1500mm+中值平滑)
+2026-03-03 16:22:16,544 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:22:16,545 - __main__ - WARNING - 警告 3/10: 人脸检测失败
+2026-03-03 16:22:16,646 - __main__ - INFO - 尝试重试 (3/3)
+2026-03-03 16:22:20,540 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.099 max=1497.312 mean=614.957 | nan占比=60.1% | 中心Z=497.884 中心disp=76.88 (200~1500mm+中值平滑)
+2026-03-03 16:22:20,591 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:22:20,591 - __main__ - WARNING - 警告 4/10: 人脸检测失败
+2026-03-03 16:22:24,489 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=617.243 | nan占比=59.7% | 中心Z=493.460 中心disp=77.38 (200~1500mm+中值平滑)
+2026-03-03 16:22:24,525 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:22:24,525 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:22:24,526 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:22:24,526 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=pupil idx=0 x=60.821 y=-35.819 z=440.449 v=1.000
+2026-03-03 16:22:24,526 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=iris idx=0 x=67.459 y=-35.233 z=439.499 v=1.000
+2026-03-03 16:22:24,526 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=iris idx=1 x=60.450 y=-41.629 z=438.867 v=1.000
+2026-03-03 16:22:24,527 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=iris idx=2 x=54.609 y=-36.588 z=444.293 v=1.000
+2026-03-03 16:22:24,527 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=iris idx=3 x=61.301 y=-29.692 z=442.043 v=1.000
+2026-03-03 16:22:24,527 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=inner_canthus idx=0 x=74.009 y=-34.696 z=438.867 v=1.000
+2026-03-03 16:22:24,527 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=upper_eyelid idx=0 x=68.263 y=-39.140 z=435.426 v=1.000
+2026-03-03 16:22:24,528 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=upper_eyelid idx=1 x=63.999 y=-42.080 z=444.293 v=1.000
+2026-03-03 16:22:24,528 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=upper_eyelid idx=2 x=58.053 y=-42.548 z=442.043 v=1.000
+2026-03-03 16:22:24,528 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=upper_eyelid idx=3 x=53.165 y=-41.830 z=445.589 v=1.000
+2026-03-03 16:22:24,528 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=upper_eyelid idx=4 x=72.264 y=-36.590 z=438.238 v=1.000
+2026-03-03 16:22:24,528 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=lower_eyelid idx=0 x=59.556 y=-33.494 z=443.970 v=1.000
+2026-03-03 16:22:24,529 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=lower_eyelid idx=1 x=64.660 y=-33.294 z=442.363 v=1.000
+2026-03-03 16:22:24,529 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=lower_eyelid idx=2 x=69.706 y=-33.592 z=440.449 v=1.000
+2026-03-03 16:22:24,529 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=lower_eyelid idx=3 x=72.831 y=-33.994 z=439.499 v=1.000
+2026-03-03 16:22:24,529 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=lower_eyelid idx=4 x=50.268 y=-40.509 z=448.534 v=1.000
+2026-03-03 16:22:24,530 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=left type=outer_canthus idx=0 x=48.313 y=-39.290 z=449.194 v=1.000
+2026-03-03 16:22:24,530 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=pupil idx=0 x=121.939 y=-30.737 z=438.867 v=1.000
+2026-03-03 16:22:24,530 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=iris idx=0 x=129.389 y=-29.807 z=440.455 v=1.000
+2026-03-03 16:22:24,530 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=iris idx=1 x=122.926 y=-36.667 z=439.499 v=1.000
+2026-03-03 16:22:24,530 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=iris idx=2 x=114.636 y=-31.961 z=438.238 v=0.925
+2026-03-03 16:22:24,531 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=iris idx=3 x=121.157 y=-25.130 z=438.552 v=1.000
+2026-03-03 16:22:24,531 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=inner_canthus idx=0 x=110.162 y=-30.257 z=438.867 v=1.000
+2026-03-03 16:22:24,531 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=upper_eyelid idx=0 x=116.783 y=-34.428 z=438.867 v=0.923
+2026-03-03 16:22:24,531 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=upper_eyelid idx=1 x=122.766 y=-35.536 z=439.499 v=0.919
+2026-03-03 16:22:24,532 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=upper_eyelid idx=2 x=129.726 y=-35.271 z=443.970 v=1.000
+2026-03-03 16:22:24,532 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=upper_eyelid idx=3 x=132.830 y=-33.201 z=439.499 v=1.000
+2026-03-03 16:22:24,532 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=upper_eyelid idx=4 x=112.284 y=-32.144 z=438.238 v=0.926
+2026-03-03 16:22:24,532 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=lower_eyelid idx=0 x=124.506 y=-26.805 z=439.183 v=1.000
+2026-03-03 16:22:24,533 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=lower_eyelid idx=1 x=119.355 y=-27.639 z=439.183 v=1.000
+2026-03-03 16:22:24,533 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=lower_eyelid idx=2 x=114.471 y=-28.753 z=438.867 v=1.000
+2026-03-03 16:22:24,533 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=lower_eyelid idx=3 x=111.477 y=-29.686 z=438.552 v=1.000
+2026-03-03 16:22:24,533 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=lower_eyelid idx=4 x=132.350 y=-27.009 z=439.183 v=1.000
+2026-03-03 16:22:24,534 - __main__ - DEBUG - 坐标 frame_id=1772526107300400 eye=right type=outer_canthus idx=0 x=140.775 y=-30.626 z=452.856 v=1.000
+2026-03-03 16:22:24,534 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:22:24,534 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:22:28,445 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=619.612 | nan占比=59.0% | 中心Z=484.844 中心disp=78.75 (200~1500mm+中值平滑)
+2026-03-03 16:22:28,479 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:22:28,480 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:22:28,480 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:22:28,480 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=pupil idx=0 x=73.370 y=-51.693 z=423.944 v=1.000
+2026-03-03 16:22:28,480 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=iris idx=0 x=78.001 y=-49.314 z=422.770 v=1.000
+2026-03-03 16:22:28,480 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=iris idx=1 x=74.449 y=-55.974 z=419.576 v=1.000
+2026-03-03 16:22:28,481 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=iris idx=2 x=67.973 y=-54.029 z=423.944 v=1.000
+2026-03-03 16:22:28,481 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=iris idx=3 x=71.191 y=-46.642 z=424.238 v=1.000
+2026-03-03 16:22:28,481 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=inner_canthus idx=0 x=84.796 y=-45.959 z=423.944 v=1.000
+2026-03-03 16:22:28,481 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=upper_eyelid idx=0 x=81.374 y=-49.853 z=422.478 v=1.000
+2026-03-03 16:22:28,481 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=upper_eyelid idx=1 x=77.652 y=-52.383 z=423.356 v=1.000
+2026-03-03 16:22:28,482 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=upper_eyelid idx=2 x=73.480 y=-54.255 z=424.533 v=1.000
+2026-03-03 16:22:28,482 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=upper_eyelid idx=3 x=68.458 y=-54.825 z=421.313 v=1.000
+2026-03-03 16:22:28,482 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=upper_eyelid idx=4 x=83.682 y=-47.439 z=422.478 v=1.000
+2026-03-03 16:22:28,482 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=lower_eyelid idx=0 x=71.900 y=-47.786 z=423.944 v=1.000
+2026-03-03 16:22:28,482 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=lower_eyelid idx=1 x=75.753 y=-46.736 z=424.238 v=1.000
+2026-03-03 16:22:28,483 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=lower_eyelid idx=2 x=79.690 y=-46.202 z=423.650 v=1.000
+2026-03-03 16:22:28,483 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=lower_eyelid idx=3 x=83.052 y=-45.872 z=423.650 v=1.000
+2026-03-03 16:22:28,483 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=lower_eyelid idx=4 x=64.888 y=-55.242 z=420.443 v=1.000
+2026-03-03 16:22:28,483 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=left type=outer_canthus idx=0 x=62.470 y=-55.464 z=421.894 v=1.000
+2026-03-03 16:22:28,484 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=pupil idx=0 x=126.421 y=-26.200 z=434.497 v=1.000
+2026-03-03 16:22:28,484 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=iris idx=0 x=128.913 y=-23.471 z=428.403 v=1.000
+2026-03-03 16:22:28,484 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=iris idx=1 x=128.550 y=-31.077 z=434.497 v=1.000
+2026-03-03 16:22:28,485 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=iris idx=2 x=121.862 y=-28.906 z=434.188 v=1.000
+2026-03-03 16:22:28,485 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=iris idx=3 x=121.500 y=-21.063 z=425.717 v=1.000
+2026-03-03 16:22:28,485 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=inner_canthus idx=0 x=116.881 y=-30.248 z=433.572 v=1.000
+2026-03-03 16:22:28,485 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=upper_eyelid idx=0 x=120.362 y=-30.982 z=433.265 v=1.000
+2026-03-03 16:22:28,486 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=upper_eyelid idx=1 x=123.744 y=-29.882 z=434.497 v=1.000
+2026-03-03 16:22:28,486 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=upper_eyelid idx=2 x=127.516 y=-27.494 z=434.497 v=1.000
+2026-03-03 16:22:28,486 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=upper_eyelid idx=3 x=129.912 y=-24.906 z=434.188 v=1.000
+2026-03-03 16:22:28,486 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=upper_eyelid idx=4 x=118.207 y=-30.708 z=432.345 v=0.922
+2026-03-03 16:22:28,486 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=lower_eyelid idx=0 x=123.518 y=-21.159 z=426.013 v=1.000
+2026-03-03 16:22:28,487 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=lower_eyelid idx=1 x=122.711 y=-24.268 z=433.880 v=1.000
+2026-03-03 16:22:28,487 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=lower_eyelid idx=2 x=120.423 y=-26.848 z=434.497 v=1.000
+2026-03-03 16:22:28,487 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=lower_eyelid idx=3 x=118.064 y=-28.808 z=432.958 v=1.000
+2026-03-03 16:22:28,487 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=lower_eyelid idx=4 x=131.384 y=-19.498 z=437.610 v=1.000
+2026-03-03 16:22:28,488 - __main__ - DEBUG - 坐标 frame_id=1772526144547572 eye=right type=outer_canthus idx=0 x=137.120 y=-21.418 z=450.187 v=1.000
+2026-03-03 16:22:28,488 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:22:28,488 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:22:32,381 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=622.982 | nan占比=58.4% | 中心Z=471.012 中心disp=81.06 (200~1500mm+中值平滑)
+2026-03-03 16:22:32,424 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:22:32,424 - __main__ - WARNING - 警告 1/10: 人脸检测失败
+2026-03-03 16:22:32,526 - __main__ - INFO - 尝试重试 (1/3)
+2026-03-03 16:22:36,398 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=613.377 | nan占比=58.8% | 中心Z=476.524 中心disp=80.12 (200~1500mm+中值平滑)
+2026-03-03 16:22:36,432 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:22:36,433 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:22:36,433 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:22:36,433 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=pupil idx=0 x=123.999 y=-3.469 z=430.517 v=1.000
+2026-03-03 16:22:36,433 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=iris idx=0 x=130.695 y=-3.999 z=432.039 v=1.000
+2026-03-03 16:22:36,433 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=iris idx=1 x=122.862 y=-9.356 z=430.820 v=1.000
+2026-03-03 16:22:36,434 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=iris idx=2 x=116.345 y=-2.957 z=426.013 v=1.000
+2026-03-03 16:22:36,434 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=iris idx=3 x=124.281 y=2.689 z=427.504 v=1.000
+2026-03-03 16:22:36,434 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=inner_canthus idx=0 x=62.653 y=-35.182 z=433.265 v=1.000
+2026-03-03 16:22:36,434 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=upper_eyelid idx=0 x=58.811 y=-40.414 z=441.723 v=1.000
+2026-03-03 16:22:36,434 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=upper_eyelid idx=1 x=50.747 y=-40.615 z=422.186 v=1.000
+2026-03-03 16:22:36,434 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=upper_eyelid idx=2 x=46.440 y=-41.934 z=431.581 v=1.000
+2026-03-03 16:22:36,434 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=upper_eyelid idx=3 x=42.346 y=-41.757 z=440.767 v=1.000
+2026-03-03 16:22:36,435 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=upper_eyelid idx=4 x=61.248 y=-36.954 z=434.188 v=1.000
+2026-03-03 16:22:36,435 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=lower_eyelid idx=0 x=48.302 y=-34.397 z=438.552 v=0.960
+2026-03-03 16:22:36,435 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=lower_eyelid idx=1 x=53.324 y=-34.421 z=437.296 v=1.000
+2026-03-03 16:22:36,435 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=lower_eyelid idx=2 x=58.433 y=-34.568 z=435.116 v=1.000
+2026-03-03 16:22:36,435 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=lower_eyelid idx=3 x=61.493 y=-34.696 z=433.880 v=1.000
+2026-03-03 16:22:36,436 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=lower_eyelid idx=4 x=39.719 y=-40.564 z=443.326 v=1.000
+2026-03-03 16:22:36,436 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=left type=outer_canthus idx=0 x=37.809 y=-39.412 z=443.970 v=1.000
+2026-03-03 16:22:36,436 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=pupil idx=0 x=149.961 y=-13.911 z=454.944 v=1.000
+2026-03-03 16:22:36,436 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=iris idx=0 x=162.659 y=-14.641 z=471.012 v=1.000
+2026-03-03 16:22:36,436 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=iris idx=1 x=146.956 y=-19.570 z=447.220 v=1.000
+2026-03-03 16:22:36,437 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=iris idx=2 x=138.850 y=-13.336 z=442.043 v=1.000
+2026-03-03 16:22:36,437 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=iris idx=3 x=145.774 y=-7.608 z=439.815 v=1.000
+2026-03-03 16:22:36,437 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=inner_canthus idx=0 x=96.132 y=-29.316 z=432.958 v=1.000
+2026-03-03 16:22:36,437 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=upper_eyelid idx=0 x=101.722 y=-32.839 z=433.265 v=1.000
+2026-03-03 16:22:36,438 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=upper_eyelid idx=1 x=107.080 y=-33.309 z=432.958 v=1.000
+2026-03-03 16:22:36,438 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=upper_eyelid idx=2 x=112.385 y=-32.343 z=432.958 v=0.925
+2026-03-03 16:22:36,438 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=upper_eyelid idx=3 x=116.930 y=-30.504 z=432.651 v=1.000
+2026-03-03 16:22:36,438 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=upper_eyelid idx=4 x=97.756 y=-30.880 z=432.039 v=1.000
+2026-03-03 16:22:36,438 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=lower_eyelid idx=0 x=110.151 y=-25.374 z=432.958 v=1.000
+2026-03-03 16:22:36,438 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=lower_eyelid idx=1 x=105.701 y=-26.542 z=435.116 v=1.000
+2026-03-03 16:22:36,439 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=lower_eyelid idx=2 x=100.645 y=-27.886 z=433.265 v=1.000
+2026-03-03 16:22:36,439 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=lower_eyelid idx=3 x=97.080 y=-28.671 z=430.517 v=1.000
+2026-03-03 16:22:36,439 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=lower_eyelid idx=4 x=118.187 y=-25.371 z=432.651 v=1.000
+2026-03-03 16:22:36,439 - __main__ - DEBUG - 坐标 frame_id=1772526148494031 eye=right type=outer_canthus idx=0 x=121.972 y=-27.811 z=435.116 v=1.000
+2026-03-03 16:22:36,439 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:22:36,439 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:22:40,250 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.724 max=1497.312 mean=609.937 | nan占比=60.1% | 中心Z=481.026 中心disp=77.69 (200~1500mm+中值平滑)
+2026-03-03 16:22:40,294 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:22:40,295 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:22:40,295 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:22:40,295 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=pupil idx=0 x=130.079 y=-11.749 z=431.734 v=1.000
+2026-03-03 16:22:40,295 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=iris idx=0 x=140.869 y=-12.966 z=449.524 v=1.000
+2026-03-03 16:22:40,296 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=iris idx=1 x=128.839 y=-16.857 z=431.734 v=1.000
+2026-03-03 16:22:40,296 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=iris idx=2 x=123.660 y=-10.950 z=428.103 v=1.000
+2026-03-03 16:22:40,296 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=iris idx=3 x=130.860 y=-6.225 z=430.517 v=1.000
+2026-03-03 16:22:40,296 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=inner_canthus idx=0 x=65.202 y=-36.151 z=429.307 v=1.000
+2026-03-03 16:22:40,297 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=upper_eyelid idx=0 x=60.476 y=-39.511 z=429.005 v=1.000
+2026-03-03 16:22:40,297 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=upper_eyelid idx=1 x=57.029 y=-42.371 z=441.723 v=1.000
+2026-03-03 16:22:40,297 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=upper_eyelid idx=2 x=52.002 y=-42.770 z=442.043 v=1.000
+2026-03-03 16:22:40,298 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=upper_eyelid idx=3 x=46.831 y=-41.707 z=439.183 v=1.000
+2026-03-03 16:22:40,298 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=upper_eyelid idx=4 x=63.023 y=-37.122 z=425.124 v=1.000
+2026-03-03 16:22:40,298 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=lower_eyelid idx=0 x=53.246 y=-35.763 z=435.116 v=1.000
+2026-03-03 16:22:40,298 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=lower_eyelid idx=1 x=57.555 y=-35.669 z=433.880 v=1.000
+2026-03-03 16:22:40,298 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=lower_eyelid idx=2 x=61.636 y=-35.534 z=430.517 v=1.000
+2026-03-03 16:22:40,298 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=lower_eyelid idx=3 x=64.273 y=-35.668 z=429.608 v=1.000
+2026-03-03 16:22:40,298 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=lower_eyelid idx=4 x=43.223 y=-39.838 z=431.734 v=1.000
+2026-03-03 16:22:40,299 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=left type=outer_canthus idx=0 x=41.507 y=-38.921 z=433.265 v=1.000
+2026-03-03 16:22:40,299 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=pupil idx=0 x=164.026 y=-23.028 z=472.835 v=0.904
+2026-03-03 16:22:40,299 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=iris idx=0 x=172.207 y=-23.396 z=477.268 v=0.901
+2026-03-03 16:22:40,299 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=iris idx=1 x=163.069 y=-28.664 z=471.376 v=0.904
+2026-03-03 16:22:40,299 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=iris idx=2 x=153.154 y=-22.310 z=460.017 v=1.000
+2026-03-03 16:22:40,300 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=iris idx=3 x=165.028 y=-17.192 z=473.568 v=1.000
+2026-03-03 16:22:40,300 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=inner_canthus idx=0 x=101.789 y=-27.166 z=434.497 v=1.000
+2026-03-03 16:22:40,300 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=upper_eyelid idx=0 x=106.523 y=-29.887 z=429.911 v=0.929
+2026-03-03 16:22:40,300 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=upper_eyelid idx=1 x=112.930 y=-30.434 z=433.880 v=1.000
+2026-03-03 16:22:40,300 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=upper_eyelid idx=2 x=117.077 y=-29.159 z=430.820 v=1.000
+2026-03-03 16:22:40,301 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=upper_eyelid idx=3 x=121.194 y=-27.390 z=430.820 v=1.000
+2026-03-03 16:22:40,301 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=upper_eyelid idx=4 x=103.740 y=-28.564 z=433.880 v=1.000
+2026-03-03 16:22:40,301 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=lower_eyelid idx=0 x=114.378 y=-23.109 z=430.517 v=1.000
+2026-03-03 16:22:40,301 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=lower_eyelid idx=1 x=109.801 y=-24.230 z=431.734 v=1.000
+2026-03-03 16:22:40,301 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=lower_eyelid idx=2 x=104.369 y=-25.395 z=427.803 v=1.000
+2026-03-03 16:22:40,302 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=lower_eyelid idx=3 x=103.078 y=-26.674 z=433.880 v=1.000
+2026-03-03 16:22:40,302 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=lower_eyelid idx=4 x=121.634 y=-22.793 z=429.005 v=1.000
+2026-03-03 16:22:40,302 - __main__ - DEBUG - 坐标 frame_id=1772526156448759 eye=right type=outer_canthus idx=0 x=125.515 y=-24.492 z=432.039 v=1.000
+2026-03-03 16:22:40,302 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:22:40,302 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:22:44,170 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=613.833 | nan占比=59.6% | 中心Z=487.552 中心disp=78.31 (200~1500mm+中值平滑)
+2026-03-03 16:22:44,202 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:22:44,203 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:22:44,203 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:22:44,203 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=pupil idx=0 x=56.400 y=-43.278 z=429.608 v=1.000
+2026-03-03 16:22:44,204 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=iris idx=0 x=62.013 y=-42.551 z=429.005 v=1.000
+2026-03-03 16:22:44,204 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=iris idx=1 x=56.572 y=-48.574 z=429.005 v=1.000
+2026-03-03 16:22:44,204 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=iris idx=2 x=50.502 y=-43.707 z=429.307 v=1.000
+2026-03-03 16:22:44,204 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=iris idx=3 x=55.845 y=-37.400 z=428.103 v=1.000
+2026-03-03 16:22:44,204 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=inner_canthus idx=0 x=67.714 y=-40.513 z=425.124 v=1.000
+2026-03-03 16:22:44,205 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=upper_eyelid idx=0 x=63.824 y=-44.793 z=428.403 v=1.000
+2026-03-03 16:22:44,205 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=upper_eyelid idx=1 x=59.451 y=-46.982 z=431.429 v=1.000
+2026-03-03 16:22:44,205 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=upper_eyelid idx=2 x=54.249 y=-47.199 z=429.307 v=1.000
+2026-03-03 16:22:44,205 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=upper_eyelid idx=3 x=49.523 y=-46.246 z=429.005 v=1.000
+2026-03-03 16:22:44,206 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=upper_eyelid idx=4 x=66.780 y=-42.450 z=428.103 v=1.000
+2026-03-03 16:22:44,206 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=lower_eyelid idx=0 x=54.944 y=-38.872 z=428.103 v=1.000
+2026-03-03 16:22:44,206 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=lower_eyelid idx=1 x=58.983 y=-38.843 z=426.162 v=1.000
+2026-03-03 16:22:44,206 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=lower_eyelid idx=2 x=63.125 y=-39.269 z=424.533 v=1.000
+2026-03-03 16:22:44,206 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=lower_eyelid idx=3 x=66.276 y=-39.804 z=424.828 v=1.000
+2026-03-03 16:22:44,206 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=lower_eyelid idx=4 x=46.491 y=-44.990 z=429.608 v=1.000
+2026-03-03 16:22:44,207 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=left type=outer_canthus idx=0 x=44.420 y=-43.676 z=429.911 v=1.000
+2026-03-03 16:22:44,207 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=pupil idx=0 x=118.961 y=-29.192 z=429.608 v=1.000
+2026-03-03 16:22:44,207 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=iris idx=0 x=126.827 y=-28.490 z=436.984 v=1.000
+2026-03-03 16:22:44,207 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=iris idx=1 x=119.413 y=-34.639 z=428.403 v=1.000
+2026-03-03 16:22:44,208 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=iris idx=2 x=113.646 y=-30.696 z=432.039 v=1.000
+2026-03-03 16:22:44,208 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=iris idx=3 x=119.313 y=-24.112 z=434.188 v=1.000
+2026-03-03 16:22:44,208 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=inner_canthus idx=0 x=106.587 y=-30.262 z=433.572 v=1.000
+2026-03-03 16:22:44,208 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=upper_eyelid idx=0 x=111.368 y=-33.235 z=431.734 v=1.000
+2026-03-03 16:22:44,209 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=upper_eyelid idx=1 x=115.552 y=-33.764 z=430.214 v=1.000
+2026-03-03 16:22:44,209 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=upper_eyelid idx=2 x=119.780 y=-32.706 z=428.704 v=1.000
+2026-03-03 16:22:44,209 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=upper_eyelid idx=3 x=124.905 y=-31.153 z=433.880 v=1.000
+2026-03-03 16:22:44,210 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=upper_eyelid idx=4 x=108.676 y=-31.673 z=433.880 v=1.000
+2026-03-03 16:22:44,210 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=lower_eyelid idx=0 x=117.666 y=-25.752 z=429.307 v=1.000
+2026-03-03 16:22:44,210 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=lower_eyelid idx=1 x=113.754 y=-26.911 z=430.214 v=1.000
+2026-03-03 16:22:44,210 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=lower_eyelid idx=2 x=110.366 y=-28.211 z=431.734 v=1.000
+2026-03-03 16:22:44,210 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=lower_eyelid idx=3 x=107.958 y=-29.382 z=432.651 v=1.000
+2026-03-03 16:22:44,211 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=lower_eyelid idx=4 x=126.276 y=-25.689 z=437.610 v=1.000
+2026-03-03 16:22:44,211 - __main__ - DEBUG - 坐标 frame_id=1772526160309808 eye=right type=outer_canthus idx=0 x=128.745 y=-27.235 z=435.426 v=1.000
+2026-03-03 16:22:44,211 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:22:44,211 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:22:44,330 - __main__ - INFO - 识别线程主循环停止
+2026-03-03 16:22:44,601 - __main__ - INFO - 摄像头资源已释放
+2026-03-03 16:22:44,660 - __main__ - INFO - OpenCV窗口已关闭
+2026-03-03 16:22:44,726 - project.data.data_manager - INFO - 摄像头资源已释放
+2026-03-03 16:22:49,267 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-03-03 16:22:51,210 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-03-03 16:22:51,211 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-03-03 16:22:51,218 - project.core.recognition.detector - INFO - FaceDetector 初始化完成（依赖 CameraDataManager）
+2026-03-03 16:22:51,218 - project.data.data_manager - INFO - 从配置文件加载参数: project/config/camera_params.json
+2026-03-03 16:23:11,628 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=483.079 | nan占比=75.2% | 中心Z=410.277 中心disp=93.06 (200~1500mm+中值平滑)
+2026-03-03 16:23:11,634 - __main__ - INFO - [显示参数] 图像尺寸 h=1080 w=1920 显示尺寸 1280x720 宽高比=1.778 (窗口将固定为该尺寸)
+2026-03-03 16:23:12,616 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:23:12,617 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:23:12,617 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:23:12,617 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=pupil idx=0 x=34.233 y=-29.177 z=371.596 v=0.963
+2026-03-03 16:23:12,618 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=iris idx=0 x=40.483 y=-29.200 z=370.919 v=0.960
+2026-03-03 16:23:12,618 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=iris idx=1 x=33.016 y=-33.825 z=359.778 v=1.000
+2026-03-03 16:23:12,618 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=iris idx=2 x=27.967 y=-29.145 z=371.596 v=1.000
+2026-03-03 16:23:12,618 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=iris idx=3 x=34.726 y=-23.514 z=374.787 v=1.000
+2026-03-03 16:23:12,619 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=inner_canthus idx=0 x=48.968 y=-27.038 z=369.796 v=1.000
+2026-03-03 16:23:12,619 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=upper_eyelid idx=0 x=43.553 y=-30.998 z=368.458 v=1.000
+2026-03-03 16:23:12,619 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=upper_eyelid idx=1 x=38.205 y=-32.422 z=366.689 v=1.000
+2026-03-03 16:23:12,619 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=upper_eyelid idx=2 x=32.939 y=-32.305 z=363.200 v=1.000
+2026-03-03 16:23:12,619 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=upper_eyelid idx=3 x=28.635 y=-31.748 z=369.796 v=1.000
+2026-03-03 16:23:12,620 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=upper_eyelid idx=4 x=47.488 y=-28.753 z=370.694 v=1.000
+2026-03-03 16:23:12,620 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=lower_eyelid idx=0 x=34.407 y=-25.078 z=371.596 v=1.000
+2026-03-03 16:23:12,620 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=lower_eyelid idx=1 x=39.186 y=-25.471 z=370.919 v=1.000
+2026-03-03 16:23:12,620 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=lower_eyelid idx=2 x=43.871 y=-26.128 z=370.020 v=1.000
+2026-03-03 16:23:12,620 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=lower_eyelid idx=3 x=47.325 y=-26.521 z=370.469 v=1.000
+2026-03-03 16:23:12,621 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=lower_eyelid idx=4 x=25.589 y=-30.257 z=370.694 v=1.000
+2026-03-03 16:23:12,621 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=left type=outer_canthus idx=0 x=23.672 y=-28.858 z=370.694 v=1.000
+2026-03-03 16:23:12,621 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=pupil idx=0 x=97.061 y=-27.501 z=365.591 v=0.923
+2026-03-03 16:23:12,621 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=iris idx=0 x=103.312 y=-27.266 z=364.936 v=1.000
+2026-03-03 16:23:12,622 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=iris idx=1 x=96.564 y=-33.109 z=363.417 v=1.000
+2026-03-03 16:23:12,622 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=iris idx=2 x=90.904 y=-27.945 z=366.909 v=1.000
+2026-03-03 16:23:12,623 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=iris idx=3 x=97.145 y=-21.844 z=366.909 v=1.000
+2026-03-03 16:23:12,623 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=inner_canthus idx=0 x=83.958 y=-25.303 z=366.249 v=1.000
+2026-03-03 16:23:12,623 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=upper_eyelid idx=0 x=89.739 y=-29.732 z=367.129 v=1.000
+2026-03-03 16:23:12,623 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=upper_eyelid idx=1 x=95.147 y=-31.293 z=367.129 v=0.647
+2026-03-03 16:23:12,624 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=upper_eyelid idx=2 x=100.141 y=-31.270 z=365.591 v=0.644
+2026-03-03 16:23:12,624 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=upper_eyelid idx=3 x=104.714 y=-30.084 z=365.154 v=0.642
+2026-03-03 16:23:12,624 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=upper_eyelid idx=4 x=85.976 y=-27.250 z=366.909 v=1.000
+2026-03-03 16:23:12,624 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=lower_eyelid idx=0 x=98.283 y=-22.609 z=364.283 v=1.000
+2026-03-03 16:23:12,625 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=lower_eyelid idx=1 x=93.699 y=-23.203 z=366.249 v=1.000
+2026-03-03 16:23:12,625 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=lower_eyelid idx=2 x=88.508 y=-23.859 z=364.066 v=0.930
+2026-03-03 16:23:12,625 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=lower_eyelid idx=3 x=85.675 y=-24.616 z=365.591 v=1.000
+2026-03-03 16:23:12,625 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=lower_eyelid idx=4 x=105.883 y=-23.447 z=364.283 v=1.000
+2026-03-03 16:23:12,625 - __main__ - DEBUG - 坐标 frame_id=1772526171214510 eye=right type=outer_canthus idx=0 x=111.549 y=-27.429 z=372.729 v=0.915
+2026-03-03 16:23:12,626 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:23:12,626 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:23:16,970 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=735.511 | nan占比=83.9% | 中心Z=nan 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:23:17,018 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:23:17,019 - __main__ - WARNING - 警告 1/10: 人脸检测失败
+2026-03-03 16:23:17,121 - __main__ - INFO - 尝试重试 (1/3)
+2026-03-03 16:23:20,860 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=556.152 | nan占比=56.6% | 中心Z=397.723 中心disp=96.00 (200~1500mm+中值平滑)
+2026-03-03 16:23:20,893 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:23:20,894 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:23:20,894 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:23:20,894 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=pupil idx=0 x=32.712 y=-39.363 z=363.633 v=1.000
+2026-03-03 16:23:20,895 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=iris idx=0 x=39.095 y=-39.682 z=363.849 v=1.000
+2026-03-03 16:23:20,895 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=iris idx=1 x=32.352 y=-45.089 z=364.501 v=1.000
+2026-03-03 16:23:20,895 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=iris idx=2 x=26.325 y=-39.098 z=363.417 v=1.000
+2026-03-03 16:23:20,895 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=iris idx=3 x=33.124 y=-33.564 z=363.417 v=1.000
+2026-03-03 16:23:20,896 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=inner_canthus idx=0 x=45.561 y=-36.669 z=359.144 v=1.000
+2026-03-03 16:23:20,896 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=upper_eyelid idx=0 x=40.498 y=-41.574 z=364.066 v=1.000
+2026-03-03 16:23:20,896 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=upper_eyelid idx=1 x=33.576 y=-41.377 z=348.093 v=1.000
+2026-03-03 16:23:20,897 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=upper_eyelid idx=2 x=29.649 y=-42.858 z=360.202 v=1.000
+2026-03-03 16:23:20,897 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=upper_eyelid idx=3 x=24.838 y=-41.369 z=359.144 v=1.000
+2026-03-03 16:23:20,897 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=upper_eyelid idx=4 x=43.956 y=-38.528 z=360.415 v=1.000
+2026-03-03 16:23:20,897 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=lower_eyelid idx=0 x=31.800 y=-35.072 z=363.633 v=1.000
+2026-03-03 16:23:20,897 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=lower_eyelid idx=1 x=36.599 y=-35.677 z=363.849 v=1.000
+2026-03-03 16:23:20,898 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=lower_eyelid idx=2 x=41.115 y=-36.302 z=362.769 v=1.000
+2026-03-03 16:23:20,898 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=lower_eyelid idx=3 x=44.024 y=-36.256 z=359.566 v=1.000
+2026-03-03 16:23:20,898 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=lower_eyelid idx=4 x=22.182 y=-40.032 z=362.554 v=1.000
+2026-03-03 16:23:20,898 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=left type=outer_canthus idx=0 x=20.504 y=-38.638 z=363.417 v=1.000
+2026-03-03 16:23:20,898 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=pupil idx=0 x=95.426 y=-41.230 z=359.144 v=0.919
+2026-03-03 16:23:20,898 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=iris idx=0 x=101.705 y=-41.373 z=358.933 v=1.000
+2026-03-03 16:23:20,899 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=iris idx=1 x=93.740 y=-46.251 z=353.737 v=1.000
+2026-03-03 16:23:20,899 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=iris idx=2 x=88.765 y=-41.134 z=358.511 v=1.000
+2026-03-03 16:23:20,899 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=iris idx=3 x=94.664 y=-35.177 z=356.212 v=1.000
+2026-03-03 16:23:20,899 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=inner_canthus idx=0 x=79.410 y=-36.972 z=354.970 v=1.000
+2026-03-03 16:23:20,900 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=upper_eyelid idx=0 x=85.602 y=-42.459 z=357.672 v=1.000
+2026-03-03 16:23:20,900 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=upper_eyelid idx=1 x=91.306 y=-44.925 z=358.722 v=1.000
+2026-03-03 16:23:20,900 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=upper_eyelid idx=2 x=96.536 y=-45.398 z=357.881 v=1.000
+2026-03-03 16:23:20,900 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=upper_eyelid idx=3 x=101.236 y=-44.488 z=357.462 v=1.000
+2026-03-03 16:23:20,900 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=upper_eyelid idx=4 x=81.792 y=-39.326 z=357.462 v=1.000
+2026-03-03 16:23:20,901 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=lower_eyelid idx=0 x=94.493 y=-35.960 z=356.212 v=1.000
+2026-03-03 16:23:20,901 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=lower_eyelid idx=1 x=89.441 y=-36.214 z=356.420 v=1.000
+2026-03-03 16:23:20,901 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=lower_eyelid idx=2 x=84.927 y=-36.686 z=357.253 v=1.000
+2026-03-03 16:23:20,901 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=lower_eyelid idx=3 x=81.558 y=-36.822 z=356.628 v=1.000
+2026-03-03 16:23:20,902 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=lower_eyelid idx=4 x=102.355 y=-37.159 z=356.212 v=1.000
+2026-03-03 16:23:20,902 - __main__ - DEBUG - 坐标 frame_id=1772526192636264 eye=right type=outer_canthus idx=0 x=105.809 y=-41.326 z=357.045 v=1.000
+2026-03-03 16:23:20,902 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:23:20,902 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:23:24,682 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=566.286 | nan占比=56.4% | 中心Z=389.607 中心disp=98.00 (200~1500mm+中值平滑)
+2026-03-03 16:23:24,776 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:23:24,777 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:23:24,777 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:23:24,777 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=pupil idx=0 x=35.243 y=-40.919 z=362.985 v=1.000
+2026-03-03 16:23:24,777 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=iris idx=0 x=41.364 y=-41.198 z=363.200 v=1.000
+2026-03-03 16:23:24,777 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=iris idx=1 x=34.097 y=-45.276 z=354.352 v=1.000
+2026-03-03 16:23:24,778 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=iris idx=2 x=29.202 y=-40.662 z=362.769 v=1.000
+2026-03-03 16:23:24,778 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=iris idx=3 x=35.310 y=-35.058 z=360.202 v=1.000
+2026-03-03 16:23:24,778 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=inner_canthus idx=0 x=48.718 y=-38.677 z=358.933 v=1.000
+2026-03-03 16:23:24,779 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=upper_eyelid idx=0 x=43.044 y=-42.034 z=356.836 v=1.000
+2026-03-03 16:23:24,779 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=upper_eyelid idx=1 x=37.589 y=-43.035 z=354.147 v=1.000
+2026-03-03 16:23:24,779 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=upper_eyelid idx=2 x=33.080 y=-43.293 z=356.420 v=1.000
+2026-03-03 16:23:24,779 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=upper_eyelid idx=3 x=28.777 y=-42.397 z=358.722 v=1.000
+2026-03-03 16:23:24,780 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=upper_eyelid idx=4 x=47.138 y=-40.226 z=359.778 v=1.000
+2026-03-03 16:23:24,780 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=lower_eyelid idx=0 x=34.894 y=-36.925 z=360.202 v=1.000
+2026-03-03 16:23:24,780 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=lower_eyelid idx=1 x=39.761 y=-37.671 z=362.339 v=1.000
+2026-03-03 16:23:24,780 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=lower_eyelid idx=2 x=44.183 y=-38.177 z=360.841 v=1.000
+2026-03-03 16:23:24,781 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=lower_eyelid idx=3 x=47.280 y=-38.333 z=359.778 v=1.000
+2026-03-03 16:23:24,781 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=lower_eyelid idx=4 x=26.238 y=-41.534 z=363.633 v=1.000
+2026-03-03 16:23:24,781 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=left type=outer_canthus idx=0 x=24.393 y=-40.306 z=364.066 v=1.000
+2026-03-03 16:23:24,781 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=pupil idx=0 x=96.723 y=-40.588 z=355.797 v=0.918
+2026-03-03 16:23:24,781 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=iris idx=0 x=103.169 y=-40.686 z=356.836 v=1.000
+2026-03-03 16:23:24,782 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=iris idx=1 x=94.877 y=-45.311 z=349.287 v=1.000
+2026-03-03 16:23:24,782 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=iris idx=2 x=90.741 y=-40.869 z=356.836 v=1.000
+2026-03-03 16:23:24,782 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=iris idx=3 x=95.364 y=-34.613 z=351.296 v=1.000
+2026-03-03 16:23:24,782 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=inner_canthus idx=0 x=82.928 y=-37.911 z=356.836 v=1.000
+2026-03-03 16:23:24,783 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=upper_eyelid idx=0 x=88.373 y=-42.166 z=356.004 v=1.000
+2026-03-03 16:23:24,783 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=upper_eyelid idx=1 x=93.808 y=-43.870 z=356.212 v=1.000
+2026-03-03 16:23:24,783 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=upper_eyelid idx=2 x=97.514 y=-43.457 z=350.892 v=0.915
+2026-03-03 16:23:24,783 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=upper_eyelid idx=3 x=102.200 y=-42.653 z=351.498 v=0.912
+2026-03-03 16:23:24,784 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=upper_eyelid idx=4 x=84.838 y=-39.747 z=357.045 v=1.000
+2026-03-03 16:23:24,784 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=lower_eyelid idx=0 x=97.171 y=-36.200 z=355.590 v=1.000
+2026-03-03 16:23:24,784 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=lower_eyelid idx=1 x=92.485 y=-36.685 z=356.836 v=1.000
+2026-03-03 16:23:24,784 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=lower_eyelid idx=2 x=87.970 y=-37.283 z=357.462 v=1.000
+2026-03-03 16:23:24,785 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=lower_eyelid idx=3 x=84.836 y=-37.622 z=357.462 v=1.000
+2026-03-03 16:23:24,785 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=lower_eyelid idx=4 x=105.456 y=-37.157 z=357.462 v=1.000
+2026-03-03 16:23:24,785 - __main__ - DEBUG - 坐标 frame_id=1772526200909718 eye=right type=outer_canthus idx=0 x=108.697 y=-40.497 z=357.462 v=1.000
+2026-03-03 16:23:24,785 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:23:24,785 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:23:28,724 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=565.013 | nan占比=56.6% | 中心Z=402.175 中心disp=94.94 (200~1500mm+中值平滑)
+2026-03-03 16:23:28,756 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:23:28,757 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:23:28,757 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:23:28,757 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=pupil idx=0 x=37.920 y=-40.417 z=370.244 v=1.000
+2026-03-03 16:23:28,757 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=iris idx=0 x=43.909 y=-40.498 z=368.458 v=1.000
+2026-03-03 16:23:28,758 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=iris idx=1 x=36.183 y=-44.002 z=356.940 v=1.000
+2026-03-03 16:23:28,758 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=iris idx=2 x=31.644 y=-40.018 z=368.680 v=1.000
+2026-03-03 16:23:28,758 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=iris idx=3 x=38.038 y=-34.805 z=367.350 v=1.000
+2026-03-03 16:23:28,758 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=inner_canthus idx=0 x=50.784 y=-38.411 z=365.810 v=1.000
+2026-03-03 16:23:28,759 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=upper_eyelid idx=0 x=45.883 y=-42.049 z=370.244 v=1.000
+2026-03-03 16:23:28,759 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=upper_eyelid idx=1 x=40.571 y=-42.981 z=369.349 v=1.000
+2026-03-03 16:23:28,759 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=upper_eyelid idx=2 x=35.335 y=-42.190 z=363.849 v=1.000
+2026-03-03 16:23:28,759 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=upper_eyelid idx=3 x=30.716 y=-40.671 z=360.628 v=1.000
+2026-03-03 16:23:28,759 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=upper_eyelid idx=4 x=49.259 y=-39.848 z=367.129 v=1.000
+2026-03-03 16:23:28,760 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=lower_eyelid idx=0 x=37.337 y=-36.932 z=367.571 v=1.000
+2026-03-03 16:23:28,760 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=lower_eyelid idx=1 x=41.939 y=-37.512 z=368.236 v=1.000
+2026-03-03 16:23:28,760 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=lower_eyelid idx=2 x=46.498 y=-38.228 z=369.349 v=1.000
+2026-03-03 16:23:28,760 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=lower_eyelid idx=3 x=49.367 y=-38.177 z=366.909 v=1.000
+2026-03-03 16:23:28,760 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=lower_eyelid idx=4 x=28.644 y=-40.344 z=369.572 v=1.000
+2026-03-03 16:23:28,761 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=left type=outer_canthus idx=0 x=26.794 y=-39.190 z=369.572 v=1.000
+2026-03-03 16:23:28,761 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=pupil idx=0 x=99.103 y=-41.535 z=363.849 v=1.000
+2026-03-03 16:23:28,761 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=iris idx=0 x=104.976 y=-41.483 z=362.769 v=1.000
+2026-03-03 16:23:28,761 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=iris idx=1 x=98.107 y=-46.463 z=360.628 v=1.000
+2026-03-03 16:23:28,761 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=iris idx=2 x=92.665 y=-41.579 z=363.417 v=1.000
+2026-03-03 16:23:28,762 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=iris idx=3 x=98.880 y=-36.167 z=363.417 v=1.000
+2026-03-03 16:23:28,762 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=inner_canthus idx=0 x=85.345 y=-38.495 z=363.633 v=1.000
+2026-03-03 16:23:28,762 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=upper_eyelid idx=0 x=90.446 y=-42.521 z=362.769 v=1.000
+2026-03-03 16:23:28,762 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=upper_eyelid idx=1 x=95.890 y=-44.259 z=363.633 v=1.000
+2026-03-03 16:23:28,763 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=upper_eyelid idx=2 x=100.971 y=-44.592 z=363.633 v=1.000
+2026-03-03 16:23:28,763 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=upper_eyelid idx=3 x=105.465 y=-43.855 z=363.633 v=1.000
+2026-03-03 16:23:28,763 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=upper_eyelid idx=4 x=87.031 y=-40.217 z=363.417 v=1.000
+2026-03-03 16:23:28,763 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=lower_eyelid idx=0 x=99.589 y=-37.416 z=363.417 v=1.000
+2026-03-03 16:23:28,764 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=lower_eyelid idx=1 x=94.730 y=-37.657 z=363.633 v=1.000
+2026-03-03 16:23:28,764 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=lower_eyelid idx=2 x=90.021 y=-37.952 z=362.985 v=1.000
+2026-03-03 16:23:28,764 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=lower_eyelid idx=3 x=86.943 y=-38.155 z=362.985 v=1.000
+2026-03-03 16:23:28,764 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=lower_eyelid idx=4 x=107.149 y=-38.281 z=363.633 v=1.000
+2026-03-03 16:23:28,764 - __main__ - DEBUG - 坐标 frame_id=1772526204799954 eye=right type=outer_canthus idx=0 x=110.200 y=-41.357 z=363.633 v=0.910
+2026-03-03 16:23:28,765 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:23:28,765 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:23:32,574 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=202.353 max=1497.312 mean=569.198 | nan占比=57.6% | 中心Z=405.646 中心disp=94.06 (200~1500mm+中值平滑)
+2026-03-03 16:23:32,607 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:23:32,608 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:23:32,608 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:23:32,608 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=pupil idx=0 x=36.496 y=-40.035 z=372.729 v=1.000
+2026-03-03 16:23:32,609 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=iris idx=0 x=42.524 y=-40.092 z=370.020 v=1.000
+2026-03-03 16:23:32,609 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=iris idx=1 x=34.560 y=-43.354 z=356.420 v=1.000
+2026-03-03 16:23:32,609 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=iris idx=2 x=29.933 y=-39.422 z=369.796 v=1.000
+2026-03-03 16:23:32,609 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=iris idx=3 x=36.700 y=-34.421 z=370.919 v=1.000
+2026-03-03 16:23:32,610 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=inner_canthus idx=0 x=49.773 y=-37.583 z=364.718 v=1.000
+2026-03-03 16:23:32,610 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=upper_eyelid idx=0 x=44.560 y=-41.151 z=368.236 v=1.000
+2026-03-03 16:23:32,610 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=upper_eyelid idx=1 x=39.500 y=-42.542 z=371.144 v=1.000
+2026-03-03 16:23:32,610 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=upper_eyelid idx=2 x=34.710 y=-42.489 z=372.048 v=1.000
+2026-03-03 16:23:32,610 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=upper_eyelid idx=3 x=29.992 y=-41.092 z=369.796 v=1.000
+2026-03-03 16:23:32,611 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=upper_eyelid idx=4 x=48.211 y=-39.055 z=366.249 v=1.000
+2026-03-03 16:23:32,611 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=lower_eyelid idx=0 x=36.196 y=-36.335 z=370.469 v=1.000
+2026-03-03 16:23:32,611 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=lower_eyelid idx=1 x=40.943 y=-36.912 z=370.694 v=1.000
+2026-03-03 16:23:32,611 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=lower_eyelid idx=2 x=45.335 y=-37.374 z=368.458 v=1.000
+2026-03-03 16:23:32,611 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=lower_eyelid idx=3 x=48.386 y=-37.381 z=366.249 v=1.000
+2026-03-03 16:23:32,611 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=lower_eyelid idx=4 x=27.124 y=-39.759 z=369.572 v=1.000
+2026-03-03 16:23:32,612 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=left type=outer_canthus idx=0 x=25.420 y=-38.831 z=371.370 v=1.000
+2026-03-03 16:23:32,612 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=pupil idx=0 x=98.103 y=-41.623 z=363.417 v=1.000
+2026-03-03 16:23:32,612 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=iris idx=0 x=104.079 y=-41.681 z=362.339 v=1.000
+2026-03-03 16:23:32,612 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=iris idx=1 x=96.027 y=-46.022 z=356.212 v=1.000
+2026-03-03 16:23:32,613 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=iris idx=2 x=91.431 y=-41.506 z=362.554 v=1.000
+2026-03-03 16:23:32,613 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=iris idx=3 x=99.040 y=-36.699 z=367.350 v=1.000
+2026-03-03 16:23:32,613 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=inner_canthus idx=0 x=83.501 y=-38.281 z=360.415 v=1.000
+2026-03-03 16:23:32,613 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=upper_eyelid idx=0 x=88.967 y=-42.427 z=361.054 v=1.000
+2026-03-03 16:23:32,613 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=upper_eyelid idx=1 x=94.854 y=-44.401 z=363.417 v=1.000
+2026-03-03 16:23:32,613 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=upper_eyelid idx=2 x=99.768 y=-44.615 z=362.554 v=1.000
+2026-03-03 16:23:32,614 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=upper_eyelid idx=3 x=103.143 y=-43.480 z=359.144 v=0.913
+2026-03-03 16:23:32,614 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=upper_eyelid idx=4 x=85.837 y=-40.281 z=362.985 v=1.000
+2026-03-03 16:23:32,614 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=lower_eyelid idx=0 x=97.938 y=-37.360 z=360.628 v=1.000
+2026-03-03 16:23:32,614 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=lower_eyelid idx=1 x=93.049 y=-37.556 z=360.841 v=1.000
+2026-03-03 16:23:32,614 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=lower_eyelid idx=2 x=88.373 y=-37.861 z=360.415 v=1.000
+2026-03-03 16:23:32,614 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=lower_eyelid idx=3 x=85.449 y=-38.126 z=361.267 v=1.000
+2026-03-03 16:23:32,614 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=lower_eyelid idx=4 x=105.573 y=-38.467 z=361.695 v=1.000
+2026-03-03 16:23:32,615 - __main__ - DEBUG - 坐标 frame_id=1772526208771345 eye=right type=outer_canthus idx=0 x=108.429 y=-41.486 z=361.481 v=0.911
+2026-03-03 16:23:32,615 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:23:32,615 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:23:36,368 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.099 max=1497.312 mean=569.381 | nan占比=58.1% | 中心Z=403.236 中心disp=94.75 (200~1500mm+中值平滑)
+2026-03-03 16:23:36,395 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:23:36,396 - project.core.recognition.detector - WARNING - 拟合点未全部有效（缺失或 x/y/z 为 nan）
+2026-03-03 16:23:36,397 - __main__ - WARNING - 警告 1/10: 人脸检测失败
+2026-03-03 16:23:36,498 - __main__ - INFO - 尝试重试 (1/3)
+2026-03-03 16:23:40,147 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=587.599 | nan占比=56.7% | 中心Z=447.548 中心disp=85.38 (200~1500mm+中值平滑)
+2026-03-03 16:23:40,179 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:23:40,180 - project.core.recognition.detector - WARNING - 拟合点未全部有效（缺失或 x/y/z 为 nan）
+2026-03-03 16:23:40,180 - __main__ - WARNING - 警告 2/10: 人脸检测失败
+2026-03-03 16:23:40,281 - __main__ - INFO - 尝试重试 (2/3)
+2026-03-03 16:23:43,955 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.132 max=1497.312 mean=583.662 | nan占比=58.5% | 中心Z=449.855 中心disp=85.00 (200~1500mm+中值平滑)
+2026-03-03 16:23:44,026 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:23:44,027 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:23:44,027 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:23:44,027 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=pupil idx=0 x=89.253 y=19.684 z=404.840 v=1.000
+2026-03-03 16:23:44,027 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=iris idx=0 x=93.144 y=17.957 z=400.855 v=1.000
+2026-03-03 16:23:44,028 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=iris idx=1 x=87.963 y=14.026 z=403.769 v=1.000
+2026-03-03 16:23:44,028 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=iris idx=2 x=83.843 y=20.973 z=402.175 v=1.000
+2026-03-03 16:23:44,028 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=iris idx=3 x=90.184 y=25.430 z=404.974 v=1.000
+2026-03-03 16:23:44,029 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=inner_canthus idx=0 x=43.751 y=-54.515 z=420.154 v=1.000
+2026-03-03 16:23:44,029 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=upper_eyelid idx=0 x=39.067 y=-55.899 z=418.714 v=1.000
+2026-03-03 16:23:44,029 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=upper_eyelid idx=1 x=34.324 y=-56.191 z=419.001 v=1.000
+2026-03-03 16:23:44,029 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=upper_eyelid idx=2 x=29.808 y=-55.659 z=418.714 v=1.000
+2026-03-03 16:23:44,030 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=upper_eyelid idx=3 x=26.247 y=-56.496 z=433.880 v=1.000
+2026-03-03 16:23:44,030 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=upper_eyelid idx=4 x=42.196 y=-55.049 z=419.576 v=1.000
+2026-03-03 16:23:44,030 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=lower_eyelid idx=0 x=32.672 y=-51.658 z=427.205 v=1.000
+2026-03-03 16:23:44,031 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=lower_eyelid idx=1 x=36.636 y=-52.451 z=424.828 v=1.000
+2026-03-03 16:23:44,031 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=lower_eyelid idx=2 x=40.587 y=-53.750 z=424.238 v=1.000
+2026-03-03 16:23:44,031 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=lower_eyelid idx=3 x=43.135 y=-54.422 z=423.650 v=1.000
+2026-03-03 16:23:44,031 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=lower_eyelid idx=4 x=22.690 y=-54.112 z=424.238 v=1.000
+2026-03-03 16:23:44,031 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=left type=outer_canthus idx=0 x=20.879 y=-53.460 z=425.717 v=1.000
+2026-03-03 16:23:44,031 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=pupil idx=0 x=118.561 y=10.302 z=402.573 v=1.000
+2026-03-03 16:23:44,032 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=iris idx=0 x=139.810 y=10.827 z=454.203 v=1.000
+2026-03-03 16:23:44,032 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=iris idx=1 x=131.831 y=5.435 z=449.194 v=1.000
+2026-03-03 16:23:44,032 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=iris idx=2 x=113.858 y=11.134 z=404.574 v=1.000
+2026-03-03 16:23:44,032 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=iris idx=3 x=133.295 y=17.742 z=450.851 v=1.000
+2026-03-03 16:23:44,033 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=inner_canthus idx=0 x=82.057 y=-51.758 z=423.944 v=1.000
+2026-03-03 16:23:44,033 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=upper_eyelid idx=0 x=84.829 y=-54.822 z=420.443 v=1.000
+2026-03-03 16:23:44,033 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=upper_eyelid idx=1 x=88.747 y=-55.956 z=419.576 v=1.000
+2026-03-03 16:23:44,033 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=upper_eyelid idx=2 x=93.160 y=-56.045 z=419.001 v=1.000
+2026-03-03 16:23:44,034 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=upper_eyelid idx=3 x=97.616 y=-55.132 z=419.001 v=1.000
+2026-03-03 16:23:44,034 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=upper_eyelid idx=4 x=83.026 y=-53.126 z=422.770 v=1.000
+2026-03-03 16:23:44,034 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=lower_eyelid idx=0 x=93.164 y=-50.298 z=421.022 v=1.000
+2026-03-03 16:23:44,035 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=lower_eyelid idx=1 x=89.144 y=-50.879 z=423.063 v=1.000
+2026-03-03 16:23:44,035 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=lower_eyelid idx=2 x=85.715 y=-51.483 z=423.944 v=1.000
+2026-03-03 16:23:44,035 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=lower_eyelid idx=3 x=83.432 y=-51.666 z=423.944 v=1.000
+2026-03-03 16:23:44,036 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=lower_eyelid idx=4 x=101.731 y=-51.232 z=423.944 v=1.000
+2026-03-03 16:23:44,036 - __main__ - DEBUG - 坐标 frame_id=1772526212621224 eye=right type=outer_canthus idx=0 x=104.280 y=-53.181 z=423.944 v=1.000
+2026-03-03 16:23:44,036 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:23:44,036 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:23:47,870 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=590.620 | nan占比=57.8% | 中心Z=459.499 中心disp=83.00 (200~1500mm+中值平滑)
+2026-03-03 16:23:47,904 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:23:47,905 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:23:47,905 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:23:47,905 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=pupil idx=0 x=42.474 y=-50.094 z=427.504 v=1.000
+2026-03-03 16:23:47,906 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=iris idx=0 x=48.290 y=-50.098 z=423.944 v=1.000
+2026-03-03 16:23:47,906 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=iris idx=1 x=41.625 y=-55.582 z=424.238 v=1.000
+2026-03-03 16:23:47,906 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=iris idx=2 x=36.546 y=-49.779 z=428.403 v=1.000
+2026-03-03 16:23:47,930 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=iris idx=3 x=42.799 y=-43.820 z=424.828 v=1.000
+2026-03-03 16:23:47,930 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=inner_canthus idx=0 x=49.280 y=-52.733 z=423.356 v=1.000
+2026-03-03 16:23:47,930 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=upper_eyelid idx=0 x=43.872 y=-55.971 z=424.238 v=1.000
+2026-03-03 16:23:47,931 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=upper_eyelid idx=1 x=38.748 y=-57.104 z=424.533 v=1.000
+2026-03-03 16:23:47,931 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=upper_eyelid idx=2 x=33.731 y=-56.905 z=423.063 v=1.000
+2026-03-03 16:23:47,931 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=upper_eyelid idx=3 x=29.472 y=-56.474 z=428.403 v=1.000
+2026-03-03 16:23:47,932 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=upper_eyelid idx=4 x=47.517 y=-53.936 z=423.650 v=1.000
+2026-03-03 16:23:47,932 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=lower_eyelid idx=0 x=35.164 y=-50.644 z=424.828 v=1.000
+2026-03-03 16:23:47,933 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=lower_eyelid idx=1 x=40.187 y=-51.534 z=428.403 v=1.000
+2026-03-03 16:23:47,933 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=lower_eyelid idx=2 x=44.924 y=-52.196 z=427.504 v=1.000
+2026-03-03 16:23:47,933 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=lower_eyelid idx=3 x=47.856 y=-52.268 z=424.238 v=1.000
+2026-03-03 16:23:47,934 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=lower_eyelid idx=4 x=26.158 y=-54.298 z=422.770 v=1.000
+2026-03-03 16:23:47,934 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=left type=outer_canthus idx=0 x=24.109 y=-52.859 z=421.313 v=1.000
+2026-03-03 16:23:47,934 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=pupil idx=0 x=103.679 y=-47.319 z=427.803 v=1.000
+2026-03-03 16:23:47,935 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=iris idx=0 x=110.367 y=-47.217 z=429.307 v=1.000
+2026-03-03 16:23:47,935 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=iris idx=1 x=102.915 y=-52.685 z=423.650 v=1.000
+2026-03-03 16:23:47,935 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=iris idx=2 x=97.400 y=-47.750 z=428.403 v=1.000
+2026-03-03 16:23:47,936 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=iris idx=3 x=104.503 y=-42.075 z=432.820 v=1.000
+2026-03-03 16:23:47,936 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=inner_canthus idx=0 x=81.868 y=-49.474 z=423.944 v=1.000
+2026-03-03 16:23:47,936 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=upper_eyelid idx=0 x=86.802 y=-53.278 z=423.944 v=1.000
+2026-03-03 16:23:47,937 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=upper_eyelid idx=1 x=91.689 y=-54.856 z=424.238 v=1.000
+2026-03-03 16:23:47,937 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=upper_eyelid idx=2 x=96.428 y=-54.717 z=422.770 v=1.000
+2026-03-03 16:23:47,937 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=upper_eyelid idx=3 x=100.997 y=-53.617 z=423.063 v=1.000
+2026-03-03 16:23:47,937 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=upper_eyelid idx=4 x=83.602 y=-51.143 z=424.238 v=1.000
+2026-03-03 16:23:47,938 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=lower_eyelid idx=0 x=96.899 y=-47.202 z=428.704 v=1.000
+2026-03-03 16:23:47,938 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=lower_eyelid idx=1 x=91.205 y=-47.519 z=425.124 v=1.000
+2026-03-03 16:23:47,938 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=lower_eyelid idx=2 x=86.761 y=-48.351 z=424.533 v=1.000
+2026-03-03 16:23:47,938 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=lower_eyelid idx=3 x=83.724 y=-48.984 z=424.238 v=1.000
+2026-03-03 16:23:47,939 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=lower_eyelid idx=4 x=104.440 y=-47.689 z=428.103 v=1.000
+2026-03-03 16:23:47,939 - __main__ - DEBUG - 坐标 frame_id=1772526224056133 eye=right type=outer_canthus idx=0 x=106.577 y=-50.679 z=426.311 v=1.000
+2026-03-03 16:23:47,939 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:23:47,940 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:23:48,075 - __main__ - INFO - 识别线程主循环停止
+2026-03-03 16:23:48,341 - __main__ - INFO - 摄像头资源已释放
+2026-03-03 16:23:48,389 - __main__ - INFO - OpenCV窗口已关闭
+2026-03-03 16:23:48,455 - project.data.data_manager - INFO - 摄像头资源已释放
+2026-03-03 16:24:13,210 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-03-03 16:24:14,987 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-03-03 16:24:14,988 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-03-03 16:24:15,000 - project.core.recognition.detector - INFO - FaceDetector 初始化完成（依赖 CameraDataManager）
+2026-03-03 16:24:15,001 - project.data.data_manager - INFO - 从配置文件加载参数: project/config/camera_params.json
+2026-03-03 16:24:35,531 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.099 max=1497.312 mean=569.023 | nan占比=98.1% | 中心Z=nan 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:24:35,539 - __main__ - INFO - [显示参数] 图像尺寸 h=1080 w=1920 显示尺寸 1280x720 宽高比=1.778 (窗口将固定为该尺寸)
+2026-03-03 16:24:36,536 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:24:36,537 - __main__ - WARNING - 警告 1/10: 人脸检测失败
+2026-03-03 16:24:36,638 - __main__ - INFO - 尝试重试 (1/3)
+2026-03-03 16:24:40,932 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1490.008 mean=639.742 | nan占比=96.2% | 中心Z=nan 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:24:40,946 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:24:40,947 - __main__ - WARNING - 警告 2/10: 人脸检测失败
+2026-03-03 16:24:41,048 - __main__ - INFO - 尝试重试 (2/3)
+2026-03-03 16:24:44,969 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=562.878 | nan占比=69.1% | 中心Z=441.085 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:24:45,001 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:24:45,002 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:24:45,002 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:24:45,002 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=pupil idx=0 x=0.130 y=38.700 z=416.147 v=1.000
+2026-03-03 16:24:45,002 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=iris idx=0 x=6.212 y=38.024 z=415.016 v=1.000
+2026-03-03 16:24:45,003 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=iris idx=1 x=-0.608 y=33.284 z=419.865 v=1.000
+2026-03-03 16:24:45,003 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=iris idx=2 x=-5.931 y=39.410 z=417.569 v=1.000
+2026-03-03 16:24:45,003 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=iris idx=3 x=0.898 y=44.073 z=411.660 v=0.977
+2026-03-03 16:24:45,003 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=inner_canthus idx=0 x=14.992 y=39.880 z=416.147 v=1.000
+2026-03-03 16:24:45,003 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=upper_eyelid idx=0 x=9.761 y=36.590 z=419.288 v=1.000
+2026-03-03 16:24:45,004 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=upper_eyelid idx=1 x=4.587 y=35.306 z=419.001 v=1.000
+2026-03-03 16:24:45,004 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=upper_eyelid idx=2 x=-0.510 y=35.145 z=416.714 v=1.000
+2026-03-03 16:24:45,004 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=upper_eyelid idx=3 x=-5.543 y=36.508 z=415.722 v=1.000
+2026-03-03 16:24:45,004 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=upper_eyelid idx=4 x=13.329 y=38.436 z=416.147 v=1.000
+2026-03-03 16:24:45,004 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=lower_eyelid idx=0 x=0.716 y=42.865 z=411.660 v=1.000
+2026-03-03 16:24:45,005 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=lower_eyelid idx=1 x=5.405 y=41.942 z=410.553 v=0.978
+2026-03-03 16:24:45,005 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=lower_eyelid idx=2 x=9.882 y=40.509 z=406.997 v=1.000
+2026-03-03 16:24:45,005 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=lower_eyelid idx=3 x=13.021 y=39.634 z=405.377 v=1.000
+2026-03-03 16:24:45,005 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=lower_eyelid idx=4 x=-8.751 y=38.745 z=419.865 v=1.000
+2026-03-03 16:24:45,005 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=left type=outer_canthus idx=0 x=-10.606 y=40.392 z=419.576 v=1.000
+2026-03-03 16:24:45,006 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=pupil idx=0 x=64.313 y=37.374 z=411.106 v=1.000
+2026-03-03 16:24:45,006 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=iris idx=0 x=69.882 y=36.878 z=406.727 v=1.000
+2026-03-03 16:24:45,006 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=iris idx=1 x=64.957 y=32.141 z=417.854 v=1.000
+2026-03-03 16:24:45,006 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=iris idx=2 x=58.062 y=37.369 z=411.383 v=1.000
+2026-03-03 16:24:45,006 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=iris idx=3 x=64.597 y=43.072 z=411.383 v=1.000
+2026-03-03 16:24:45,007 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=inner_canthus idx=0 x=51.349 y=40.563 z=407.813 v=1.000
+2026-03-03 16:24:45,007 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=upper_eyelid idx=0 x=57.239 y=36.232 z=413.611 v=1.000
+2026-03-03 16:24:45,007 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=upper_eyelid idx=1 x=62.276 y=34.275 z=412.215 v=0.956
+2026-03-03 16:24:45,007 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=upper_eyelid idx=2 x=67.646 y=33.996 z=412.215 v=0.667
+2026-03-03 16:24:45,007 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=upper_eyelid idx=3 x=71.066 y=34.324 z=403.237 v=0.950
+2026-03-03 16:24:45,008 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=upper_eyelid idx=4 x=53.703 y=38.970 z=413.052 v=1.000
+2026-03-03 16:24:45,008 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=lower_eyelid idx=0 x=67.324 y=43.212 z=413.891 v=1.000
+2026-03-03 16:24:45,008 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=lower_eyelid idx=1 x=61.592 y=42.566 z=410.277 v=1.000
+2026-03-03 16:24:45,008 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=lower_eyelid idx=2 x=56.454 y=41.660 z=407.269 v=1.000
+2026-03-03 16:24:45,009 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=lower_eyelid idx=3 x=53.420 y=41.223 z=408.631 v=1.000
+2026-03-03 16:24:45,009 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=lower_eyelid idx=4 x=75.235 y=42.168 z=414.453 v=1.000
+2026-03-03 16:24:45,009 - __main__ - DEBUG - 坐标 frame_id=1772526254994605 eye=right type=outer_canthus idx=0 x=76.722 y=37.956 z=406.997 v=0.946
+2026-03-03 16:24:45,009 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:24:45,009 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:24:48,864 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=549.658 | nan占比=63.4% | 中心Z=404.650 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:24:48,907 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:24:48,908 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:24:48,908 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:24:48,908 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=pupil idx=0 x=13.555 y=-16.148 z=396.304 v=1.000
+2026-03-03 16:24:48,909 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=iris idx=0 x=19.395 y=-16.686 z=397.206 v=1.000
+2026-03-03 16:24:48,909 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=iris idx=1 x=13.026 y=-21.999 z=399.283 v=1.000
+2026-03-03 16:24:48,909 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=iris idx=2 x=7.740 y=-15.608 z=393.117 v=1.000
+2026-03-03 16:24:48,909 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=iris idx=3 x=14.181 y=-10.415 z=396.948 v=1.000
+2026-03-03 16:24:48,909 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=inner_canthus idx=0 x=27.118 y=-16.421 z=395.919 v=1.000
+2026-03-03 16:24:48,910 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=upper_eyelid idx=0 x=21.736 y=-17.629 z=390.853 v=1.000
+2026-03-03 16:24:48,910 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=upper_eyelid idx=1 x=17.101 y=-18.282 z=397.723 v=1.000
+2026-03-03 16:24:48,910 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=upper_eyelid idx=2 x=12.240 y=-17.872 z=393.623 v=1.000
+2026-03-03 16:24:48,910 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=upper_eyelid idx=3 x=7.621 y=-17.005 z=393.370 v=1.000
+2026-03-03 16:24:48,911 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=upper_eyelid idx=4 x=25.427 y=-17.026 z=395.663 v=1.000
+2026-03-03 16:24:48,911 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=lower_eyelid idx=0 x=13.983 y=-13.576 z=393.370 v=1.000
+2026-03-03 16:24:48,911 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=lower_eyelid idx=1 x=18.100 y=-13.956 z=386.159 v=1.000
+2026-03-03 16:24:48,911 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=lower_eyelid idx=2 x=22.540 y=-15.050 z=390.853 v=1.000
+2026-03-03 16:24:48,911 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=lower_eyelid idx=3 x=25.790 y=-15.875 z=396.176 v=1.000
+2026-03-03 16:24:48,912 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=lower_eyelid idx=4 x=4.601 y=-16.499 z=400.592 v=1.000
+2026-03-03 16:24:48,912 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=left type=outer_canthus idx=0 x=2.425 y=-15.831 z=401.646 v=1.000
+2026-03-03 16:24:48,912 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=pupil idx=0 x=75.108 y=-14.155 z=393.877 v=1.000
+2026-03-03 16:24:48,912 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=iris idx=0 x=81.701 y=-14.267 z=398.242 v=1.000
+2026-03-03 16:24:48,913 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=iris idx=1 x=74.664 y=-19.572 z=392.359 v=1.000
+2026-03-03 16:24:48,913 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=iris idx=2 x=68.625 y=-14.255 z=390.603 v=1.000
+2026-03-03 16:24:48,913 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=iris idx=3 x=75.083 y=-8.783 z=394.131 v=1.000
+2026-03-03 16:24:48,913 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=inner_canthus idx=0 x=61.678 y=-12.383 z=392.359 v=1.000
+2026-03-03 16:24:48,913 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=upper_eyelid idx=0 x=66.026 y=-15.477 z=393.117 v=1.000
+2026-03-03 16:24:48,913 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=upper_eyelid idx=1 x=70.758 y=-16.672 z=394.640 v=1.000
+2026-03-03 16:24:48,914 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=upper_eyelid idx=2 x=75.114 y=-16.694 z=393.117 v=1.000
+2026-03-03 16:24:48,914 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=upper_eyelid idx=3 x=80.231 y=-16.127 z=397.983 v=1.000
+2026-03-03 16:24:48,914 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=upper_eyelid idx=4 x=63.252 y=-13.785 z=393.117 v=1.000
+2026-03-03 16:24:48,914 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=lower_eyelid idx=0 x=75.618 y=-10.512 z=393.623 v=0.946
+2026-03-03 16:24:48,914 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=lower_eyelid idx=1 x=70.358 y=-10.786 z=390.353 v=0.949
+2026-03-03 16:24:48,915 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=lower_eyelid idx=2 x=66.663 y=-11.463 z=393.623 v=1.000
+2026-03-03 16:24:48,915 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=lower_eyelid idx=3 x=63.640 y=-11.968 z=393.117 v=1.000
+2026-03-03 16:24:48,915 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=lower_eyelid idx=4 x=84.118 y=-11.537 z=401.910 v=1.000
+2026-03-03 16:24:48,915 - __main__ - DEBUG - 坐标 frame_id=1772526285040646 eye=right type=outer_canthus idx=0 x=85.965 y=-13.689 z=401.646 v=0.940
+2026-03-03 16:24:48,915 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:24:48,915 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:24:52,800 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=542.031 | nan占比=65.9% | 中心Z=nan 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:24:52,828 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:24:52,829 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:24:52,829 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:24:52,830 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=pupil idx=0 x=10.208 y=-17.297 z=385.915 v=1.000
+2026-03-03 16:24:52,830 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=iris idx=0 x=16.255 y=-17.814 z=386.159 v=1.000
+2026-03-03 16:24:52,830 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=iris idx=1 x=9.736 y=-23.276 z=392.359 v=1.000
+2026-03-03 16:24:52,830 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=iris idx=2 x=4.103 y=-16.817 z=385.428 v=1.000
+2026-03-03 16:24:52,830 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=iris idx=3 x=10.839 y=-11.593 z=387.138 v=1.000
+2026-03-03 16:24:52,830 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=inner_canthus idx=0 x=24.240 y=-16.586 z=385.428 v=1.000
+2026-03-03 16:24:52,831 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=upper_eyelid idx=0 x=18.963 y=-19.327 z=385.185 v=1.000
+2026-03-03 16:24:52,831 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=upper_eyelid idx=1 x=13.983 y=-20.124 z=385.671 v=1.000
+2026-03-03 16:24:52,831 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=upper_eyelid idx=2 x=9.355 y=-19.898 z=385.915 v=1.000
+2026-03-03 16:24:52,831 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=upper_eyelid idx=3 x=4.646 y=-18.630 z=385.671 v=1.000
+2026-03-03 16:24:52,831 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=upper_eyelid idx=4 x=22.596 y=-17.727 z=384.942 v=1.000
+2026-03-03 16:24:52,831 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=lower_eyelid idx=0 x=10.073 y=-13.528 z=386.892 v=1.000
+2026-03-03 16:24:52,832 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=lower_eyelid idx=1 x=14.812 y=-14.316 z=387.875 v=1.000
+2026-03-03 16:24:52,832 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=lower_eyelid idx=2 x=19.473 y=-15.386 z=388.368 v=1.000
+2026-03-03 16:24:52,832 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=lower_eyelid idx=3 x=22.626 y=-15.916 z=385.671 v=1.000
+2026-03-03 16:24:52,832 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=lower_eyelid idx=4 x=1.545 y=-17.212 z=384.700 v=1.000
+2026-03-03 16:24:52,833 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=left type=outer_canthus idx=0 x=-0.460 y=-16.052 z=386.159 v=1.000
+2026-03-03 16:24:52,833 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=pupil idx=0 x=73.631 y=-20.003 z=385.671 v=1.000
+2026-03-03 16:24:52,833 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=iris idx=0 x=79.973 y=-20.286 z=386.403 v=1.000
+2026-03-03 16:24:52,833 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=iris idx=1 x=72.090 y=-25.283 z=379.207 v=1.000
+2026-03-03 16:24:52,834 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=iris idx=2 x=67.291 y=-19.970 z=385.671 v=1.000
+2026-03-03 16:24:52,834 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=iris idx=3 x=73.837 y=-14.363 z=386.403 v=1.000
+2026-03-03 16:24:52,834 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=inner_canthus idx=0 x=59.961 y=-17.488 z=385.185 v=1.000
+2026-03-03 16:24:52,834 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=upper_eyelid idx=0 x=65.293 y=-21.351 z=385.428 v=1.000
+2026-03-03 16:24:52,835 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=upper_eyelid idx=1 x=70.192 y=-22.699 z=383.974 v=1.000
+2026-03-03 16:24:52,835 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=upper_eyelid idx=2 x=75.232 y=-23.089 z=384.216 v=1.000
+2026-03-03 16:24:52,835 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=upper_eyelid idx=3 x=80.382 y=-22.641 z=387.383 v=1.000
+2026-03-03 16:24:52,836 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=upper_eyelid idx=4 x=61.755 y=-19.266 z=385.671 v=1.000
+2026-03-03 16:24:52,836 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=lower_eyelid idx=0 x=74.854 y=-15.352 z=386.159 v=1.000
+2026-03-03 16:24:52,836 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=lower_eyelid idx=1 x=69.640 y=-15.639 z=385.671 v=1.000
+2026-03-03 16:24:52,836 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=lower_eyelid idx=2 x=64.975 y=-16.366 z=385.671 v=1.000
+2026-03-03 16:24:52,837 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=lower_eyelid idx=3 x=61.864 y=-16.994 z=385.671 v=1.000
+2026-03-03 16:24:52,837 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=lower_eyelid idx=4 x=82.360 y=-16.798 z=386.159 v=1.000
+2026-03-03 16:24:52,837 - __main__ - DEBUG - 坐标 frame_id=1772526288923670 eye=right type=outer_canthus idx=0 x=85.190 y=-20.203 z=387.138 v=1.000
+2026-03-03 16:24:52,837 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:24:52,837 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:24:56,659 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=533.576 | nan占比=62.1% | 中心Z=381.219 中心disp=100.00 (200~1500mm+中值平滑)
+2026-03-03 16:24:56,687 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:24:56,687 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:24:56,688 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:24:56,688 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=pupil idx=0 x=11.017 y=-20.322 z=381.814 v=1.000
+2026-03-03 16:24:56,688 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=iris idx=0 x=16.924 y=-20.912 z=382.771 v=1.000
+2026-03-03 16:24:56,688 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=iris idx=1 x=10.307 y=-25.963 z=380.862 v=1.000
+2026-03-03 16:24:56,689 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=iris idx=2 x=5.110 y=-19.768 z=381.338 v=1.000
+2026-03-03 16:24:56,689 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=iris idx=3 x=11.817 y=-14.638 z=386.403 v=1.000
+2026-03-03 16:24:56,689 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=inner_canthus idx=0 x=24.234 y=-19.327 z=382.292 v=1.000
+2026-03-03 16:24:56,689 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=upper_eyelid idx=0 x=19.193 y=-22.421 z=382.532 v=1.000
+2026-03-03 16:24:56,689 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=upper_eyelid idx=1 x=14.181 y=-23.328 z=380.862 v=1.000
+2026-03-03 16:24:56,690 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=upper_eyelid idx=2 x=9.486 y=-23.181 z=381.814 v=1.000
+2026-03-03 16:24:56,690 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=upper_eyelid idx=3 x=4.825 y=-21.875 z=382.532 v=1.000
+2026-03-03 16:24:56,690 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=upper_eyelid idx=4 x=22.641 y=-20.556 z=382.292 v=1.000
+2026-03-03 16:24:56,690 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=lower_eyelid idx=0 x=10.947 y=-16.210 z=385.915 v=1.000
+2026-03-03 16:24:56,691 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=lower_eyelid idx=1 x=15.429 y=-16.946 z=384.700 v=1.000
+2026-03-03 16:24:56,691 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=lower_eyelid idx=2 x=19.968 y=-18.141 z=387.138 v=1.000
+2026-03-03 16:24:56,691 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=lower_eyelid idx=3 x=22.843 y=-18.672 z=383.252 v=1.000
+2026-03-03 16:24:56,691 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=lower_eyelid idx=4 x=1.778 y=-20.385 z=382.532 v=1.000
+2026-03-03 16:24:56,691 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=left type=outer_canthus idx=0 x=-0.193 y=-19.206 z=385.671 v=1.000
+2026-03-03 16:24:56,692 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=pupil idx=0 x=74.141 y=-20.280 z=383.252 v=1.000
+2026-03-03 16:24:56,692 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=iris idx=0 x=80.616 y=-20.548 z=385.185 v=1.000
+2026-03-03 16:24:56,692 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=iris idx=1 x=73.731 y=-26.099 z=383.011 v=1.000
+2026-03-03 16:24:56,692 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=iris idx=2 x=67.811 y=-20.257 z=382.532 v=1.000
+2026-03-03 16:24:56,692 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=iris idx=3 x=75.638 y=-14.780 z=390.353 v=1.000
+2026-03-03 16:24:56,693 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=inner_canthus idx=0 x=60.545 y=-17.445 z=382.053 v=1.000
+2026-03-03 16:24:56,693 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=upper_eyelid idx=0 x=65.558 y=-21.691 z=382.053 v=1.000
+2026-03-03 16:24:56,693 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=upper_eyelid idx=1 x=70.335 y=-23.279 z=381.100 v=1.000
+2026-03-03 16:24:56,693 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=upper_eyelid idx=2 x=75.688 y=-23.758 z=383.011 v=1.000
+2026-03-03 16:24:56,693 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=upper_eyelid idx=3 x=80.250 y=-22.955 z=383.252 v=1.000
+2026-03-03 16:24:56,694 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=upper_eyelid idx=4 x=62.336 y=-19.349 z=383.011 v=1.000
+2026-03-03 16:24:56,694 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=lower_eyelid idx=0 x=76.380 y=-15.514 z=389.855 v=1.000
+2026-03-03 16:24:56,694 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=lower_eyelid idx=1 x=70.024 y=-15.605 z=382.771 v=1.000
+2026-03-03 16:24:56,694 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=lower_eyelid idx=2 x=65.710 y=-16.393 z=384.216 v=1.000
+2026-03-03 16:24:56,695 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=lower_eyelid idx=3 x=62.368 y=-16.945 z=382.292 v=1.000
+2026-03-03 16:24:56,695 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=lower_eyelid idx=4 x=82.879 y=-16.527 z=385.185 v=1.000
+2026-03-03 16:24:56,695 - __main__ - DEBUG - 坐标 frame_id=1772526292843382 eye=right type=outer_canthus idx=0 x=85.054 y=-19.950 z=383.011 v=1.000
+2026-03-03 16:24:56,695 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:24:56,696 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:25:00,508 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=527.789 | nan占比=61.7% | 中心Z=381.576 中心disp=89.88 (200~1500mm+中值平滑)
+2026-03-03 16:25:00,537 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:25:00,537 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:25:00,538 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:25:00,538 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=pupil idx=0 x=9.661 y=-21.956 z=377.567 v=1.000
+2026-03-03 16:25:00,538 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=iris idx=0 x=15.298 y=-22.732 z=380.625 v=1.000
+2026-03-03 16:25:00,539 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=iris idx=1 x=9.065 y=-27.701 z=382.771 v=1.000
+2026-03-03 16:25:00,539 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=iris idx=2 x=4.182 y=-21.517 z=379.207 v=1.000
+2026-03-03 16:25:00,539 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=iris idx=3 x=10.399 y=-16.593 z=379.915 v=1.000
+2026-03-03 16:25:00,540 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=inner_canthus idx=0 x=23.620 y=-21.753 z=380.388 v=1.000
+2026-03-03 16:25:00,540 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=upper_eyelid idx=0 x=18.600 y=-23.692 z=381.576 v=1.000
+2026-03-03 16:25:00,540 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=upper_eyelid idx=1 x=13.839 y=-24.703 z=388.863 v=1.000
+2026-03-03 16:25:00,540 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=upper_eyelid idx=2 x=8.618 y=-23.890 z=378.268 v=1.000
+2026-03-03 16:25:00,541 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=upper_eyelid idx=3 x=3.784 y=-23.072 z=379.207 v=1.000
+2026-03-03 16:25:00,541 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=upper_eyelid idx=4 x=21.968 y=-22.490 z=380.388 v=1.000
+2026-03-03 16:25:00,541 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=lower_eyelid idx=0 x=10.348 y=-19.264 z=379.915 v=1.000
+2026-03-03 16:25:00,541 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=lower_eyelid idx=1 x=14.880 y=-19.953 z=380.388 v=1.000
+2026-03-03 16:25:00,542 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=lower_eyelid idx=2 x=19.238 y=-20.806 z=380.625 v=1.000
+2026-03-03 16:25:00,542 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=lower_eyelid idx=3 x=22.282 y=-21.302 z=380.862 v=1.000
+2026-03-03 16:25:00,542 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=lower_eyelid idx=4 x=0.610 y=-22.227 z=380.388 v=1.000
+2026-03-03 16:25:00,542 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=left type=outer_canthus idx=0 x=-1.526 y=-21.529 z=382.532 v=1.000
+2026-03-03 16:25:00,543 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=pupil idx=0 x=72.764 y=-22.197 z=381.338 v=1.000
+2026-03-03 16:25:00,543 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=iris idx=0 x=78.700 y=-22.471 z=382.292 v=1.000
+2026-03-03 16:25:00,543 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=iris idx=1 x=71.226 y=-27.262 z=375.709 v=1.000
+2026-03-03 16:25:00,543 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=iris idx=2 x=67.143 y=-22.214 z=382.771 v=1.000
+2026-03-03 16:25:00,543 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=iris idx=3 x=72.040 y=-16.613 z=376.404 v=1.000
+2026-03-03 16:25:00,543 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=inner_canthus idx=0 x=59.628 y=-19.322 z=380.151 v=1.000
+2026-03-03 16:25:00,544 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=upper_eyelid idx=0 x=64.869 y=-23.233 z=382.292 v=1.000
+2026-03-03 16:25:00,544 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=upper_eyelid idx=1 x=69.518 y=-24.546 z=380.625 v=1.000
+2026-03-03 16:25:00,544 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=upper_eyelid idx=2 x=74.562 y=-24.796 z=381.100 v=1.000
+2026-03-03 16:25:00,544 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=upper_eyelid idx=3 x=79.346 y=-24.231 z=382.891 v=1.000
+2026-03-03 16:25:00,544 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=upper_eyelid idx=4 x=61.341 y=-21.008 z=380.862 v=1.000
+2026-03-03 16:25:00,544 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=lower_eyelid idx=0 x=74.353 y=-17.976 z=381.576 v=1.000
+2026-03-03 16:25:00,544 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=lower_eyelid idx=1 x=69.216 y=-18.112 z=380.625 v=1.000
+2026-03-03 16:25:00,545 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=lower_eyelid idx=2 x=64.834 y=-18.629 z=381.814 v=1.000
+2026-03-03 16:25:00,545 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=lower_eyelid idx=3 x=61.588 y=-18.998 z=380.862 v=1.000
+2026-03-03 16:25:00,545 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=lower_eyelid idx=4 x=81.889 y=-19.128 z=382.771 v=1.000
+2026-03-03 16:25:00,545 - __main__ - DEBUG - 坐标 frame_id=1772526296707620 eye=right type=outer_canthus idx=0 x=85.558 y=-22.095 z=388.368 v=1.000
+2026-03-03 16:25:00,546 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:25:00,546 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:25:04,407 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.559 max=1497.312 mean=532.036 | nan占比=61.1% | 中心Z=374.099 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:25:04,435 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:25:04,436 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:25:04,436 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:25:04,436 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=pupil idx=0 x=10.858 y=-19.519 z=379.207 v=1.000
+2026-03-03 16:25:04,437 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=iris idx=0 x=16.639 y=-20.105 z=380.151 v=1.000
+2026-03-03 16:25:04,437 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=iris idx=1 x=10.254 y=-24.631 z=380.507 v=1.000
+2026-03-03 16:25:04,437 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=iris idx=2 x=5.247 y=-19.051 z=379.207 v=1.000
+2026-03-03 16:25:04,437 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=iris idx=3 x=11.751 y=-14.694 z=387.260 v=1.000
+2026-03-03 16:25:04,438 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=inner_canthus idx=0 x=25.662 y=-19.334 z=378.737 v=1.000
+2026-03-03 16:25:04,438 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=upper_eyelid idx=0 x=20.564 y=-20.514 z=381.814 v=1.000
+2026-03-03 16:25:04,438 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=upper_eyelid idx=1 x=15.294 y=-20.383 z=379.443 v=1.000
+2026-03-03 16:25:04,439 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=upper_eyelid idx=2 x=10.476 y=-20.034 z=378.737 v=1.000
+2026-03-03 16:25:04,439 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=upper_eyelid idx=3 x=5.599 y=-19.377 z=379.207 v=1.000
+2026-03-03 16:25:04,439 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=upper_eyelid idx=4 x=24.164 y=-19.974 z=381.814 v=1.000
+2026-03-03 16:25:04,439 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=lower_eyelid idx=0 x=11.954 y=-17.645 z=381.338 v=1.000
+2026-03-03 16:25:04,440 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=lower_eyelid idx=1 x=16.654 y=-18.263 z=381.814 v=1.000
+2026-03-03 16:25:04,440 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=lower_eyelid idx=2 x=21.172 y=-18.903 z=381.576 v=1.000
+2026-03-03 16:25:04,440 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=lower_eyelid idx=3 x=24.304 y=-19.158 z=380.862 v=1.000
+2026-03-03 16:25:04,440 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=lower_eyelid idx=4 x=2.281 y=-18.924 z=381.338 v=1.000
+2026-03-03 16:25:04,441 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=left type=outer_canthus idx=0 x=-0.106 y=-18.448 z=382.053 v=1.000
+2026-03-03 16:25:04,441 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=pupil idx=0 x=74.251 y=-22.201 z=380.862 v=1.000
+2026-03-03 16:25:04,441 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=iris idx=0 x=80.043 y=-22.243 z=379.207 v=1.000
+2026-03-03 16:25:04,442 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=iris idx=1 x=73.802 y=-27.439 z=380.151 v=1.000
+2026-03-03 16:25:04,442 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=iris idx=2 x=68.935 y=-22.495 z=385.671 v=1.000
+2026-03-03 16:25:04,442 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=iris idx=3 x=74.056 y=-16.898 z=379.325 v=1.000
+2026-03-03 16:25:04,442 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=inner_canthus idx=0 x=61.697 y=-19.266 z=378.737 v=1.000
+2026-03-03 16:25:04,442 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=upper_eyelid idx=0 x=67.793 y=-23.087 z=385.671 v=1.000
+2026-03-03 16:25:04,442 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=upper_eyelid idx=1 x=72.560 y=-24.011 z=383.733 v=1.000
+2026-03-03 16:25:04,443 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=upper_eyelid idx=2 x=76.878 y=-23.829 z=380.151 v=1.000
+2026-03-03 16:25:04,443 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=upper_eyelid idx=3 x=80.971 y=-23.119 z=378.503 v=1.000
+2026-03-03 16:25:04,443 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=upper_eyelid idx=4 x=63.703 y=-20.936 z=381.100 v=1.000
+2026-03-03 16:25:04,443 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=lower_eyelid idx=0 x=76.702 y=-18.467 z=381.338 v=1.000
+2026-03-03 16:25:04,443 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=lower_eyelid idx=1 x=71.071 y=-18.397 z=378.034 v=1.000
+2026-03-03 16:25:04,444 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=lower_eyelid idx=2 x=66.699 y=-18.792 z=379.207 v=1.000
+2026-03-03 16:25:04,444 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=lower_eyelid idx=3 x=63.725 y=-19.081 z=379.679 v=1.000
+2026-03-03 16:25:04,444 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=lower_eyelid idx=4 x=84.149 y=-19.297 z=381.576 v=1.000
+2026-03-03 16:25:04,444 - __main__ - DEBUG - 坐标 frame_id=1772526300552152 eye=right type=outer_canthus idx=0 x=87.730 y=-21.687 z=385.793 v=1.000
+2026-03-03 16:25:04,445 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:25:04,445 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:25:08,267 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=533.853 | nan占比=60.4% | 中心Z=364.501 中心disp=104.88 (200~1500mm+中值平滑)
+2026-03-03 16:25:08,292 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:25:08,293 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:25:08,293 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:25:08,293 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=pupil idx=0 x=0.318 y=-16.163 z=386.159 v=1.000
+2026-03-03 16:25:08,293 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=iris idx=0 x=6.360 y=-16.497 z=387.138 v=1.000
+2026-03-03 16:25:08,293 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=iris idx=1 x=-0.068 y=-21.386 z=382.053 v=1.000
+2026-03-03 16:25:08,293 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=iris idx=2 x=-5.760 y=-16.035 z=388.615 v=1.000
+2026-03-03 16:25:08,294 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=iris idx=3 x=0.705 y=-10.741 z=388.615 v=1.000
+2026-03-03 16:25:08,294 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=inner_canthus idx=0 x=11.481 y=-15.263 z=383.974 v=1.000
+2026-03-03 16:25:08,294 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=upper_eyelid idx=0 x=6.703 y=-18.324 z=387.138 v=1.000
+2026-03-03 16:25:08,294 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=upper_eyelid idx=1 x=1.801 y=-19.181 z=387.875 v=1.000
+2026-03-03 16:25:08,294 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=upper_eyelid idx=2 x=-2.901 y=-18.940 z=388.615 v=1.000
+2026-03-03 16:25:08,294 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=upper_eyelid idx=3 x=-7.244 y=-17.753 z=390.353 v=1.000
+2026-03-03 16:25:08,295 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=upper_eyelid idx=4 x=9.979 y=-16.508 z=384.216 v=1.000
+2026-03-03 16:25:08,295 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=lower_eyelid idx=0 x=-1.701 y=-13.367 z=388.615 v=1.000
+2026-03-03 16:25:08,295 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=lower_eyelid idx=1 x=2.704 y=-13.876 z=388.121 v=1.000
+2026-03-03 16:25:08,296 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=lower_eyelid idx=2 x=7.087 y=-14.626 z=389.110 v=1.000
+2026-03-03 16:25:08,296 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=lower_eyelid idx=3 x=10.083 y=-14.886 z=385.915 v=1.000
+2026-03-03 16:25:08,296 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=lower_eyelid idx=4 x=-9.919 y=-16.404 z=390.353 v=1.000
+2026-03-03 16:25:08,296 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=left type=outer_canthus idx=0 x=-11.587 y=-15.316 z=389.607 v=1.000
+2026-03-03 16:25:08,296 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=pupil idx=0 x=61.203 y=-18.292 z=374.328 v=1.000
+2026-03-03 16:25:08,296 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=iris idx=0 x=67.137 y=-18.404 z=374.099 v=1.000
+2026-03-03 16:25:08,296 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=iris idx=1 x=60.208 y=-23.456 z=369.126 v=1.000
+2026-03-03 16:25:08,297 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=iris idx=2 x=54.913 y=-18.301 z=372.729 v=1.000
+2026-03-03 16:25:08,297 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=iris idx=3 x=61.101 y=-12.890 z=373.870 v=1.000
+2026-03-03 16:25:08,297 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=inner_canthus idx=0 x=45.678 y=-15.769 z=374.557 v=1.000
+2026-03-03 16:25:08,298 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=upper_eyelid idx=0 x=50.547 y=-19.549 z=372.048 v=1.000
+2026-03-03 16:25:08,298 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=upper_eyelid idx=1 x=55.672 y=-21.259 z=372.275 v=1.000
+2026-03-03 16:25:08,298 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=upper_eyelid idx=2 x=60.924 y=-21.738 z=374.099 v=1.000
+2026-03-03 16:25:08,298 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=upper_eyelid idx=3 x=65.494 y=-21.106 z=374.328 v=1.000
+2026-03-03 16:25:08,298 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=upper_eyelid idx=4 x=47.423 y=-17.420 z=375.017 v=1.000
+2026-03-03 16:25:08,299 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=lower_eyelid idx=0 x=59.581 y=-14.755 z=374.557 v=1.000
+2026-03-03 16:25:08,299 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=lower_eyelid idx=1 x=54.276 y=-14.823 z=370.919 v=1.000
+2026-03-03 16:25:08,299 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=lower_eyelid idx=2 x=50.360 y=-15.332 z=374.328 v=1.000
+2026-03-03 16:25:08,300 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=lower_eyelid idx=3 x=47.361 y=-15.561 z=374.557 v=1.000
+2026-03-03 16:25:08,300 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=lower_eyelid idx=4 x=67.283 y=-15.770 z=374.328 v=1.000
+2026-03-03 16:25:08,300 - __main__ - DEBUG - 坐标 frame_id=1772526304452504 eye=right type=outer_canthus idx=0 x=70.272 y=-18.782 z=372.957 v=1.000
+2026-03-03 16:25:08,300 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:25:08,300 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:25:11,998 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=553.077 | nan占比=60.1% | 中心Z=382.292 中心disp=nan (200~1500mm+中值平滑)
+2026-03-03 16:25:12,027 - project.core.recognition.detector - INFO - 提取到 478 个关键点
+2026-03-03 16:25:12,028 - project.core.recognition.detector - INFO - 人脸检测成功，拟合点全部有效
+2026-03-03 16:25:12,028 - __main__ - INFO - 人脸检测成功
+2026-03-03 16:25:12,029 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=pupil idx=0 x=-1.066 y=-17.992 z=384.700 v=1.000
+2026-03-03 16:25:12,029 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=iris idx=0 x=4.910 y=-18.287 z=385.671 v=1.000
+2026-03-03 16:25:12,030 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=iris idx=1 x=-1.399 y=-23.057 z=378.738 v=1.000
+2026-03-03 16:25:12,030 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=iris idx=2 x=-6.997 y=-17.908 z=386.892 v=1.000
+2026-03-03 16:25:12,030 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=iris idx=3 x=-0.705 y=-12.845 z=393.877 v=1.000
+2026-03-03 16:25:12,030 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=inner_canthus idx=0 x=10.290 y=-17.247 z=382.771 v=1.000
+2026-03-03 16:25:12,031 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=upper_eyelid idx=0 x=5.560 y=-20.011 z=382.292 v=1.000
+2026-03-03 16:25:12,031 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=upper_eyelid idx=1 x=0.696 y=-20.724 z=380.151 v=1.000
+2026-03-03 16:25:12,031 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=upper_eyelid idx=2 x=-4.076 y=-20.878 z=385.671 v=1.000
+2026-03-03 16:25:12,031 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=upper_eyelid idx=3 x=-8.580 y=-19.868 z=389.607 v=1.000
+2026-03-03 16:25:12,032 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=upper_eyelid idx=4 x=8.827 y=-18.467 z=383.252 v=1.000
+2026-03-03 16:25:12,032 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=lower_eyelid idx=0 x=-3.191 y=-15.192 z=391.605 v=1.000
+2026-03-03 16:25:12,032 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=lower_eyelid idx=1 x=1.346 y=-15.511 z=385.671 v=1.000
+2026-03-03 16:25:12,032 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=lower_eyelid idx=2 x=5.832 y=-16.457 z=388.121 v=1.000
+2026-03-03 16:25:12,033 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=lower_eyelid idx=3 x=8.859 y=-16.816 z=385.185 v=1.000
+2026-03-03 16:25:12,033 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=lower_eyelid idx=4 x=-11.443 y=-18.737 z=394.386 v=1.000
+2026-03-03 16:25:12,033 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=left type=outer_canthus idx=0 x=-13.161 y=-17.593 z=393.623 v=1.000
+2026-03-03 16:25:12,034 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=pupil idx=0 x=58.859 y=-18.717 z=369.796 v=1.000
+2026-03-03 16:25:12,034 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=iris idx=0 x=65.419 y=-18.873 z=373.185 v=1.000
+2026-03-03 16:25:12,034 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=iris idx=1 x=57.825 y=-23.761 z=363.633 v=1.000
+2026-03-03 16:25:12,035 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=iris idx=2 x=53.034 y=-18.961 z=370.694 v=1.000
+2026-03-03 16:25:12,035 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=iris idx=3 x=59.878 y=-13.607 z=376.868 v=1.000
+2026-03-03 16:25:12,035 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=inner_canthus idx=0 x=43.896 y=-16.616 z=372.957 v=1.000
+2026-03-03 16:25:12,035 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=upper_eyelid idx=0 x=49.037 y=-20.359 z=371.144 v=1.000
+2026-03-03 16:25:12,036 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=upper_eyelid idx=1 x=54.157 y=-21.774 z=370.020 v=1.000
+2026-03-03 16:25:12,036 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=upper_eyelid idx=2 x=58.833 y=-21.862 z=367.571 v=1.000
+2026-03-03 16:25:12,036 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=upper_eyelid idx=3 x=64.400 y=-21.459 z=373.185 v=1.000
+2026-03-03 16:25:12,036 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=upper_eyelid idx=4 x=45.657 y=-18.219 z=372.957 v=1.000
+2026-03-03 16:25:12,036 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=lower_eyelid idx=0 x=57.873 y=-14.791 z=371.144 v=1.000
+2026-03-03 16:25:12,037 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=lower_eyelid idx=1 x=52.855 y=-15.180 z=370.694 v=1.000
+2026-03-03 16:25:12,037 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=lower_eyelid idx=2 x=48.251 y=-15.791 z=369.796 v=1.000
+2026-03-03 16:25:12,037 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=lower_eyelid idx=3 x=45.487 y=-16.281 z=372.048 v=1.000
+2026-03-03 16:25:12,037 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=lower_eyelid idx=4 x=66.527 y=-15.799 z=374.328 v=1.000
+2026-03-03 16:25:12,037 - __main__ - DEBUG - 坐标 frame_id=1772526308313278 eye=right type=outer_canthus idx=0 x=68.993 y=-18.794 z=369.796 v=1.000
+2026-03-03 16:25:12,037 - project.data.data_manager - INFO - RecgFitDataManager初始化 - debug_log: True, key_coordinates: True
+2026-03-03 16:25:12,038 - project.data.data_manager - INFO - RecgFitDataManager初始化完成
+2026-03-03 16:25:12,153 - __main__ - INFO - 识别线程主循环停止
+2026-03-03 16:25:12,421 - __main__ - INFO - 摄像头资源已释放
+2026-03-03 16:25:12,468 - __main__ - INFO - OpenCV窗口已关闭
+2026-03-03 16:25:12,530 - project.data.data_manager - INFO - 摄像头资源已释放
+2026-03-03 16:25:27,107 - project.data.data_manager - INFO - 初始化RGB-D摄像头
+2026-03-03 16:25:28,964 - project.data.data_manager - INFO - RGB-D摄像头打开成功，分辨率 3840x1080
+2026-03-03 16:25:28,965 - project.data.data_manager - INFO - 摄像头初始化成功，RGB-D模式: True
+2026-03-03 16:25:28,971 - project.core.recognition.detector - INFO - FaceDetector 初始化完成（依赖 CameraDataManager）
+2026-03-03 16:25:28,972 - project.data.data_manager - INFO - 从配置文件加载参数: project/config/camera_params.json
+2026-03-03 16:25:49,021 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.165 max=1497.312 mean=637.872 | nan占比=66.3% | 中心Z=551.855 中心disp=69.00 (200~1500mm+中值平滑)
+2026-03-03 16:25:49,029 - __main__ - INFO - [显示参数] 图像尺寸 h=1080 w=1920 显示尺寸 1280x720 宽高比=1.778 (窗口将固定为该尺寸)
+2026-03-03 16:25:49,946 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:25:49,947 - __main__ - WARNING - 警告 1/10: 人脸检测失败
+2026-03-03 16:25:50,048 - __main__ - INFO - 尝试重试 (1/3)
+2026-03-03 16:25:54,031 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=638.312 | nan占比=64.1% | 中心Z=555.619 中心disp=68.62 (200~1500mm+中值平滑)
+2026-03-03 16:25:54,117 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:25:54,117 - __main__ - WARNING - 警告 2/10: 人脸检测失败
+2026-03-03 16:25:54,219 - __main__ - INFO - 尝试重试 (2/3)
+2026-03-03 16:25:58,144 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=633.839 | nan占比=64.0% | 中心Z=553.354 中心disp=69.00 (200~1500mm+中值平滑)
+2026-03-03 16:25:58,170 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:25:58,171 - __main__ - WARNING - 警告 3/10: 人脸检测失败
+2026-03-03 16:25:58,272 - __main__ - INFO - 尝试重试 (3/3)
+2026-03-03 16:26:02,146 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=635.063 | nan占比=64.2% | 中心Z=549.373 中心disp=69.62 (200~1500mm+中值平滑)
+2026-03-03 16:26:02,171 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:26:02,172 - __main__ - WARNING - 警告 4/10: 人脸检测失败
+2026-03-03 16:26:06,090 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=635.000 | nan占比=64.3% | 中心Z=556.378 中心disp=68.62 (200~1500mm+中值平滑)
+2026-03-03 16:26:06,135 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:26:06,136 - __main__ - WARNING - 警告 5/10: 人脸检测失败
+2026-03-03 16:26:09,963 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=637.375 | nan占比=64.5% | 中心Z=553.354 中心disp=69.00 (200~1500mm+中值平滑)
+2026-03-03 16:26:09,985 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:26:09,986 - __main__ - WARNING - 警告 6/10: 人脸检测失败
+2026-03-03 16:26:13,732 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=201.918 max=1497.312 mean=655.800 | nan占比=63.4% | 中心Z=559.948 中心disp=68.19 (200~1500mm+中值平滑)
+2026-03-03 16:26:13,752 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:26:13,752 - __main__ - WARNING - 警告 7/10: 人脸检测失败
+2026-03-03 16:26:17,538 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.034 max=1497.312 mean=633.687 | nan占比=64.2% | 中心Z=563.044 中心disp=67.69 (200~1500mm+中值平滑)
+2026-03-03 16:26:17,563 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:26:17,563 - __main__ - WARNING - 警告 8/10: 人脸检测失败
+2026-03-03 16:26:21,459 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=200.823 max=1497.312 mean=637.837 | nan占比=64.1% | 中心Z=560.462 中心disp=68.44 (200~1500mm+中值平滑)
+2026-03-03 16:26:21,479 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:26:21,479 - __main__ - WARNING - 警告 9/10: 人脸检测失败
+2026-03-03 16:26:25,292 - project.data.data_manager - INFO - [深度调试] 立体输出 Z: min=201.154 max=1497.312 mean=627.243 | nan占比=64.2% | 中心Z=563.564 中心disp=67.75 (200~1500mm+中值平滑)
+2026-03-03 16:26:25,316 - project.core.recognition.detector - WARNING - 未提取到关键点
+2026-03-03 16:26:25,316 - __main__ - WARNING - 警告 10/10: 人脸检测失败
+2026-03-03 16:26:25,317 - __main__ - ERROR - 警告次数超过限制 (10)，停止执行
+2026-03-03 16:26:25,323 - __main__ - INFO - 识别线程主循环停止
+2026-03-03 16:26:25,596 - __main__ - INFO - 摄像头资源已释放
+2026-03-03 16:26:25,635 - __main__ - INFO - OpenCV窗口已关闭
+2026-03-03 16:26:25,702 - project.data.data_manager - INFO - 摄像头资源已释放

@@ -1,7 +1,312 @@
-{"location":"data_manager:51","message":"init before initialize_camera","data":{"rgb_d":True},"hypothesisId":"H5","timestamp":1770394490575.5066}
-{"location": "recognition.main:run", "message": "run() entry", "data": {"rgb_d": true}, "hypothesisId": "H5", "timestamp": 1770394491753}
-{"location": "recognition.main:_check_camera_initialization", "message": "cap before isOpened", "data": {"cap_type": "VideoCapture", "has_isOpened": true}, "hypothesisId": "H5", "timestamp": 1770394491753}
-{"location": "recognition.main:run", "message": "before loop cap type", "data": {"cap_type": "VideoCapture"}, "hypothesisId": "H5", "timestamp": 1770394491754}
-{"location": "data_manager:_read_depth_map_from_rgb_d", "message": "rgb_d branch returns None", "data": {"bgr_shape": [1080, 3840]}, "hypothesisId": "H1", "timestamp": 1770394492754}
-{"location": "recognition.main:run", "message": "get_image get_depth", "data": {"image_ok": true, "depth_ok": false, "frame_shape": [1080, 3840, 3]}, "hypothesisId": "H1", "timestamp": 1770394492756}
-{"location": "recognition.main:run", "message": "RecognitionWarning caught", "data": {"msg": "\u65e0\u6cd5\u83b7\u53d6\u56fe\u50cf\u6216\u6df1\u5ea6\u56fe", "warn_count": 0}, "hypothesisId": "H1,H3", "timestamp": 1770394492756}
+{"id": "log_warn_cb", "timestamp": 1772421485929.8105, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421485930.1619, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421487109.301, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421487109.614, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421488278.9639, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421488279.2322, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421489448.9087, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421489449.2974, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421490620.0874, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421490620.4124, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421491794.2078, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421491794.583, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421492976.3816, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421492976.6814, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421562483.2593, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421562483.5608, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421563646.611, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421563646.8657, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421564844.6619, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421564845.0623, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421566022.517, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421566022.8564, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421567201.378, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421567201.6936, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421568380.3572, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421568380.6523, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421569543.2034, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421569543.4111, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421574396.2136, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421574396.5444, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772421575007.222, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772421575007.4495, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423681750.296, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423681750.6003, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423682925.6836, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423682925.9666, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423684093.7417, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423684094.0947, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423685266.8367, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423685267.1382, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423686440.672, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423686441.049, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423687614.7695, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423687615.171, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423688602.3936, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423688602.7866, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423689222.7083, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423689223.0657, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423689840.9817, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423689841.3, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423719812.1292, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423719812.3591, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423720979.1003, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423720979.3164, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423722149.5002, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423722149.795, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423723326.9158, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423723327.3206, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423724504.4912, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423724504.8296, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423725682.9277, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423725683.2637, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423726867.9631, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423726868.3296, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423727476.376, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423727476.6855, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772423728090.6497, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772423728090.9692, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424041895.6362, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424041895.818, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424043070.6091, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424043070.7776, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424044244.849, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424044245.061, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424045416.9487, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424045417.1355, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424046591.4766, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424046591.6438, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424047765.0847, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424047765.299, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424048938.4446, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424048938.6167, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424049258.8875, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424049259.0469, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424049876.917, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424049877.0925, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424475417.4868, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424475417.7332, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424476581.873, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424476582.06, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424477745.3557, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424477745.5212, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424478909.1133, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424478909.3464, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424480076.6042, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424480076.7856, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424481244.2722, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424481244.4497, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424482409.919, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424482410.196, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424482791.4917, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424482792.4375, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424483392.2236, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424483392.3994, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424799223.841, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424799224.0115, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424800482.648, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424800482.8054, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424801657.7678, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424801657.9553, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424802843.6506, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424802843.911, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424805598.1648, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424805598.3413, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424809646.535, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424809646.71, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424810264.779, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424810264.935, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424812721.6506, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424812721.824, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772424813331.8296, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772424813332.0132, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425078124.2646, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425078124.5044, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425079320.54, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425079320.7844, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425080506.1272, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425080506.4001, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425081695.0618, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425081695.3047, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425082870.2683, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425082870.4976, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425084064.342, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425084064.6572, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425085279.0007, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425085279.249, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425085467.5857, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425085467.815, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425085957.1008, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425085957.2812, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425307104.0754, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425307104.2422, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425308283.9136, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425308284.1787, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425309463.88, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425309464.1262, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425310642.738, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425310642.941, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425311821.1023, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425311821.289, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425312998.9492, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425312999.138, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425314175.3296, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425314175.5269, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425314486.8567, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425314487.0974, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425315088.8367, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425315089.041, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425674288.9055, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425674289.1897, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425675471.4202, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425675471.5955, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425676657.1997, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425676657.3528, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425677835.8337, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425677836.075, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425679019.4385, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425679019.6245, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425680201.9546, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425680202.1208, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425681378.3643, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425681378.6743, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425681585.1243, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425681585.296, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772425682197.593, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772425682197.873, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772513974326.9346, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772513974327.111, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772513975533.159, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772513975533.3372, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772513976740.1985, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772513976740.47, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772513977942.293, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772513977942.4548, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772513979152.295, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772513979152.4546, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772513980356.3506, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772513980356.634, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772513982153.411, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772513982153.6138, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772513982784.7402, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772513982784.8972, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772513983385.772, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772513983385.968, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772517833578.5352, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772517833578.736, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772517834778.051, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772517834778.2563, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772517835977.5405, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772517835977.7805, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772517837173.423, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772517837173.5964, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772517838369.0935, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772517838369.2756, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772517839565.2185, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772517839565.401, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772517840763.7344, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772517840764.023, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772517844082.5945, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772517844083.0107, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772517844703.3518, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772517844703.5195, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772518355561.0525, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772518355561.246, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772518356757.2432, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772518356757.5574, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772518357958.7532, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772518357958.9182, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772518359186.4863, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772518359186.7817, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772518844871.734, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772518844871.9556, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772519187516.1252, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772519187516.3164, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772519192240.872, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772519192241.044, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772524208046.0671, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772524208046.233, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772524210189.3748, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772524210189.5398, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772524212264.5906, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772524212264.7703, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772524214364.0361, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772524214364.197, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772524216679.9514, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772524216680.1172, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525835999.452, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525835999.8342, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525840442.0513, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525840442.4104, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525844347.0745, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525844347.3752, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525848206.192, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525848206.5115, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525852108.8071, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525852109.1196, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525855935.2947, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525855935.5815, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525927791.9502, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525927792.4912, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525931956.7844, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525931957.1133, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525935860.399, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525935860.705, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772525939725.0842, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772525939725.3823, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526015022.2805, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526015022.8613, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526019767.4773, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526019767.9114, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526023852.1433, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526023852.5713, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526027748.4006, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526027748.7168, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526031615.8848, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526031616.2615, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526035430.0256, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526035430.3284, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526039281.8865, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526039282.185, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526043141.6821, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526043142.0493, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526046872.2102, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526046872.5056, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526128383.2117, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526128383.5405, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526132476.8657, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526132477.1685, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526136545.6104, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526136545.922, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526140591.8145, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526140592.7563, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526152425.1484, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526152425.4539, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526197019.9463, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526197020.3518, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526216397.7273, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526216398.0889, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526220180.9565, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526220181.4119, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526276537.736, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526276538.1228, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526280947.5881, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526280947.8894, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526349947.5007, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526349947.879, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526354118.2285, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526354118.654, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526358171.5706, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526358171.9065, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526362172.539, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526362172.855, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526366136.4797, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526366136.8904, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526369986.616, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526369986.8962, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526373753.5476, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526373753.8555, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526377564.3164, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526377564.7805, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}
+{"id": "log_warn_cb", "timestamp": 1772526381480.4426, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": 0.1}, "hypothesisId": "A"}
+{"id": "log_handle_warn", "timestamp": 1772526381480.7268, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": 0.1}, "hypothesisId": "B"}

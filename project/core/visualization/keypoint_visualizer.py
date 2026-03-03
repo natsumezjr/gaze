@@ -2,7 +2,7 @@
 import numpy as np
 import cv2
 from typing import Dict, List, Optional, Tuple
-from project.data.data_models import KeyCoordinates, Point3DWithVisibility, FITTING_TYPE, EYE_TYPE
+from project.data.data_models import KeyCoordinates, Point3DWithVisibility, FITTING_TYPE, EYE_TYPE, Landmark
 
 # 配置日志
 from project.config.logging_config import setup_logging 
@@ -184,7 +184,54 @@ class KeypointVisualizer:
             logger.error(f"绘制关键点时出错: {e}")
         
         return visualized_frame
-    
+
+    def draw_2d_landmarks(self, frame: np.ndarray, landmarks: List[Landmark]) -> np.ndarray:
+        """
+        在图像上绘制 2D 关键点（像素坐标），用于稳定显示，避免因深度 nan 导致 3D 投影乱跳。
+        """
+        out = frame.copy()
+        if not landmarks:
+            return out
+        h, w = out.shape[:2]
+        for lm in landmarks:
+            x, y = int(round(lm.x)), int(round(lm.y))
+            if 0 <= x < w and 0 <= y < h:
+                cv2.circle(out, (x, y), self.point_radius, (0, 255, 0), -1)
+        return out
+
+    def draw_2d_fitting_landmarks(self, frame: np.ndarray, landmarks: List[Landmark]) -> np.ndarray:
+        """
+        仅绘制拟合用关键点（与 get_landmark_indices 一致），按类型区分颜色，与之前 3D 绘制逻辑一致。
+        """
+        from project.core.recognition.landmark_extractor import get_landmark_indices
+        out = frame.copy()
+        if not landmarks:
+            return out
+        h, w = out.shape[:2]
+        indices = get_landmark_indices()
+        for eye in EYE_TYPE:
+            for fitting_type in FITTING_TYPE:
+                color = self._get_color_for_type(fitting_type)
+                for idx in indices.get(eye, {}).get(fitting_type, []):
+                    if idx >= len(landmarks):
+                        continue
+                    lm = landmarks[idx]
+                    x, y = int(round(lm.x)), int(round(lm.y))
+                    if 0 <= x < w and 0 <= y < h:
+                        cv2.circle(out, (x, y), self.point_radius, color, -1)
+                # 可选：iris/眼睑连线（与 _draw_point_group 一致）
+                pts = []
+                for idx in indices.get(eye, {}).get(fitting_type, []):
+                    if idx < len(landmarks):
+                        x, y = int(round(landmarks[idx].x)), int(round(landmarks[idx].y))
+                        if 0 <= x < w and 0 <= y < h:
+                            pts.append([x, y])
+                if fitting_type == "iris" and len(pts) > 2:
+                    cv2.polylines(out, [np.array(pts, dtype=np.int32)], True, color, self.line_thickness)
+                elif fitting_type in ("upper_eyelid", "lower_eyelid") and len(pts) > 1:
+                    cv2.polylines(out, [np.array(pts, dtype=np.int32)], False, color, self.line_thickness)
+        return out
+
     def set_drawing_params(self, 
                           point_radius: Optional[int] = None,
                           line_thickness: Optional[int] = None,

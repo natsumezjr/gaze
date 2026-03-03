@@ -1,277 +1,189 @@
-# 人脸检测模块
+# 人脸检测模块 - 仅拟合点 2D→3D，无深度图
 import numpy as np
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TYPE_CHECKING
 from project.data.data_models import (
-    BGRImage, DepthMap, Landmark, KeyCoordinates,
-    FITTING_TYPE, EYE_TYPE
+    BGRImage, Landmark, KeyCoordinates, Point3DWithVisibility,
+    FITTING_TYPE, EYE_TYPE, FITTING_LANDMARK_INDICES,
 )
 
 # 配置日志
-from project.config.logging_config import setup_logging 
+from project.config.logging_config import setup_logging
 logger = setup_logging(__name__)
+
+# 当使用邻域中值或默认深度 fallback 时，用 MediaPipe 相对 z 做微调：Z_final = Z + K_MEDIAPIPE_Z_SCALE * z_mediapipe
+K_MEDIAPIPE_Z_SCALE_MM = 20.0
+# 无有效深度时使用的低可见性，避免“500mm 平面墙”被当作高置信度
+FALLBACK_VISIBILITY = 0.2
+
+if TYPE_CHECKING:
+    from project.data.data_manager import CameraDataManager
 
 
 class FaceDetector:
-    """人脸检测器核心类"""
-    
+    """人脸检测器 - 仅校验拟合点有效，2D→3D 依赖 CameraDataManager（单位 mm）"""
+
     _instance = None
-    
+
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(FaceDetector, cls).__new__(cls)
         return cls._instance
-    
-    def __init__(self, camera_params: Dict, rgb_d: bool = False):
-        """初始化检测器"""
-        self._validate_camera_params(camera_params)
-        self.camera_params = camera_params
+
+    def __init__(self, camera_data_manager: "CameraDataManager"):
+        """初始化：仅接受 CameraDataManager，内参与 pixel_to_xy_mm 由其提供。"""
+        if camera_data_manager is None:
+            raise ValueError("camera_data_manager 不能为 None")
+        self._camera_data_manager = camera_data_manager
         self._bgr_image: Optional[BGRImage] = None
-        self._depth_map: Optional[DepthMap] = None
         self._landmarks: List[Landmark] = []
+        self._key_coordinates: Optional[KeyCoordinates] = None
         self._detection_success = False
-        self._rgb_d = rgb_d
-        
-        logger.info(f"FaceDetector初始化完成，RGB-D模式: {rgb_d}")
-    
-    def detect_face(self, bgr_image: BGRImage, depth_map: DepthMap) -> bool:
-        """检测人脸和关键点"""
+        self._current_frame_id: Optional[int] = None
+        logger.info("FaceDetector 初始化完成（依赖 CameraDataManager）")
+
+    def detect_face(self, bgr_image: BGRImage, frame_id: Optional[int] = None) -> bool:
+        """检测：提取 478 关键点，仅对拟合点做 2D→3D；当且仅当所有拟合点存在且 x,y,z 非 nan 时返回 True。
+        frame_id 非空且该帧有立体深度时使用每像素深度，否则使用 DEFAULT_FACE_DEPTH_MM。"""
         try:
-            self._validate_input_images(bgr_image, depth_map)
+            if not isinstance(bgr_image, BGRImage) or bgr_image.data is None:
+                raise ValueError("bgr_image 必须是有效的 BGRImage")
             self._bgr_image = bgr_image
-            
-            # 导入关键点提取模块
-            from project.core.recognition.landmark_extractor import extract_landmarks, validate_landmarks
-            
-            # 提取关键点
+            self._current_frame_id = frame_id
+
+            from project.core.recognition.landmark_extractor import extract_landmarks
+
             landmarks = extract_landmarks(bgr_image)
-            
-            if landmarks:
-                logger.info(f"提取到 {len(landmarks)} 个关键点")
-                is_valid = validate_landmarks(landmarks)
-                logger.info(f"关键点验证结果: {is_valid}")
-                
-                if is_valid:
-                    self._landmarks = landmarks
-                    self._detection_success = True
-                    
-                    # 处理深度图
-                    if not self._rgb_d:
-                        # 不使用RGB-D相机时，修改深度图
-                        modified_depth_map = self._set_depth_map_without_rgb_d(depth_map)
-                        self._depth_map = modified_depth_map.to_meters()
-                    else:
-                        # 使用RGB-D相机时，直接转换深度图单位
-                        self._depth_map = depth_map.to_meters()
-                    
-                    logger.info(f"人脸检测成功，提取到 {len(landmarks)} 个关键点")
-                    return True
-                else:
-                    logger.warning(f"关键点验证失败，期望478个，实际{len(landmarks)}个")
-            else:
+            if not landmarks:
                 logger.warning("未提取到关键点")
-                
-            self._detection_success = False
-            self._landmarks = []
-            self._depth_map = None
-            logger.warning("人脸检测失败或关键点无效")
-            return False
-                
+                self._set_fail()
+                return False
+
+            logger.info(f"提取到 {len(landmarks)} 个关键点")
+            key_coordinates, all_valid = self._fitting_points_2d_to_3d(landmarks)
+            if not all_valid:
+                logger.warning("拟合点未全部有效（缺失或 x/y/z 为 nan）")
+                self._set_fail()
+                return False
+
+            self._landmarks = landmarks
+            self._key_coordinates = key_coordinates
+            self._detection_success = True
+            logger.info("人脸检测成功，拟合点全部有效")
+            return True
+
         except Exception as e:
             logger.error(f"人脸检测失败: {e}", exc_info=True)
-            self._detection_success = False
-            self._landmarks = []
-            self._depth_map = None
+            self._set_fail()
             return False
-    
+
+    def _fitting_points_2d_to_3d(self, landmarks: List[Landmark]) -> tuple:
+        """
+        仅对拟合点做 2D→3D（单位 mm）。返回 (KeyCoordinates, all_valid)。
+        深度优先级：单点深度 -> 5×5 邻域中值 -> 默认深度；后两种时 visibility=0.2 并可选融合 MediaPipe z。
+        """
+        key_coordinates = KeyCoordinates()
+        default_z_mm = getattr(
+            self._camera_data_manager,
+            "DEFAULT_FACE_DEPTH_MM",
+            500,
+        )
+        indices = FITTING_LANDMARK_INDICES
+        all_valid = True
+
+        for eye in EYE_TYPE:
+            for fitting_type in FITTING_TYPE:
+                landmark_indices = indices[eye][fitting_type]
+                points = []
+                for idx in landmark_indices:
+                    if idx >= len(landmarks):
+                        all_valid = False
+                        continue
+                    lm = landmarks[idx]
+                    z_mm = None
+                    used_fallback = False
+                    if self._current_frame_id is not None:
+                        z_mm = self._camera_data_manager.get_depth_at_pixel(
+                            self._current_frame_id, lm.x, lm.y
+                        )
+                        if z_mm is None:
+                            z_mm = self._camera_data_manager.get_depth_neighborhood_median(
+                                self._current_frame_id, lm.x, lm.y
+                            )
+                            used_fallback = z_mm is not None
+                        if z_mm is None:
+                            z_mm = default_z_mm
+                            used_fallback = True
+                    else:
+                        z_mm = default_z_mm
+                        used_fallback = True
+                    if used_fallback:
+                        z_mm = z_mm + K_MEDIAPIPE_Z_SCALE_MM * lm.z
+                    visibility = FALLBACK_VISIBILITY if used_fallback else lm.visibility
+                    x_mm, y_mm = self._camera_data_manager.pixel_to_xy_mm(lm.x, lm.y, z_mm)
+                    if not (np.isfinite(x_mm) and np.isfinite(y_mm)):
+                        all_valid = False
+                    pt = Point3DWithVisibility(
+                        x=x_mm, y=y_mm, z=z_mm,
+                        visibility=visibility,
+                    )
+                    if not (np.isfinite(pt.x) and np.isfinite(pt.y) and np.isfinite(pt.z)):
+                        all_valid = False
+                    points.append(pt)
+                key_coordinates.set_points(eye, fitting_type, points)
+
+        return key_coordinates, all_valid
+
+    def _set_fail(self) -> None:
+        self._detection_success = False
+        self._landmarks = []
+        self._key_coordinates = None
+
     def get_fitting_data(self) -> KeyCoordinates:
-        """
-        获取拟合所需的关键点数据
-        
-        Returns:
-            key_coordinates: 关键点坐标数据
-        """
-        if not self._detection_success or not self._landmarks or not self._depth_map:
+        """获取拟合所需关键点（mm）。未检测成功时返回空 KeyCoordinates。"""
+        if not self._detection_success or not self._landmarks:
             logger.warning("检测未成功或无有效数据")
             return KeyCoordinates()
-        
-        try:
-            # 导入坐标转换模块
-            from project.core.recognition.coordinate_converter import batch_convert_landmarks
-            from project.core.recognition.landmark_extractor import get_landmark_indices
-            
-            # 批量转换关键点为3D坐标
-            points_3d = batch_convert_landmarks(self._landmarks, self._depth_map, self.camera_params)
-            
-            # 创建KeyCoordinates对象
-            key_coordinates = KeyCoordinates()
-            
-            # 获取关键点索引
-            indices = get_landmark_indices()
-            
-            # 填充数据
-            for eye in EYE_TYPE:
-                for fitting_type in FITTING_TYPE:
-                    # 获取该类型的关键点索引
-                    landmark_indices = indices[eye][fitting_type]
-                    eye_points = []
-                    
-                    for idx in landmark_indices:
-                        if idx < len(points_3d):
-                            eye_points.append(points_3d[idx])
-                    
-                    # 设置坐标
-                    key_coordinates.set_points(eye, fitting_type, eye_points)
-            
-            
-            logger.debug(f"拟合数据获取完成：左眼 {len(key_coordinates.left_eye)} 种类型，右眼 {len(key_coordinates.right_eye)} 种类型")
-            return key_coordinates
-            
-        except Exception as e:
-            logger.error(f"获取拟合数据失败: {e}", exc_info=True)
-            return KeyCoordinates()
-    
+        if self._key_coordinates is not None:
+            return self._key_coordinates
+        key_coordinates, _ = self._fitting_points_2d_to_3d(self._landmarks)
+        return key_coordinates
+
     def get_landmarks(self) -> List[Landmark]:
         """获取原始关键点数据"""
         return self._landmarks.copy() if self._landmarks else []
-    
-    def get_bgr_image(self) -> Optional[BGRImage]:
-        """获取BGR图像"""
-        return self._bgr_image
-    
-    def get_depth_map(self) -> Optional[DepthMap]:
-        """获取深度图"""
-        return self._depth_map
-    
+
     def is_detection_successful(self) -> bool:
-        """检查检测是否成功"""
         return self._detection_success
-    
-    def clear_data(self):
-        """清空所有数据"""
-        self._bgr_image = None
-        self._depth_map = None
-        self._landmarks = []
-        self._detection_success = False
-        logger.debug("数据已清空")
-    
-    def _validate_camera_params(self, camera_params: Dict) -> None:
-        """验证相机参数的有效性"""
-        required_keys = ['intrinsic_params', 'depth_scale']
-        for key in required_keys:
-            if key not in camera_params:
-                raise ValueError(f"相机参数缺少必需字段: {key}")
-        
-        intrinsic_params = camera_params['intrinsic_params']
-        required_intrinsic_keys = ['fx', 'fy', 'cx', 'cy']
-        for key in required_intrinsic_keys:
-            if key not in intrinsic_params:
-                raise ValueError(f"相机内参缺少必需字段: {key}")
-            if not isinstance(intrinsic_params[key], (int, float)) or intrinsic_params[key] <= 0:
-                raise ValueError(f"相机内参 {key} 必须为正数")
-        
-        if not isinstance(camera_params['depth_scale'], (int, float)) or camera_params['depth_scale'] <= 0:
-            raise ValueError("depth_scale 必须为正数")
-    
-    def _set_depth_map_without_rgb_d(self, depth_map: DepthMap) -> DepthMap:
-        """当不使用RGB-D相机时，为所有关键点设置深度值"""
-        if not self._landmarks:
-            return depth_map
-        
-        # 创建修改后的深度图
-        modified_data = depth_map.data.copy().astype(np.float32)
-        
-        for landmark in self._landmarks:
-            if len(landmark.to_ndarray()) >= 3:
-                x, y, z = landmark.x, landmark.y, landmark.z
-                x_idx, y_idx = int(round(x)), int(round(y))
-                
-                if (0 <= x_idx < depth_map.width and 0 <= y_idx < depth_map.height):
-                    original_depth = depth_map.data[y_idx, x_idx]
-                    # 使用MediaPipe估计的z值来修补深度
-                    new_depth = original_depth + z * 100  # z是相对深度，需要放大
-                    modified_data[y_idx, x_idx] = new_depth
-        
-        return DepthMap(data=modified_data, unit=depth_map.unit)
-    
-    
-    def _validate_input_images(self, bgr_image: BGRImage, depth_map: DepthMap) -> None:
-        """验证输入图像的有效性"""
-        if not isinstance(bgr_image, BGRImage):
-            raise ValueError("bgr_image必须是BGRImage类型")
-        
-        if not isinstance(depth_map, DepthMap):
-            raise ValueError("depth_map必须是DepthMap类型")
-        
-        if not depth_map.validate_with_image(bgr_image):
-            raise ValueError(f"BGR图像和深度图尺寸不匹配: {bgr_image.shape} vs {depth_map.shape}")
-    
+
     def get_detection_info(self) -> Dict:
-        """获取检测信息"""
         return {
-            'detection_success': self._detection_success,
-            'landmark_count': len(self._landmarks) if self._landmarks else 0,
-            'has_bgr_image': self._bgr_image is not None,
-            'has_depth_map': self._depth_map is not None,
-            'rgb_d_mode': self._rgb_d
+            "detection_success": self._detection_success,
+            "landmark_count": len(self._landmarks) if self._landmarks else 0,
+            "has_bgr_image": self._bgr_image is not None,
         }
 
-# 测试函数
-def test_face_detector():
-    """测试人脸检测器功能"""
+
+def test_face_detector() -> None:
+    """测试：使用 CameraDataManager，仅传 image，无深度图。"""
     print("=== 人脸检测器测试 ===")
-    
-    # 创建测试相机参数
-    camera_params = {
-        "intrinsic_params": {
-            "fx": 925.0,
-            "fy": 925.0,
-            "cx": 640.0,
-            "cy": 360.0
-        },
-        "depth_scale": 0.001
-    }
-    
-    # 测试RGB-D模式
-    print("\n1. 测试RGB-D模式")
-    detector_rgbd = FaceDetector(camera_params, rgb_d=True)
+    from project.data.data_manager import CameraDataManager
+    from project.data.data_models import BGRImage
+
+    camera_manager = CameraDataManager(rgb_d=False)
+    detector = FaceDetector(camera_manager)
     bgr_image = BGRImage(data=np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8))
-    depth_map_rgbd = DepthMap(data=np.ones((480, 640), dtype=np.float32) * 500, unit="camera_unit")  # 毫米单位
-    
-    success_rgbd = detector_rgbd.detect_face(bgr_image, depth_map_rgbd)
-    print(f"RGB-D检测结果: {'成功' if success_rgbd else '失败'}")
-    if success_rgbd:
-        final_depth_map = detector_rgbd.get_depth_map()
-        print(f"最终深度图单位: {final_depth_map.unit}")
-        print(f"深度图范围: {np.min(final_depth_map.data):.3f}m - {np.max(final_depth_map.data):.3f}m")
-    
-    # 测试非RGB-D模式
-    print("\n2. 测试非RGB-D模式")
-    detector_normal = FaceDetector(camera_params, rgb_d=False)
-    depth_map_normal = DepthMap(data=np.ones((480, 640), dtype=np.float32) * 0.5, unit="meter")  # 米单位
-    
-    success_normal = detector_normal.detect_face(bgr_image, depth_map_normal)
-    print(f"非RGB-D检测结果: {'成功' if success_normal else '失败'}")
-    if success_normal:
-        final_depth_map = detector_normal.get_depth_map()
-        print(f"最终深度图单位: {final_depth_map.unit}")
-        print(f"深度图范围: {np.min(final_depth_map.data):.3f}m - {np.max(final_depth_map.data):.3f}m")
-        
-        # 测试获取拟合数据
-        print("\n3. 测试获取拟合数据")
-        key_coordinates = detector_normal.get_fitting_data()
-        print(f"拟合数据: {key_coordinates}")
-        
-        # 测试获取关键点
-        print("\n4. 测试获取关键点")
-        landmarks = detector_normal.get_landmarks()
+
+    success = detector.detect_face(bgr_image)
+    print(f"检测结果: {'成功' if success else '失败'}")
+    if success:
+        key_coords = detector.get_fitting_data()
+        print(f"拟合数据: {key_coords}")
+        landmarks = detector.get_landmarks()
         print(f"关键点数量: {len(landmarks)}")
-        
-        # 测试检测信息
-        print("\n5. 测试检测信息")
-        info = detector_normal.get_detection_info()
+        info = detector.get_detection_info()
         print(f"检测信息: {info}")
-    
-    print("\n=== 测试完成 ===")
+    print("=== 测试完成 ===")
+
 
 if __name__ == "__main__":
     test_face_detector()
