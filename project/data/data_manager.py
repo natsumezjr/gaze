@@ -11,6 +11,21 @@ from project.data.data_models import (
     Point3DWithVisibility, KeyCoordinates, FITTING_TYPE, EYE_TYPE, DepthMap, BGRImage
 )
 from project.config.settings import CAMERA_PARAMS_PATH
+from project.config.stereo_config import (
+    DEFAULT_DEPTH_SCALE,
+    PLACEHOLDER_DEPTH_METERS,
+    SGBM_BLOCK_SIZE,
+    SGBM_DISP12_MAX_DIFF,
+    SGBM_MIN_DISPARITY,
+    SGBM_NUM_DISPARITIES,
+    SGBM_P1,
+    SGBM_P2,
+    SGBM_PREFILTER_CAP,
+    SGBM_SPECKLE_RANGE,
+    SGBM_SPECKLE_WINDOW_SIZE,
+    SGBM_UNIQUENESS_RATIO,
+    STEREO_FRAME_SIZES,
+)
 
 # 配置日志
 from project.config.logging_config import setup_logging
@@ -48,6 +63,14 @@ class CameraDataManager:
             self._data_dict = {}  # 帧数据存储：{frame_id: frame_data}
             self._resolution = None  # 分辨率 (width, height)
             self._camera_params = None  # 相机参数缓存
+            # 立体深度：remap 与 SGBM 缓存（懒初始化）
+            self._stereo_map1x = None
+            self._stereo_map1y = None
+            self._stereo_map2x = None
+            self._stereo_map2y = None
+            self._stereo_sgbm = None
+            self._stereo_Q = None
+            self._stereo_image_size = None
             ok = self.initialize_camera()
             if not ok:
                 self._cap = None
@@ -109,7 +132,8 @@ class CameraDataManager:
             else:
                 logger.warning("配置文件不存在，使用默认参数")
                 config = self._get_default_config()
-                
+            if self._rgb_d:
+                config = self._adapt_stereo_config(config)
             # 缓存参数
             self._camera_params = config
             return config
@@ -177,19 +201,27 @@ class CameraDataManager:
         if self._resolution is None:
             h, w = bgr_image.shape[:2]
             self._resolution = (w, h)
-        
+
+        if depth_map is None and self._rgb_d:
+            result = self._compute_stereo_depth(bgr_image)
+            if result is not None:
+                rect_left, _rect_right, depth_mm = result
+                frame_data = {
+                    "bgr_image": rect_left,
+                    "depth_map": depth_mm,
+                    "timestamp": datetime.now().isoformat()
+                }
+                self._data_dict[frame_id] = frame_data
+                return
+
         if depth_map is None:
-            depth_map = self._read_depth_map_from_rgb_d(bgr_image)
+            depth_map = self._set_default_depth_map(bgr_image)
 
-
-         
         frame_data = {
             "bgr_image": bgr_image,
             "depth_map": depth_map,
             "timestamp": datetime.now().isoformat()
         }
-        
-        # 存储数据
         self._data_dict[frame_id] = frame_data
     
     def get_image(self, frame_id: int) -> Optional[BGRImage]:
@@ -242,8 +274,108 @@ class CameraDataManager:
         if removed_count > 0:
             pass
     
+    def compute_stereo_depth(
+        self, frame_bgr: np.ndarray
+    ) -> Optional[Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+        """
+        从双目并排整帧计算左/右目校正图与深度图（毫米）。
+        供测试或外部调用；若帧尺寸不支持或无双目标定则返回 None。
+        返回 (rect_left_bgr, rect_right_bgr, depth_mm)。
+        """
+        return self._compute_stereo_depth(frame_bgr)
+
+    def _ensure_stereo_processor(self) -> bool:
+        """若存在 stereo 标定则构建并缓存 remap 与 SGBM，返回是否可用。"""
+        if self._stereo_sgbm is not None:
+            return True
+        config = self.load_camera_params()
+        if "stereo" not in config or "left" not in config or "right" not in config:
+            return False
+        left = config["left"]
+        right = config["right"]
+        stereo = config["stereo"]
+        image_size = tuple(stereo["image_size"])
+        K1 = np.array(left["K"], dtype=np.float64)
+        dist1 = np.array(left["dist"], dtype=np.float64).reshape(-1, 1)
+        K2 = np.array(right["K"], dtype=np.float64)
+        dist2 = np.array(right["dist"], dtype=np.float64).reshape(-1, 1)
+        R1 = np.array(stereo["R1"], dtype=np.float64)
+        R2 = np.array(stereo["R2"], dtype=np.float64)
+        P1 = np.array(stereo["P1"], dtype=np.float64)
+        P2 = np.array(stereo["P2"], dtype=np.float64)
+        Q = np.array(stereo["Q"], dtype=np.float64)
+        self._stereo_map1x, self._stereo_map1y = cv2.initUndistortRectifyMap(
+            K1, dist1, R1, P1, image_size, cv2.CV_32FC1
+        )
+        self._stereo_map2x, self._stereo_map2y = cv2.initUndistortRectifyMap(
+            K2, dist2, R2, P2, image_size, cv2.CV_32FC1
+        )
+        self._stereo_sgbm = cv2.StereoSGBM_create(
+            minDisparity=SGBM_MIN_DISPARITY,
+            numDisparities=SGBM_NUM_DISPARITIES,
+            blockSize=SGBM_BLOCK_SIZE,
+            P1=SGBM_P1,
+            P2=SGBM_P2,
+            disp12MaxDiff=SGBM_DISP12_MAX_DIFF,
+            uniquenessRatio=SGBM_UNIQUENESS_RATIO,
+            speckleWindowSize=SGBM_SPECKLE_WINDOW_SIZE,
+            speckleRange=SGBM_SPECKLE_RANGE,
+            preFilterCap=SGBM_PREFILTER_CAP,
+            mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY,
+        )
+        self._stereo_Q = Q
+        self._stereo_image_size = image_size
+        return True
+
+    def _compute_stereo_depth(
+        self, frame_bgr: np.ndarray
+    ) -> Optional[Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+        """从双目并排整帧得到 (左目校正图, 右目校正图, 深度图 mm)。不支持或无双目标定时返回 None。"""
+        h, w = frame_bgr.shape[:2]
+        if (w, h) not in STEREO_FRAME_SIZES:
+            return None
+        if not self._ensure_stereo_processor():
+            return None
+        half = w // 2
+        left_bgr = frame_bgr[:, :half]
+        right_bgr = frame_bgr[:, half:]
+        # 标定与运行一致(3840×1080 → 半幅 1920×1080, stereo.image_size=(1920,1080))时无需 resize，直接 remap(1920)
+        w_cal, h_cal = self._stereo_image_size
+        if left_bgr.shape[1] != w_cal or left_bgr.shape[0] != h_cal:
+            left_bgr = cv2.resize(left_bgr, (w_cal, h_cal), interpolation=cv2.INTER_LINEAR)
+        if right_bgr.shape[1] != w_cal or right_bgr.shape[0] != h_cal:
+            right_bgr = cv2.resize(right_bgr, (w_cal, h_cal), interpolation=cv2.INTER_LINEAR)
+        rect_left = cv2.remap(left_bgr, self._stereo_map1x, self._stereo_map1y, cv2.INTER_LINEAR)
+        rect_right = cv2.remap(right_bgr, self._stereo_map2x, self._stereo_map2y, cv2.INTER_LINEAR)
+        gray_l = cv2.cvtColor(rect_left, cv2.COLOR_BGR2GRAY)
+        gray_r = cv2.cvtColor(rect_right, cv2.COLOR_BGR2GRAY)
+        disp_raw = self._stereo_sgbm.compute(gray_l, gray_r)  # int16, Q16 定点：真实视差 = raw/16
+        disp = disp_raw.astype(np.float32) / 16.0
+        invalid_disp = disp <= 0
+        disp_safe = disp.copy()
+        disp_safe[invalid_disp] = 0.0
+        points_3d = cv2.reprojectImageTo3D(disp_safe, self._stereo_Q)
+        depth_mm = points_3d[:, :, 2].astype(np.float32)
+        invalid = invalid_disp | ~np.isfinite(depth_mm) | (depth_mm <= 0)
+        depth_mm[invalid] = np.nan
+        # [深度调试] 立体输出 Z（已按 Q16 换算视差后 reproject），单位由 Q 决定（标定为 mm）
+        valid = np.isfinite(depth_mm) & (depth_mm > 0)
+        if np.any(valid):
+            v = depth_mm[valid]
+            h_d, w_d = depth_mm.shape
+            center_z = depth_mm[h_d // 2, w_d // 2]
+            center_disp = float(disp[h_d // 2, w_d // 2]) if disp[h_d // 2, w_d // 2] > 0 else float("nan")
+            logger.info(
+                "[深度调试] 立体输出 Z: min=%.3f max=%.3f mean=%.3f | nan占比=%.1f%% | 中心Z=%.3f 中心disp=%.2f (disp≤0 已置 nan)",
+                float(np.min(v)), float(np.max(v)), float(np.mean(v)),
+                100.0 * np.sum(invalid) / depth_mm.size,
+                float(center_z) if np.isfinite(center_z) else float("nan"),
+                center_disp,
+            )
+        return (rect_left, rect_right, depth_mm)
+
     # ==================== 私有方法 ====================
-    
+
     def _open_rgb_d(self) -> Optional[cv2.VideoCapture]:
         """打开 RGB-D 摄像头，优先 1080P（双目 3840x1080 或单路 1920x1080）"""
         import platform
@@ -270,20 +402,14 @@ class CameraDataManager:
             logger.error(f"打开RGB-D摄像头失败: {e}", exc_info=True)
             return None
         
-    def _read_depth_map_from_rgb_d(self, bgr_image: np.ndarray) -> np.ndarray:
-        """从RGB-D摄像头读取深度图"""
-        if self._rgb_d:
-            # RGB-D 双目相机输出 3840x1080，暂无可用的深度 API 时使用占位深度图
-            h, w = bgr_image.shape[:2]
-            depth_scale = self.get_depth_scale()
-            depth_map = np.ones((h, w), dtype=np.float32) * (0.4 / depth_scale)
-            return depth_map
-        else:
+    def _set_default_depth_map(self, bgr_image: np.ndarray) -> np.ndarray:
+        """从RGB-D摄像头读取深度图；无双目标定或非立体分辨率时使用占位深度图。"""
+        h, w = bgr_image.shape[:2]
+        depth_scale = self.get_depth_scale()
+        depth_map = np.ones((h, w), dtype=np.float32) * (PLACEHOLDER_DEPTH_METERS / depth_scale)
+        if not self._rgb_d:
             logger.warning("非RGB-D摄像头，使用默认深度图")
-            h, w = bgr_image.shape[:2]
-            depth_scale = self.get_depth_scale()
-            depth_map = np.ones((h, w), dtype=np.float32) * (0.4 / depth_scale)
-            return depth_map
+        return depth_map
     
     def _get_default_config(self) -> Dict:
         """获取默认配置"""
@@ -300,11 +426,27 @@ class CameraDataManager:
                 "width": 640,
                 "height": 480
             },
-            "depth_scale": 0.001
+            "depth_scale": DEFAULT_DEPTH_SCALE
         }
-    
 
-    
+    def _adapt_stereo_config(self, config: Dict) -> Dict:
+        """若存在 stereo/left/right，则从 P1 派生 intrinsic_params 并设置 depth_scale，供 detector 使用。"""
+        if "stereo" not in config or "left" not in config or "right" not in config:
+            return config
+        stereo = config["stereo"]
+        if "P1" not in stereo:
+            return config
+        P1 = stereo["P1"]
+        config = dict(config)
+        config["intrinsic_params"] = {
+            "fx": float(P1[0][0]),
+            "fy": float(P1[1][1]),
+            "cx": float(P1[0][2]),
+            "cy": float(P1[1][2]),
+        }
+        config["depth_scale"] = DEFAULT_DEPTH_SCALE
+        return config
+
     def _check_required_fields(self, config: Dict) -> Dict:
         """检查必需字段"""
         required_fields = [
@@ -324,7 +466,7 @@ class CameraDataManager:
                 elif field == "image_resolution":
                     config[field] = {"width": 640, "height": 480}
                 elif field == "depth_scale":
-                    config[field] = 0.001
+                    config[field] = DEFAULT_DEPTH_SCALE
         
         return config
 

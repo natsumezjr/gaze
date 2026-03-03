@@ -1,4 +1,5 @@
 from project.data.data_manager import CameraDataManager
+from project.data.data_models import Landmark
 from project.core.recognition.detector import FaceDetector
 import logging
 from time import sleep
@@ -63,6 +64,14 @@ class ErrorHandler:
         
         # 执行警告回调（如睡眠）
         if self.on_warning and warning.sleep_duration:
+            # #region agent log
+            try:
+                open(r"d:\my_projects\gaze\.cursor\debug.log", "a").write(
+                    __import__("json").dumps({"id": "log_warn_cb", "timestamp": __import__("time").time() * 1000, "location": "main.py:on_warning", "message": "calling on_warning with 1 arg", "data": {"sleep_duration": warning.sleep_duration}, "hypothesisId": "A"}) + "\n"
+                )
+            except Exception:
+                pass
+            # #endregion
             self.on_warning(warning.sleep_duration)
         
         if self.retry_count < self.max_retries:
@@ -116,9 +125,18 @@ class RecognitionManager:
         from project.events import SYSTEM_STOP
         CALLBACK_MANAGER.unregister(SYSTEM_STOP, self._on_system_stop)
     
-    def _handle_warning(self):
-        """警告时的睡眠处理"""
-        pass
+    def _handle_warning(self, sleep_duration=None):
+        """警告时的睡眠处理 - 接受 ErrorHandler 传入的 sleep_duration"""
+        # #region agent log
+        try:
+            open(r"d:\my_projects\gaze\.cursor\debug.log", "a").write(
+                __import__("json").dumps({"id": "log_handle_warn", "timestamp": __import__("time").time() * 1000, "location": "main.py:_handle_warning", "message": "callback received", "data": {"sleep_duration": sleep_duration}, "hypothesisId": "B"}) + "\n"
+            )
+        except Exception:
+            pass
+        # #endregion
+        if sleep_duration is not None and sleep_duration > 0:
+            sleep(sleep_duration)
     
     def _handle_error(self):
         """错误时的停止处理"""
@@ -146,7 +164,15 @@ class RecognitionManager:
         """检查人脸检测"""
         if not self.face_detector.detect_face(image, depth_map):
             raise RecognitionWarning("人脸检测失败", "FACE_DETECTION_FAILED", sleep_duration=self.interval)
-    
+
+    @staticmethod
+    def _scale_landmarks_for_display(landmarks, src_w: int, src_h: int, dst_w: int, dst_h: int):
+        """将原始图像坐标下的关键点缩放到显示尺寸，用于与 resize 后的画面对齐"""
+        if not landmarks or src_w <= 0 or src_h <= 0:
+            return landmarks
+        sx, sy = dst_w / src_w, dst_h / src_h
+        return [Landmark(x=lm.x * sx, y=lm.y * sy, z=lm.z, visibility=lm.visibility) for lm in landmarks]
+
     def run(self):
         """主运行循环"""
         self.running = True
@@ -161,6 +187,9 @@ class RecognitionManager:
             return
     
 
+        _win_name = "Gaze-Camera"  # ASCII 标题避免 Windows 下中文乱码
+        cv2.namedWindow(_win_name, cv2.WINDOW_NORMAL)
+        _display_params_logged = [False]
         while self.running:
             try:
                 frame_id = self._cycle_start()
@@ -172,20 +201,54 @@ class RecognitionManager:
                 image = self.camera_manager.get_image(frame_id)
                 depth_map = self.camera_manager.get_depth(frame_id)
                 self._check_data_availability(image, depth_map)
-                
-                # 尝试检测人脸，但即使失败也继续显示摄像头画面
+                # 按固定比例缩放显示，并强制窗口尺寸=显示尺寸，避免系统/用户拉伸导致变形
+                if image is not None:
+                    frame_for_draw = image.data if hasattr(image, "data") else image
+                    h, w = frame_for_draw.shape[:2]
+                    max_display_w = 1280
+                    if w > max_display_w:
+                        scale = max_display_w / w
+                        display_w, display_h = max_display_w, int(round(h * scale))
+                        frame_display = cv2.resize(frame_for_draw, (display_w, display_h), interpolation=cv2.INTER_LINEAR)
+                    else:
+                        display_w, display_h = w, h
+                        frame_display = frame_for_draw
+                    if not _display_params_logged[0]:
+                        logger.info(
+                            "[显示参数] 图像尺寸 h=%d w=%d 显示尺寸 %dx%d 宽高比=%.3f (窗口将固定为该尺寸)",
+                            h, w, display_w, display_h, display_w / display_h if display_h else 0,
+                        )
+                        _display_params_logged[0] = True
+                    try:
+                        cv2.resizeWindow(_win_name, display_w, display_h)
+                    except cv2.error:
+                        pass
+                    cv2.imshow(_win_name, frame_display)
+                    cv2.waitKey(1)
+                # 尝试检测人脸
                 self._check_face_detection(image, depth_map)
                 logger.info("人脸检测成功")
                 key_coordinates = self.face_detector.get_fitting_data()
 
                 recg_fit_data_manager = RecgFitDataManager(key_coordinates, debug_log=True)
                 self.data_pipeline.store_recognition_data(frame_id, recg_fit_data_manager)
-                
-                # 可视化关键点并显示
-                if frame is not None:
-                    visualized_frame = self.visualizer.draw_keypoints(frame, key_coordinates)
-                    cv2.imshow('眼动追踪系统 - 摄像头画面', visualized_frame)
-                    cv2.waitKey(1)  # 非阻塞等待，允许其他处理继续
+                # 检测成功后用 2D 关键点绘制叠加层（显示与上面保持同一缩放）
+                if image is not None:
+                    frame_for_draw = image.data if hasattr(image, "data") else image
+                    h, w = frame_for_draw.shape[:2]
+                    max_display_w = 1280
+                    if w > max_display_w:
+                        scale = max_display_w / w
+                        display_w, display_h = max_display_w, int(round(h * scale))
+                        frame_display = cv2.resize(frame_for_draw, (display_w, display_h), interpolation=cv2.INTER_LINEAR)
+                    else:
+                        display_w, display_h = w, h
+                        frame_display = frame_for_draw
+                    landmarks_2d = self.face_detector.get_landmarks()
+                    scaled = self._scale_landmarks_for_display(landmarks_2d, w, h, display_w, display_h)
+                    visualized_frame = self.visualizer.draw_2d_fitting_landmarks(frame_display, scaled)
+                    cv2.imshow(_win_name, visualized_frame)
+                    cv2.waitKey(1)
                 self._cycle_update()
                 
             except KeyboardInterrupt:

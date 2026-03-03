@@ -44,7 +44,15 @@ class FaceDetector:
             
             # 提取关键点
             landmarks = extract_landmarks(bgr_image)
-            
+            # #region agent log
+            if not landmarks:
+                try:
+                    _sh = getattr(getattr(bgr_image, "data", None), "shape", None) or (0, 0)
+                    _payload = {"sessionId": "6d5179", "timestamp": __import__("time").time() * 1000, "location": "detector.py:detect_face", "message": "empty landmarks", "data": {"image_shape": list(_sh)[:2] if hasattr(_sh, "__len__") else []}, "hypothesisId": "H1"}
+                    open("debug-6d5179.log", "a").write(__import__("json").dumps(_payload) + "\n")
+                except Exception:
+                    pass
+            # #endregion
             if landmarks:
                 logger.info(f"提取到 {len(landmarks)} 个关键点")
                 is_valid = validate_landmarks(landmarks)
@@ -54,15 +62,31 @@ class FaceDetector:
                     self._landmarks = landmarks
                     self._detection_success = True
                     
-                    # 处理深度图
+                    # 处理深度图：统一转为米，使用配置的 depth_scale（camera_unit→米，默认 mm→m 0.001）
+                    depth_scale = self.camera_params.get("depth_scale", 0.001)
+                    # [深度调试] to_meters 前：camera_unit 原始值
+                    raw = depth_map.data
+                    raw_valid = np.isfinite(raw) & (raw > 0)
+                    if np.any(raw_valid):
+                        rv = raw[raw_valid]
+                        logger.info(
+                            "[深度调试] to_meters 前 unit=%s depth_scale=%s: min=%.3f max=%.3f mean=%.3f (若实际约0.4m则期望camera_unit约400)",
+                            depth_map.unit, depth_scale, float(np.min(rv)), float(np.max(rv)), float(np.mean(rv)),
+                        )
                     if not self._rgb_d:
-                        # 不使用RGB-D相机时，修改深度图
                         modified_depth_map = self._set_depth_map_without_rgb_d(depth_map)
-                        self._depth_map = modified_depth_map.to_meters()
+                        self._depth_map = modified_depth_map.to_meters(depth_scale)
                     else:
-                        # 使用RGB-D相机时，直接转换深度图单位
-                        self._depth_map = depth_map.to_meters()
-                    
+                        self._depth_map = depth_map.to_meters(depth_scale)
+                    # [深度调试] to_meters 后：应为米
+                    out = self._depth_map.data
+                    out_valid = np.isfinite(out) & (out > 0)
+                    if np.any(out_valid):
+                        ov = out[out_valid]
+                        logger.info(
+                            "[深度调试] to_meters 后 unit=m: min=%.4f max=%.4f mean=%.4f (期望约0.4)",
+                            float(np.min(ov)), float(np.max(ov)), float(np.mean(ov)),
+                        )
                     logger.info(f"人脸检测成功，提取到 {len(landmarks)} 个关键点")
                     return True
                 else:

@@ -13,8 +13,8 @@ from project.config.logging_config import setup_logging
 logger = setup_logging(__name__)
 
 
-# 默认参数
-DEPTH_VALIDATION_THRESHOLD = 0.1
+# 默认参数（深度单位：米；低于此值视为无效，支持近距离人脸约 5cm+）
+DEPTH_VALIDATION_THRESHOLD = 0.05
 COORDINATE_QUALITY_THRESHOLD = 0.8
 
 def pixel_to_3d(pixel: Point2D, depth_map: DepthMap, camera_params: Dict) -> Point3D:
@@ -106,11 +106,40 @@ def batch_convert_landmarks(landmarks: List[Landmark], depth_map: DepthMap,
     Returns:
         points_3d: 三维坐标点列表（带可见性）
     """
-
-    
     points_3d = []
     success_count = 0
-    
+    _debug_first_z_logged = [False]
+    if not hasattr(batch_convert_landmarks, "_depth_log_count"):
+        batch_convert_landmarks._depth_log_count = 0
+    batch_convert_landmarks._depth_log_count += 1
+    _log_depth_this_batch = batch_convert_landmarks._depth_log_count <= 3 or batch_convert_landmarks._depth_log_count % 60 == 0
+
+    if _log_depth_this_batch:
+        # [深度调试] 在关键点处采样深度；若为 nan 则 [深度追溯] 说明可能原因
+        for idx in [0, 468, 473]:
+            if idx < len(landmarks):
+                lm = landmarks[idx]
+                pixel = lm.to_point2d()
+                raw_z = get_depth_interpolated(depth_map, pixel)
+                valid = np.isfinite(raw_z) and raw_z > DEPTH_VALIDATION_THRESHOLD
+                logger.info(
+                    "[深度调试] 关键点 %d 像素(%.0f,%.0f) 采样深度=%.4f m 有效=%s (depth_map %dx%d unit=%s)",
+                    idx, pixel.x, pixel.y, raw_z, valid, depth_map.height, depth_map.width, getattr(depth_map, "unit", "?"),
+                )
+                if not np.isfinite(raw_z) or (isinstance(raw_z, float) and np.isnan(raw_z)):
+                    logger.info(
+                        "[深度追溯] 关键点 %d 像素(%.0f,%.0f) 深度=nan: 立体匹配在该像素无有效视差(或深度图与图像未对齐)，可检查标定/光照/遮挡及 image 与 depth 是否同源同尺寸",
+                        idx, pixel.x, pixel.y,
+                    )
+        valid_mask = np.isfinite(depth_map.data) & (depth_map.data > 0)
+        if np.any(valid_mask):
+            v = depth_map.data[valid_mask]
+            logger.info(
+                "[深度调试] 深度图统计: min=%.4f max=%.4f mean=%.4f m nan占比=%.1f%%",
+                float(np.min(v)), float(np.max(v)), float(np.mean(v)),
+                100.0 * (1.0 - np.sum(valid_mask) / depth_map.data.size),
+            )
+
     for i, landmark in enumerate(landmarks):
         try:
             # 提取像素坐标
@@ -122,6 +151,11 @@ def batch_convert_landmarks(landmarks: List[Landmark], depth_map: DepthMap,
             
             # 转换为3D坐标
             point_3d = pixel_to_3d(pixel, depth_map, camera_params)
+            
+            # [深度调试] 首次成功转换时打印该点 Z(米)，用于确认进入 coordinate_converter 的深度
+            if not _debug_first_z_logged[0]:
+                logger.info("[深度调试] coordinate_converter 首次成功 pixel_to_3d 得到 Z(米)=%.4f  (期望约0.4)", point_3d.z)
+                _debug_first_z_logged[0] = True
             
             # 创建带可见性的3D点
             point_with_visibility = Point3DWithVisibility(

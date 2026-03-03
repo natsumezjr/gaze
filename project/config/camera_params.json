@@ -1,27 +1,325 @@
 {
-    "camera_name": "HD Camera",
-    "camera_type": "RGB",
-    "intrinsic_params": {
-        "fx": 500.0,
-        "fy": 500.0,
-        "cx": 320.0,
-        "cy": 240.0
+  "pattern_size": [
+    9,
+    6
+  ],
+  "square_size_mm": 23.5,
+  "left": {
+    "success": true,
+    "image_size": [
+      1920,
+      1080
+    ],
+    "K": [
+      [
+        606.415327550281,
+        0.0,
+        965.318186727759
+      ],
+      [
+        0.0,
+        603.5111067148329,
+        536.4803650900203
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "dist": [
+      -0.016959243099880283,
+      0.0236120649056923,
+      -0.004082530758050481,
+      -0.0016179076216304752,
+      -0.01694341202790389
+    ],
+    "reprojection_error_train": 1.1354111952199546,
+    "reprojection_error_test": 1.3387015220216991,
+    "used_images": 47,
+    "used_train": 37,
+    "used_test": 10
+  },
+  "right": {
+    "success": true,
+    "image_size": [
+      1920,
+      1080
+    ],
+    "K": [
+      [
+        597.4944913315474,
+        0.0,
+        950.8449236223308
+      ],
+      [
+        0.0,
+        595.2502648913727,
+        476.89946058597775
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "dist": [
+      -0.025418766133412284,
+      0.041978977768017636,
+      -0.004014133663731218,
+      -0.0014981591662339897,
+      -0.03015962270342568
+    ],
+    "reprojection_error_train": 1.158048764287379,
+    "reprojection_error_test": 1.2632027818516132,
+    "used_images": 47,
+    "used_train": 37,
+    "used_test": 10
+  },
+  "stereo": {
+    "rms": 1.0832572863966983,
+    "R": [
+      [
+        0.999880033204409,
+        0.0020916923775545922,
+        0.015347443505276366
+      ],
+      [
+        -0.0021346001887754353,
+        0.9999938577603807,
+        0.002779914305431619
+      ],
+      [
+        -0.015341534512037886,
+        -0.0028123414638239613,
+        0.9998783566285985
+      ]
+    ],
+    "T": [
+      -64.25395277232421,
+      0.18955969039049939,
+      -2.0642490262175985
+    ],
+    "E": [
+      [
+        -0.007314482893260657,
+        2.063703240528291,
+        0.19527506710863404
+      ],
+      [
+        -3.049755618868086,
+        -0.1850218295497078,
+        64.21445575957242
+      ],
+      [
+        -0.052380449804498824,
+        -64.25395460970927,
+        -0.1815297391314576
+      ]
+    ],
+    "F": [
+      [
+        -4.874888352270167e-09,
+        1.3820163914882225e-06,
+        -0.0006577968529084794
+      ],
+      [
+        -2.0402359393368913e-06,
+        -1.243721744274501e-07,
+        0.028086836009982123
+      ],
+      [
+        0.0009567641289254084,
+        -0.026964630480643393,
+        1.0
+      ]
+    ],
+    "R1": [
+      [
+        0.9988737784885622,
+        -0.0009483104447012527,
+        0.047437067313265704
+      ],
+      [
+        0.0008806303356489965,
+        0.9999985644518514,
+        0.0014476133627966934
+      ],
+      [
+        -0.04743837200194338,
+        -0.0014042085089769926,
+        0.998873179668104
+      ]
+    ],
+    "R2": [
+      [
+        0.9994800009390744,
+        -0.002948629794043,
+        0.03210970733540751
+      ],
+      [
+        0.0029944312283810585,
+        0.9999945666684649,
+        -0.001378410377031043
+      ],
+      [
+        -0.032105468450815924,
+        0.0014738439153087262,
+        0.9994833999020027
+      ]
+    ],
+    "P1": [
+      [
+        593.4990878737491,
+        0.0,
+        873.4570693969727,
+        0.0
+      ],
+      [
+        0.0,
+        593.4990878737491,
+        506.2484588623047,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    ],
+    "P2": [
+      [
+        593.4990878737491,
+        0.0,
+        873.4570693969727,
+        -38154.50266821492
+      ],
+      [
+        0.0,
+        593.4990878737491,
+        506.2484588623047,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    ],
+    "Q": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -873.4570693969727
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -506.2484588623047
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        593.4990878737491
+      ],
+      [
+        0.0,
+        0.0,
+        0.015555151983888151,
+        -0.0
+      ]
+    ],
+    "roi1": [
+      23,
+      16,
+      1889,
+      987
+    ],
+    "roi2": [
+      0,
+      50,
+      1905,
+      1023
+    ],
+    "image_size": [
+      1920,
+      1080
+    ],
+    "num_pairs_total": 47,
+    "num_pairs_accepted": 22,
+    "rejected": {
+      "no_corners": 0,
+      "area": 2,
+      "blur": 23,
+      "area_ratio_min": 0.05,
+      "blur_var_min": 70.0
     },
-    "image_resolution": {
-        "width": 640,
-        "height": 480
+    "rectify": {
+      "alpha": 0.3,
+      "dy_rms": 0.6881023443320948,
+      "dy_max_abs": 3.223052978515625,
+      "used_pairs_for_dy": 19
     },
-    "depth_scale": 0.001,
-    "min_depth": 0.1,
-    "max_depth": 10.0,
-    "distortion_coeffs": {
-        "k1": 0.0,
-        "k2": 0.0,
-        "p1": 0.0,
-        "p2": 0.0,
-        "k3": 0.0
+    "used_pair_paths": [
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0003.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0004.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0005.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0006.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0007.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0008.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0009.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0016.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0017.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0020.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0025.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0036.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0037.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0039.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0040.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0041.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0042.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0043.png",
+      "D:\\my_projects\\gaze\\project\\config\\calibration\\stereo_0044.png"
+    ],
+    "debug_dirs": {
+      "pairs": "D:\\my_projects\\gaze\\project\\config\\calibration\\debug_stereo",
+      "rectified": "D:\\my_projects\\gaze\\project\\config\\calibration\\debug_rectified"
     },
-    "calibration_date": "2025-09-17",
-    "calibration_method": "通过虹膜半径标定获得",
-    "notes": "通过虹膜半径标定获得，制造商: Microsoft"
+    "pruning": {
+      "enabled": true,
+      "drop_top_k": 3,
+      "keep_min_pairs": 12,
+      "before_pairs": 22,
+      "after_pairs": 19,
+      "dropped": [
+        {
+          "file": "stereo_0015.png",
+          "dy_rms": 1.4779440376593436,
+          "dy_max_abs": 2.6385955810546875
+        },
+        {
+          "file": "stereo_0030.png",
+          "dy_rms": 1.4292245611209178,
+          "dy_max_abs": 3.870574951171875
+        },
+        {
+          "file": "stereo_0038.png",
+          "dy_rms": 1.3541674297778412,
+          "dy_max_abs": 2.385498046875
+        }
+      ],
+      "second_pass": {
+        "rms": 1.0832572863966983,
+        "dy_rms": 0.6881023443320948,
+        "dy_max_abs": 3.223052978515625,
+        "used_pairs_for_dy": 19
+      },
+      "accepted_second_pass": true
+    }
+  }
 }

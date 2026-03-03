@@ -56,7 +56,7 @@ def _get_face_landmarker():
             base_options=base_options,
             running_mode=mp.tasks.vision.RunningMode.IMAGE,
             num_faces=1,
-            min_face_detection_confidence=0.5,
+            min_face_detection_confidence=0.3,  # 降低以应对校正后变形/光照，有人脸却检不到时可再调低
         )
         _face_landmarker = mp.tasks.vision.FaceLandmarker.create_from_options(options)
     return _face_landmarker
@@ -113,12 +113,31 @@ def extract_landmarks(bgr_image: BGRImage) -> List[Landmark]:
         landmarks: 关键点列表，每个点包含[x, y, z, visibility]
     """
     try:
+        # #region agent log
+        try:
+            _h, _w = bgr_image.data.shape[:2] if hasattr(bgr_image, "data") else (0, 0)
+            _payload = {"sessionId": "6d5179", "timestamp": __import__("time").time() * 1000, "location": "landmark_extractor.py:extract_landmarks", "message": "input image", "data": {"height": _h, "width": _w}, "hypothesisId": "H2"}
+            open("debug-6d5179.log", "a").write(__import__("json").dumps(_payload) + "\n")
+        except Exception:
+            pass
+        # #endregion
         landmarker = _get_face_landmarker()
         rgb_image = bgr_image.to_rgb()
+        # 保证连续且 uint8，避免异常 stride/dtype 导致 MediaPipe 检测失败
+        if rgb_image.dtype != np.uint8 or not rgb_image.flags.c_contiguous:
+            rgb_image = np.ascontiguousarray(rgb_image.astype(np.uint8))
 
         # MediaPipe Tasks 需要 mp.Image 格式
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
         result = landmarker.detect(mp_image)
+        # #region agent log
+        try:
+            _n = len(result.face_landmarks) if result.face_landmarks else 0
+            _payload = {"sessionId": "6d5179", "timestamp": __import__("time").time() * 1000, "location": "landmark_extractor.py:after detect", "message": "MediaPipe face count", "data": {"face_count": _n}, "hypothesisId": "H1"}
+            open("debug-6d5179.log", "a").write(__import__("json").dumps(_payload) + "\n")
+        except Exception:
+            pass
+        # #endregion
 
         if not result.face_landmarks:
             return []
