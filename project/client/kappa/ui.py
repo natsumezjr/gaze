@@ -149,6 +149,11 @@ class EyeCalibrationApp(FrontendAdapter):
         self.gaze_point_color = "#0000FF"  # 默认蓝色
         self.gaze_point_size = 8  # 实现点大小（半径），增大以便更容易看到
 
+        # UI更新防积压机制
+        self._pending_gaze_updates = {}  # {event_type: latest_data}
+        self._pending_rough_gaze_update: Optional[CalibrationRequest] = None  # 最新的粗略视线更新
+        self._pending_gaze_point_update: Optional[Tuple[Point2D, str]] = None  # 最新的视线点更新
+        self._update_scheduled = False  # 是否已调度更新处理
         
         # 注册回调（接收后端启动请求和粗略视线位置）
         self._register_callbacks()
@@ -192,8 +197,12 @@ class EyeCalibrationApp(FrontendAdapter):
         logger.info("回调函数已注册")
     
     def _on_rough_gaze_update(self, calibration_request: CalibrationRequest):
-        """接收粗略视线位置更新（包含 CalibrationRequest）"""
-        self.root.after(0, lambda cr=calibration_request: self.update_rough_gaze(cr))
+        """接收粗略视线位置更新（包含 CalibrationRequest）- 防积压版本"""
+        # 保存最新数据，丢弃旧的
+        self._pending_rough_gaze_update = calibration_request
+        if not self._update_scheduled:
+            self._update_scheduled = True
+            self.root.after(0, self._process_pending_updates)
     
     def _on_calibration_start_request(self, frame_id: int = None):
         """收到校准启动请求（从后端回调）"""
@@ -340,8 +349,28 @@ class EyeCalibrationApp(FrontendAdapter):
         self._draw_gaze_point(point, color)
     
     def _on_gaze_point_update(self, point: Point2D, color: str = "#0000FF"):
-        """收到视线点更新事件时，调度到主线程显示"""
-        self.root.after(0, lambda p=point, c=color: self.show_gaze_point(p, c))
+        """收到视线点更新事件时，调度到主线程显示 - 防积压版本"""
+        # 保存最新数据，丢弃旧的
+        self._pending_gaze_point_update = (point, color)
+        if not self._update_scheduled:
+            self._update_scheduled = True
+            self.root.after(0, self._process_pending_updates)
+    
+    def _process_pending_updates(self):
+        """处理积压的更新（合并）- 在主线程中执行"""
+        self._update_scheduled = False
+        
+        # 处理粗略视线更新
+        if self._pending_rough_gaze_update is not None:
+            cr = self._pending_rough_gaze_update
+            self._pending_rough_gaze_update = None
+            self.update_rough_gaze(cr)
+        
+        # 处理视线点更新
+        if self._pending_gaze_point_update is not None:
+            point, color = self._pending_gaze_point_update
+            self._pending_gaze_point_update = None
+            self.show_gaze_point(point, color)
     
     def _on_request_calibration_ui_close(self):
         """收到标定完成/请求关闭标定 UI 时，在主线程关闭"""

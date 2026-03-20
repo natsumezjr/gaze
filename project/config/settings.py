@@ -18,6 +18,6 @@ FRAME_ID_PERIOD_SECONDS = 10.0  # 周期（秒），每个周期清空半个周�
 FRAME_ID_CLEANUP_ENABLED = True  # 是否启用自动清理
 
 # 桥接层配置（WebSocket，供 Node.js / Unity 等前端连接）
-BRIDGE_ENABLED = False  # 为 True 时启动桥接服务
+BRIDGE_ENABLED = True  # 为 True 时启动桥接服务
 BRIDGE_HOST = "0.0.0.0"
 BRIDGE_PORT = 8765
