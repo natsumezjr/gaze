@@ -1,12 +1,11 @@
 # 眼动追踪系统主入口
 # 系统启动、模块协调、全局状态管理
 from project.core.fitting.main import FittingManager
-from project.core.recognition.main import RecognitionManager
+from project.core.recognition.recognition_runtime import RecognitionManager
 from project.managers import FRAME_ID_MANAGER, CALLBACK_MANAGER
 from project.events import RECOGNITION_COMPLETE, FITTING_START, SYSTEM_STOP
 from project.events.event_types import CALIBRATION_POINT_SUBMIT, CALIBRATION_COMPLETE, CALIBRATION_START_REQUEST, ROUGH_GAZE_UPDATE
 import threading
-from typing import Optional
 from project.config.settings import MAX_FITTING_THREADS
 from concurrent.futures import ThreadPoolExecutor
 from project.config.logging_config import setup_logging
@@ -20,13 +19,22 @@ from project.data.data_models import EYE_TYPE
 from project.events.event_types import GAZE_POINT_UPDATE, REQUEST_CALIBRATION_UI_CLOSE
 from project.client.kappa.ui import EyeCalibrationApp
 # 设置统一的日志配置
-logger = setup_logging(__name__)
+logger = setup_logging(__name__, logging.DEBUG)
+
+
+# 标定路径拟合日志节流：每 N 帧输出一次
+_CALIB_FIT_LOG_INTERVAL = 10
+
+
 
 
 def _run_calibration_fitting_and_emit(frame_id: int, data):
     """在拟合池中执行标定路径的拟合，并发送 ROUGH_GAZE_UPDATE / GAZE_POINT_UPDATE（供调度器提交，避免阻塞识别线程）"""
     try:
         fitting_results = fit_all_eyes(data)
+        # 与 FittingManager 一致的三处 debug 日志：拟合结果、视线向量与方向、视线焦点与屏幕方位
+        fm = FittingManager(data, frame_id=frame_id)
+        fm.log_fitting_results(fitting_results)
         for eye in EYE_TYPE:
             if eye not in fitting_results:
                 continue
@@ -36,7 +44,10 @@ def _run_calibration_fitting_and_emit(frame_id: int, data):
             if not pupil_points:
                 continue
             pupil_center = Point3D(pupil_points[0].x, pupil_points[0].y, pupil_points[0].z)
+            optical_axis = (pupil_center - eyeball_center).to_ndarray()
+            fm.log_gaze_direction(eye, optical_axis)
             intersection = SCREEN_CONFIG.calculate_gaze_intersection(pupil_center, eyeball_center)
+            fm.log_intersection_and_region(eye, intersection)
             if intersection:
                 CALLBACK_MANAGER.emit(GAZE_POINT_UPDATE, point=intersection, color="#0000FF")
                 calibration_request = CalibrationRequest(
@@ -99,7 +110,7 @@ class FittingScheduler:
             
             # 检查 kappa 是否 valid
             if not KAPPA_STORAGE.is_kappa_valid():
-                logger.info(f"kappa 未有效，发送标定启动请求，frame_id: {frame_id}")
+                logger.debug(f"kappa 未有效，发送标定启动请求，frame_id: {frame_id}")
                 CALLBACK_MANAGER.emit(CALIBRATION_START_REQUEST, frame_id=frame_id)
                 # 将标定路径的拟合提交到拟合池，避免阻塞识别线程
                 self.thread_pool_executor.submit(
@@ -110,10 +121,10 @@ class FittingScheduler:
                 return
             
             # kappa valid，正常提交拟合任务
-            logger.info(f"收到识别完成事件，开始拟合 frame_id: {frame_id}")
+            logger.debug(f"收到识别完成事件，开始拟合 frame_id: {frame_id}")
             
-            # 提交拟合任务（非阻塞）
-            fitting_manager = FittingManager(data)
+            # 提交拟合任务（非阻塞），传入 frame_id 用于拟合结果日志节流
+            fitting_manager = FittingManager(data, frame_id=frame_id)
             self.thread_pool_executor.submit(fitting_manager.run)
             
             # 发送拟合开始事件

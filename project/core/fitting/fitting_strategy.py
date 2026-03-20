@@ -18,6 +18,8 @@ from project.data.data_manager import RecgFitDataManager
 from project.data.data_models import EYE_TYPE, Point3DWithVisibility, FittingType, Point3D
 import numpy as np
 import logging
+from project.config.logging_config import setup_logging
+logger = setup_logging(__name__)
 
 # ==================== 解剖学约束参数 ====================
 ANATOMICAL_CONSTRAINTS = {
@@ -117,9 +119,9 @@ class DataProvider:
                             coord_3d = point.to_point3d().to_ndarray()
                             points_with_types.append((coord_3d, fitting_type))
                         else:
-                            logging.warning(f"跳过无效的拟合点: {point}, 类型: {type(point)}")
+                            logger.warning(f"跳过无效的拟合点: {point}, 类型: {type(point)}")
             except Exception as e:
-                logging.error(f"获取{fitting_type}拟合点时出错: {e}")
+                logger.error(f"获取{fitting_type}拟合点时出错: {e}")
         return points_with_types
     
     def get_constraint_points(self, eye: str) -> List[Tuple[np.ndarray, str]]:
@@ -136,9 +138,9 @@ class DataProvider:
                             coord_3d = point.to_point3d().to_ndarray()
                             points_with_types.append((coord_3d, fitting_type))
                         else:
-                            logging.warning(f"跳过无效的约束点: {point}, 类型: {type(point)}")
+                            logger.warning(f"跳过无效的约束点: {point}, 类型: {type(point)}")
             except Exception as e:
-                logging.error(f"获取{fitting_type}约束点时出错: {e}")
+                logger.error(f"获取{fitting_type}约束点时出错: {e}")
         return points_with_types
     
     def get_data_quality(self, eye: str) -> Dict[str, float]:
@@ -151,10 +153,10 @@ class DataProvider:
             fitting_count = len(fitting_points)
             constraint_count = len(constraint_points)
             
-            logging.debug(f"{eye}眼数据统计:")
-            logging.debug(f"  拟合点数量: {fitting_count}")
-            logging.debug(f"  约束点数量: {constraint_count}")
-            logging.debug(f"  总点数: {total_points}")
+            logger.debug(f"{eye}眼数据统计:")
+            logger.debug(f"  拟合点数量: {fitting_count}")
+            logger.debug(f"  约束点数量: {constraint_count}")
+            logger.debug(f"  总点数: {total_points}")
             
             # 计算平均可见性 - 直接从数据管理器获取原始数据
             visibility_values = []
@@ -166,8 +168,8 @@ class DataProvider:
                             visibility_values.append(float(point.visibility))
             
             mean_visibility = np.mean(visibility_values) if visibility_values else 0.0
-            logging.debug(f"  平均可见性: {mean_visibility:.3f}")
-            logging.debug(f"  可见性样本数: {len(visibility_values)}")
+            logger.debug(f"  平均可见性: {mean_visibility:.3f}")
+            logger.debug(f"  可见性样本数: {len(visibility_values)}")
             
             quality = {
                 "point_count": total_points,
@@ -176,11 +178,11 @@ class DataProvider:
                 "visibility": mean_visibility
             }
             
-            logging.debug(f"{eye}眼数据质量: {quality}")
+            logger.debug(f"{eye}眼数据质量: {quality}")
             return quality
             
         except Exception as e:
-            logging.error(f"计算{eye}眼数据质量时出错: {e}")
+            logger.error(f"计算{eye}眼数据质量时出错: {e}")
             return {
                 "point_count": 0,
                 "fitting_point_count": 0,
@@ -242,7 +244,7 @@ class RandomSamplingStrategy(SamplingStrategy):
         # 拟合点采样
         if len(fitting_points) >= self.min_fitting_points:
             fitting_sample_num = np.random.randint(self.min_fitting_points, len(fitting_points) + 1)
-            logging.debug(f"拟合点随机采样数量：{fitting_sample_num},最小采样数量：{self.min_fitting_points}")
+            logger.debug(f"拟合点随机采样数量：{fitting_sample_num},最小采样数量：{self.min_fitting_points}")
             sampled_fitting = random.sample(fitting_points, fitting_sample_num)
         else:
             sampled_fitting = fitting_points
@@ -250,7 +252,7 @@ class RandomSamplingStrategy(SamplingStrategy):
         # 约束点采样
         if len(constraint_points) >= self.min_constraint_points:
             constraint_sample_num = np.random.randint(self.min_constraint_points, len(constraint_points) + 1)
-            logging.debug(f"约束点随机采样数量：{constraint_sample_num},最小采样数量：{self.min_constraint_points}")
+            logger.debug(f"约束点随机采样数量：{constraint_sample_num},最小采样数量：{self.min_constraint_points}")
             sampled_constraint = random.sample(constraint_points, constraint_sample_num)
         else:
             sampled_constraint = constraint_points
@@ -262,7 +264,7 @@ class FailSamplingStrategy(SamplingStrategy):
     
     def sample(self, fitting_points: List[Tuple[np.ndarray, str]], 
                constraint_points: List[Tuple[np.ndarray, str]]) -> Tuple[List[Tuple[np.ndarray, str]], List[Tuple[np.ndarray, str]]]:
-        logging.warning("采样失败，返回空列表")
+        logger.warning("采样失败，返回空列表")
         return [], []
 
 # ==================== 残差计算类 ====================
@@ -362,8 +364,8 @@ class ConfidenceCalculator:
                     "sigma": sigma,
                     "mu": mu
                 }
-                #logging.debug(f"预计算sigma字典，残差类型：\n{residual_type}\n 点类型：\n{point_type}\n sigma：{sigma} mu：{mu} 最大偏差：{max_offset}")
-                #logging.debug(f"最大偏差置信度：{self.normal_distribution_vector(max_offset, 0, sigma)}")
+                #logger.debug(f"预计算sigma字典，残差类型：\n{residual_type}\n 点类型：\n{point_type}\n sigma：{sigma} mu：{mu} 最大偏差：{max_offset}")
+                #logger.debug(f"最大偏差置信度：{self.normal_distribution_vector(max_offset, 0, sigma)}")
         self.sigma_dict_computed = True
     
     def _solve_sigma_squared(self, max_offset: float, confidence: float) -> float:
@@ -410,7 +412,7 @@ class ConfidenceCalculator:
                 confidence_vector[i] = self.normal_distribution_vector(
                     residual_vector[i], 0, sigma
                 )
-                #logging.debug(f"计算置信度向量，残差类型：\n{residual_type}\n 点类型：\n{point_type}\n 置信度：\n{confidence_vector[i]}")
+                #logger.debug(f"计算置信度向量，残差类型：\n{residual_type}\n 点类型：\n{point_type}\n 置信度：\n{confidence_vector[i]}")
             else:
                 # 如果点类型不在预计算字典中，使用默认值
                 confidence_vector[i] = 0.0
@@ -723,7 +725,7 @@ class LevenbergMarquardtOptimizer(Optimizer):
                 J[:3] = -np.sqrt(self.alpha) * w * (diff / dist)
                 J[3]  = -np.sqrt(self.alpha) * w
             jacobians.append(J)
-        logging.debug(f"表面残差: {residuals}")
+        logger.debug(f"表面残差: {residuals}")
         return np.array(residuals), np.vstack(jacobians)
 
     def _center_residual(self, params, fitting_points, constraint_points):
@@ -768,7 +770,7 @@ class LevenbergMarquardtOptimizer(Optimizer):
                 # J[3] = 0（中心残差不依赖于半径）
             jacobians.append(J)
         
-        logging.debug(f"中心残差: {residuals}")
+        logger.debug(f"中心残差: {residuals}")
         return np.array(residuals), np.vstack(jacobians)
 
     def _depth_residual(self, params, fitting_points, constraint_points):
@@ -802,7 +804,7 @@ class LevenbergMarquardtOptimizer(Optimizer):
         J = np.zeros((1, 4))
         J[0, 2] = np.sqrt(self.depth_lambda) * (- df_du)
 
-        logging.debug(f"深度残差: {r}")
+        logger.debug(f"深度残差: {r}")
         return np.array([r]), J
 
     def _outside_eyeball_residual(self, params, fitting_points, constraint_points):
@@ -860,7 +862,7 @@ class LevenbergMarquardtOptimizer(Optimizer):
                 J[:3] = np.sqrt(lambda_outside) * (-df_du) * (diff / dist)  # ∂f/∂c
                 J[3] = np.sqrt(lambda_outside) * df_du                      # ∂f/∂r
             jacobians.append(J)
-        logging.debug(f"眼球外残差: {residuals}")
+        logger.debug(f"眼球外残差: {residuals}")
         return np.array(residuals), np.array(jacobians)
     # ================== 工具函数 ==================
     def _softplus(self, x, beta=1.0):
@@ -910,7 +912,7 @@ class LevenbergMarquardtOptimizer(Optimizer):
                 constraint_points: List[Tuple[np.ndarray, str]]) -> FittingResult:
         """Levenberg-Marquardt优化"""
         if not fitting_points:
-            logging.warning("没有拟合点，无法进行优化")
+            logger.warning("没有拟合点，无法进行优化")
             return FittingResult(
                 parameters=initial_params,
                 confidence=0.0,
@@ -931,9 +933,9 @@ class LevenbergMarquardtOptimizer(Optimizer):
         self.last_target_value = float('inf')
         
         for iteration in range(self.max_iterations):
-            logging.debug(f"------------------------------------------------------------------------------------------------------")
+            logger.debug(f"------------------------------------------------------------------------------------------------------")
             
-            logging.debug(f"第{iteration}次LM优化，计算残差：\n")
+            logger.debug(f"第{iteration}次LM优化，计算残差：\n")
             # 使用重构的残差计算方法
             old_residual, J = self._compute_all_residuals_and_jacobians(
                 current_params, fitting_points, constraint_points)
@@ -942,26 +944,26 @@ class LevenbergMarquardtOptimizer(Optimizer):
             # 求解正规方程
             delta = self._solve_normal_equations(J, old_residual, lambda_lm)
             
-            logging.debug(f"第{iteration}次LM优化，未裁剪前计算的步长：{np.linalg.norm(delta)}")
+            logger.debug(f"第{iteration}次LM优化，未裁剪前计算的步长：{np.linalg.norm(delta)}")
             delta = self._clip_step_size(delta)
-            logging.debug(f"第{iteration}次LM优化，裁剪后计算的步长：{np.linalg.norm(delta)}")
+            logger.debug(f"第{iteration}次LM优化，裁剪后计算的步长：{np.linalg.norm(delta)}")
             
-            # 更新参数
+            # 更新参数（确保 float64，避免 center 为 int 时 += delta 报 UFuncOutputCastingError）
             new_params = current_params.copy()
-            new_params.center += delta[:3]
-            new_params.radius += delta[3]
+            new_params.center = np.asarray(current_params.center, dtype=np.float64) + delta[:3]
+            new_params.radius = float(current_params.radius) + float(delta[3])
             
-            logging.debug(f"第{iteration}次LM优化初始参数: {current_params}")
-            logging.debug(f"第{iteration}次LM优化准备更新参数: {new_params}")
+            logger.debug(f"第{iteration}次LM优化初始参数: {current_params}")
+            logger.debug(f"第{iteration}次LM优化准备更新参数: {new_params}")
             
             # 计算新目标函数值
             new_residual, _ = self._compute_all_residuals_and_jacobians(
                 new_params, fitting_points, constraint_points)
             new_target = target_function(new_residual, self.alpha, self.huber_kappa)
             
-            logging.debug(f"第{iteration}次LM优化，计算新目标函数值: {new_target}")
+            logger.debug(f"第{iteration}次LM优化，计算新目标函数值: {new_target}")
             
-            logging.debug(f"目前的 置信度 {self.confidence_calculator.get_confidence_breakdown(current_params, fitting_points, constraint_points)}")
+            logger.debug(f"目前的 置信度 {self.confidence_calculator.get_confidence_breakdown(current_params, fitting_points, constraint_points)}")
             
             # 检查更新是否有效
             if self._check_update_enable(new_target):
@@ -971,9 +973,9 @@ class LevenbergMarquardtOptimizer(Optimizer):
                 
                 # 检查收敛
                 if self._check_convergence(delta, delta_convergence_threshold, old_residual, new_residual, residual_convergence_threshold):
-                    logging.debug(f"LM优化收敛，迭代次数: {iteration + 1}")
-                    logging.debug(f"LM优化收敛，最终参数: {current_params}")
-                    logging.debug("------------------------------------------------------------------------------------------------------")
+                    logger.debug(f"LM优化收敛，迭代次数: {iteration + 1}")
+                    logger.debug(f"LM优化收敛，最终参数: {current_params}")
+                    logger.debug("------------------------------------------------------------------------------------------------------")
                     return FittingResult(
                         parameters=current_params,
                         confidence=self.confidence_calculator.calculate_weighted_confidence(current_params, fitting_points, constraint_points),
@@ -986,7 +988,7 @@ class LevenbergMarquardtOptimizer(Optimizer):
             else:
                 lambda_lm = min(lambda_lm*lamda_factor, max_lambda)
                 
-            logging.debug(f"第{iteration}次LM优化，lambda_lm: {lambda_lm}")
+            logger.debug(f"第{iteration}次LM优化，lambda_lm: {lambda_lm}")
         
         # 未收敛
         return FittingResult(
@@ -1018,14 +1020,14 @@ class LevenbergMarquardtOptimizer(Optimizer):
         if target_value <= self.last_target_value:
             improved = True
             self.last_target_value = target_value
-        logging.debug(f"检查更新是否有效: {target_value} <= {self.last_target_value} = {improved}")
+        logger.debug(f"检查更新是否有效: {target_value} <= {self.last_target_value} = {improved}")
         return improved
     
     def _solve_normal_equations(self, J: np.ndarray, residual: np.ndarray, lambda_lm: float) -> np.ndarray:
         """求解正规方程"""
         # 检查维度匹配
         if len(residual) != J.shape[0]:
-            logging.error(f"维度不匹配: J.shape[0]={J.shape[0]}, residual长度={len(residual)}")
+            logger.error(f"维度不匹配: J.shape[0]={J.shape[0]}, residual长度={len(residual)}")
             return np.zeros(4)
         
         # 计算Hessian矩阵和梯度
@@ -1039,10 +1041,10 @@ class LevenbergMarquardtOptimizer(Optimizer):
             # 求解线性方程组
             delta = np.linalg.solve(H_lm, -g)
         except np.linalg.LinAlgError:
-            logging.warning("线性方程组求解失败，使用最小二乘法求解")
+            logger.warning("线性方程组求解失败，使用最小二乘法求解")
             delta = np.linalg.lstsq(H_lm, -g, rcond=None)[0]
         finally:
-            logging.debug(f"求解线性方程组结果: {delta}")
+            logger.debug(f"求解线性方程组结果: {delta}")
             return delta 
         
 class RANSACOptimizer(Optimizer):
@@ -1064,17 +1066,17 @@ class RANSACOptimizer(Optimizer):
             self.center_threshold = center_threshold
             
         # 打印各点类型的阈值信息
-        logging.debug("RANSAC各点类型阈值设置：")
+        logger.debug("RANSAC各点类型阈值设置：")
         for point_type in FITTING_ENABLE + OUTSIDE_EYEBALL:
             if point_type in ANATOMICAL_CONSTRAINTS["TO_SURFACE"]:
                 min_val, max_val = ANATOMICAL_CONSTRAINTS["TO_SURFACE"][point_type]
                 surface_threshold = (max_val - min_val) / 2
-                logging.debug(f"  {point_type} 表面阈值: ({min_val}, {max_val}) -> {surface_threshold:.4f}")
+                logger.debug(f"  {point_type} 表面阈值: ({min_val}, {max_val}) -> {surface_threshold:.4f}")
             
             if point_type in ANATOMICAL_CONSTRAINTS["TO_CENTER"]:
                 min_val, max_val = ANATOMICAL_CONSTRAINTS["TO_CENTER"][point_type]
                 center_threshold = (max_val - min_val) / 2
-                logging.debug(f"  {point_type} 中心阈值: ({min_val}, {max_val}) -> {center_threshold:.4f}")
+                logger.debug(f"  {point_type} 中心阈值: ({min_val}, {max_val}) -> {center_threshold:.4f}")
             
         self.base_sampling_strategy = base_sampling_strategy or RandomSamplingStrategy(min_fitting_points=3, min_constraint_points=3)
         self.base_optimizer = base_optimizer or LevenbergMarquardtOptimizer()
@@ -1093,12 +1095,12 @@ class RANSACOptimizer(Optimizer):
         # all_iterations_distances = []
         
         for iteration in range(self.max_iterations):
-            logging.debug(f"======================================================================================================")
+            logger.debug(f"======================================================================================================")
             # 随机采样
 
             sampled_fitting_points, sampled_constraint_points = self.base_sampling_strategy.sample(fitting_points, constraint_points)
 
-            logging.debug(f"RANSAC优化器，第{iteration}次迭代，采样点数：{len(sampled_fitting_points)}")
+            logger.debug(f"RANSAC优化器，第{iteration}次迭代，采样点数：{len(sampled_fitting_points)}")
             
             # 使用基础优化器
             result = self.base_optimizer.optimize(initial_params, sampled_fitting_points, sampled_constraint_points)
@@ -1108,15 +1110,15 @@ class RANSACOptimizer(Optimizer):
             # all_iterations_distances.append(point_distances)
             
             # 使用confidence作为更新标准
-            logging.debug(f"RANSAC优化器，第{iteration}次迭代，confidence：{result.confidence:.4f}")    
+            logger.debug(f"RANSAC优化器，第{iteration}次迭代，confidence：{result.confidence:.4f}")    
             
             if result.confidence > best_confidence and result.converged:
                 best_confidence = result.confidence
                 best_result = result
                 best_iteration = iteration
-                logging.debug(f"RANSAC优化更新，第{best_iteration}次迭代，confidence：{best_confidence:.4f}")
+                logger.debug(f"RANSAC优化更新，第{best_iteration}次迭代，confidence：{best_confidence:.4f}")
             
-            logging.debug(f"======================================================================================================")
+            logger.debug(f"======================================================================================================")
         
         # 打印所有迭代的平均距离
         # self._print_average_distances(all_iterations_distances)
@@ -1141,7 +1143,7 @@ class RANSACOptimizer(Optimizer):
     def _print_average_distances(self, all_iterations_distances: List[List[Tuple[str, float, float]]]):
         """打印所有迭代中每个点的平均距离统计"""
         if not all_iterations_distances:
-            logging.debug("RANSAC优化完成：无距离数据")
+            logger.debug("RANSAC优化完成：无距离数据")
             return
         
         # 统计每个点类型在所有迭代中的距离
@@ -1161,7 +1163,7 @@ class RANSACOptimizer(Optimizer):
                 point_type_stats[point_type]['count'] += 1
         
         # 计算每个点类型的平均距离、最大距离、最小距离
-        logging.debug("RANSAC优化完成 - 每个点类型在所有迭代中的距离统计：")
+        logger.debug("RANSAC优化完成 - 每个点类型在所有迭代中的距离统计：")
         for point_type, stats in point_type_stats.items():
             center_distances = stats['center_distances']
             surface_distances = stats['surface_distances']
@@ -1173,8 +1175,8 @@ class RANSACOptimizer(Optimizer):
             min_surface = np.min(surface_distances)
             max_surface = np.max(surface_distances)
             
-            logging.info(f"  {point_type}: 平均到中心距离={avg_center:.4f} (范围: {min_center:.4f}-{max_center:.4f}), "
-                        f"平均到表面距离={avg_surface:.4f} (范围: {min_surface:.4f}-{max_surface:.4f}) (出现{stats['count']}次)")
+            logger.debug(f"  {point_type}: 平均到中心距离={avg_center:.4f} (范围: {min_center:.4f}-{max_center:.4f}), "
+                         f"平均到表面距离={avg_surface:.4f} (范围: {min_surface:.4f}-{max_surface:.4f}) (出现{stats['count']}次)")
         
         # 计算所有点的整体平均距离、最大距离、最小距离
         all_center_distances = []
@@ -1191,8 +1193,8 @@ class RANSACOptimizer(Optimizer):
             overall_min_surface = np.min(all_surface_distances)
             overall_max_surface = np.max(all_surface_distances)
             
-            logging.info(f"RANSAC整体平均距离: 到中心={overall_avg_center:.4f} (范围: {overall_min_center:.4f}-{overall_max_center:.4f}), "
-                        f"到表面={overall_avg_surface:.4f} (范围: {overall_min_surface:.4f}-{overall_max_surface:.4f})")   
+            logger.debug(f"RANSAC整体平均距离: 到中心={overall_avg_center:.4f} (范围: {overall_min_center:.4f}-{overall_max_center:.4f}), "
+                         f"到表面={overall_avg_surface:.4f} (范围: {overall_min_surface:.4f}-{overall_max_surface:.4f})")   
             
 
 class FailOptimizer(Optimizer):
@@ -1201,9 +1203,9 @@ class FailOptimizer(Optimizer):
     def optimize(self, initial_params: FittingParameters, 
                 fitting_points: List[Tuple[np.ndarray, str]],
                 constraint_points: List[Tuple[np.ndarray, str]]) -> FittingResult:
-        logging.warning("优化失败")
+        logger.warning("优化失败")
         return FittingResult(
-            parameters=FittingParameters(center=np.array([0, 0, 0]), radius=0.0),
+            parameters=FittingParameters(center=np.zeros(3, dtype=np.float64), radius=0.0),
             confidence=0.0,
             converged=False,
             iteration_count=0,
@@ -1232,28 +1234,28 @@ class StrategySelector:
     
     def select_strategy(self, data_quality: Dict[str, float]) -> FittingStrategy:
         """根据数据质量选择最佳策略"""
-        logging.info(f"数据质量: {data_quality}")
-        logging.debug(f"可用策略数量: {len(self.strategies)}")
+        logger.debug(f"数据质量: {data_quality}")
+        logger.debug(f"可用策略数量: {len(self.strategies)}")
         
         # 按可见性降序排列策略
         sorted_strategies = sorted(self.strategies, key=lambda s: s.min_visibility, reverse=True)
         
         for i, strategy in enumerate(sorted_strategies):
-            logging.debug(f"策略 {i+1}: {strategy.name}")
-            logging.debug(f"  最小点数: {strategy.min_points}, 最小可见性: {strategy.min_visibility}")
-            logging.debug(f"  当前点数: {data_quality['point_count']}, 当前可见性: {data_quality['visibility']:.3f}")
+            logger.debug(f"策略 {i+1}: {strategy.name}")
+            logger.debug(f"  最小点数: {strategy.min_points}, 最小可见性: {strategy.min_visibility}")
+            logger.debug(f"  当前点数: {data_quality['point_count']}, 当前可见性: {data_quality['visibility']:.3f}")
             
             if (data_quality["point_count"] >= strategy.min_points and 
                 data_quality["visibility"] >= strategy.min_visibility):
-                logging.debug(f" 当前点数: {data_quality['point_count']}, 当前可见性: {data_quality['visibility']:.3f}")
-                logging.info(f"选择策略: {strategy.name}")
+                logger.debug(f" 当前点数: {data_quality['point_count']}, 当前可见性: {data_quality['visibility']:.3f}")
+                logger.debug(f"选择策略: {strategy.name}")
                 return strategy
             else:
-                logging.debug(f"  不满足条件，跳过")
+                logger.debug(f"  不满足条件，跳过")
         
         # 如果没有找到合适的策略，返回置信度最高的策略
         best_strategy = max(self.strategies, key=lambda s: s.confidence)
-        logging.warning(f"没有找到满足条件的策略，使用置信度最高的策略: {best_strategy.name}")
+        logger.warning(f"没有找到满足条件的策略，使用置信度最高的策略: {best_strategy.name}")
         return best_strategy
 
 # ==================== 主控制器类 ====================
@@ -1328,7 +1330,7 @@ class FittingController:
     def _initialize_parameters(self, fitting_points: List[Tuple[np.ndarray, str]]) -> FittingParameters:
         """初始化参数 - 自动选择最佳策略"""
         if not fitting_points:
-            return FittingParameters(center=np.array([0, 0, 0]), radius=ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"])
+            return FittingParameters(center=np.zeros(3, dtype=np.float64), radius=float(ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"]))
         
         # 按类型分组
         iris_points = [point[0] for point in fitting_points if point[1] == "iris"]
@@ -1341,7 +1343,7 @@ class FittingController:
                 import random
                 selected_iris = random.sample(iris_points, 3)
                 circle_center, circle_radius = self._fit_circle_to_points(selected_iris)
-                logging.info(f"虹膜点拟合外接圆，圆心：{circle_center}，半径：{circle_radius}")
+                logger.debug(f"虹膜点拟合外接圆，圆心：{circle_center}，半径：{circle_radius}")
                 
                 # 计算delta z - 验证数学有效性
                 iris_to_center_median = (ANATOMICAL_CONSTRAINTS["TO_CENTER"]["iris"][0] + 
@@ -1357,9 +1359,9 @@ class FittingController:
                 eyeball_center = circle_center.copy()
                 eyeball_center[2] += delta_z
                 
-                return FittingParameters(center=eyeball_center, radius=circle_radius)
+                return FittingParameters(center=np.asarray(eyeball_center, dtype=np.float64), radius=float(circle_radius))
             except Exception as e:
-                logging.warning(f"虹膜点拟合失败: {e}")
+                logger.warning(f"虹膜点拟合失败: {e}")
         
         # 策略2：使用瞳孔点方案
         if pupil_points:
@@ -1371,11 +1373,11 @@ class FittingController:
             eyeball_center = pupil_point.copy()
             eyeball_center[2] += pupil_to_center_median
             
-            return FittingParameters(center=eyeball_center, radius=ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"])
+            return FittingParameters(center=np.asarray(eyeball_center, dtype=np.float64), radius=float(ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"]))
         
         # 策略3：失败情况
-        logging.error("无法找到有效的瞳孔点或虹膜点进行初始化")
-        return FittingParameters(center=np.array([0, 0, 0]), radius=ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"])
+        logger.error("无法找到有效的瞳孔点或虹膜点进行初始化")
+        return FittingParameters(center=np.zeros(3, dtype=np.float64), radius=float(ANATOMICAL_CONSTRAINTS["EYEBALL_RADIUS_DEFAULT"]))
     
     def fit_all_eyes(self) -> Dict[str, FittingResult]:
         """拟合所有眼睛"""

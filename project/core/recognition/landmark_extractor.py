@@ -1,299 +1,347 @@
-# 关键点提取模块 - 使用 MediaPipe Tasks FaceLandmarker API
-import numpy as np
-import mediapipe as mp
-import cv2
-from pathlib import Path
-from typing import List, Dict, Optional
-import logging
-from project.data.data_models import (
-    Landmark, KeyCoordinates, FITTING_TYPE,
-    EYE_TYPE, BGRImage, Point3DWithVisibility, FITTING_LANDMARK_INDICES,
-)
+from __future__ import annotations
 
-# 配置日志
-from project.config.logging_config import setup_logging 
+from typing import Any, Dict, List, Optional, Tuple
+
+import cv2
+import numpy as np
+
+from project.config.logging_config import setup_logging
+from project.core.recognition.compat_points import CANONICAL_ORDER
+from project.core.recognition.eye_model_ellseg import EyeRoiModel, EllSegResult, ellipse_to_cardinal_points
+from project.core.recognition.roi.constants import MODE_DETECT, MODE_TRACK, FACE_BBOX_STABLE_MAX_SHIFT_RATIO
+from project.core.recognition.roi.debug import build_roi_debug_record
+from project.core.recognition.roi.geometry import (
+    RoiGeometry,
+    compute_roi_geometry,
+    should_switch_to_detect,
+)
+from project.core.recognition.roi.observation import build_roi_observation
+from project.core.recognition.roi.state_machine import RoiStateMachine
+from project.core.recognition.roi.types import RoiBox
+from project.data.data_models import BGRImage, Ellipse2D, Point2D
+
 logger = setup_logging(__name__)
 
 
-# FaceLandmarker 模型 URL（MediaPipe 官方）
-_FACE_LANDMARKER_MODEL_URL = (
-    "https://storage.googleapis.com/mediapipe-models/"
-    "face_landmarker/face_landmarker/float16/latest/face_landmarker.task"
-)
-
-# 模块级 FaceLandmarker 实例（复用，避免重复加载模型）
-_face_landmarker: Optional[object] = None
+def _points_roi_to_image(eye_dict: Dict[str, List[Point2D]], roi_x: int, roi_y: int) -> Dict[str, List[Point2D]]:
+    """将单眼 ROI 内点转为图像坐标。"""
+    out: Dict[str, List[Point2D]] = {}
+    for k, pts in eye_dict.items():
+        out[k] = [Point2D(x=p.x + roi_x, y=p.y + roi_y) for p in pts]
+    return out
 
 
-def _get_face_landmarker_model_path() -> Path:
-    """获取 FaceLandmarker 模型路径，不存在时自动下载"""
-    config_dir = Path(__file__).resolve().parents[3] / "project" / "config"
-    model_path = config_dir / "face_landmarker.task"
-    if model_path.exists():
-        return model_path
-    logger.info("正在下载 FaceLandmarker 模型...")
-    config_dir.mkdir(parents=True, exist_ok=True)
-    try:
-        import urllib.request
-        urllib.request.urlretrieve(_FACE_LANDMARKER_MODEL_URL, model_path)
-        logger.info(f"模型已保存至 {model_path}")
-    except Exception as e:
-        raise RuntimeError(
-            f"无法下载 FaceLandmarker 模型。请手动下载并放置于 {model_path}\n"
-            f"下载地址: {_FACE_LANDMARKER_MODEL_URL}\n"
-            f"错误: {e}"
-        ) from e
-    return model_path
+def validate_single_eye_core_dict(eye_dict: Dict[str, List[Any]]) -> bool:
+    """单眼核心点校验：仅检查 pupil=1、iris=4。"""
+    if not eye_dict:
+        return False
+    core_required = {"pupil": 1, "iris": 4}
+    for ft, count in core_required.items():
+        pts = eye_dict.get(ft, [])
+        if len(pts) != count:
+            return False
+    return True
 
 
-def _get_face_landmarker():
-    """获取或创建 FaceLandmarker 实例"""
-    global _face_landmarker
-    if _face_landmarker is None:
-        model_path = str(_get_face_landmarker_model_path())
-        base_options = mp.tasks.BaseOptions(model_asset_path=model_path)
-        options = mp.tasks.vision.FaceLandmarkerOptions(
-            base_options=base_options,
-            running_mode=mp.tasks.vision.RunningMode.IMAGE,
-            num_faces=1,
-            min_face_detection_confidence=0.3,  # 降低以应对校正后变形/光照，有人脸却检不到时可再调低
+def _compute_face_bbox_stability(
+    current_face_bbox: Optional[Tuple[int, int, int, int]],
+    last_face_bbox: Optional[Tuple[int, int, int, int]],
+    img_w: int,
+    img_h: int,
+) -> Tuple[bool, float]:
+    """
+    Face bbox stability:
+    - compute corner max shift ratio between last and current bboxes
+    - stable if max_shift <= FACE_BBOX_STABLE_MAX_SHIFT_RATIO
+    """
+
+    if current_face_bbox is None or last_face_bbox is None:
+        return False, 1.0
+
+    cx, cy, cw, ch = [float(v) for v in current_face_bbox]
+    lx, ly, lw, lh = [float(v) for v in last_face_bbox]
+
+    cur = [(cx, cy), (cx + cw, cy), (cx, cy + ch), (cx + cw, cy + ch)]
+    last = [(lx, ly), (lx + lw, ly), (lx, ly + lh), (lx + lw, ly + lh)]
+    norm = float(max(1.0, min(img_w, img_h)))
+
+    shifts = [float(np.hypot(ax - bx, ay - by)) / norm for (ax, ay), (bx, by) in zip(cur, last)]
+    max_shift = float(max(shifts))
+    return max_shift <= FACE_BBOX_STABLE_MAX_SHIFT_RATIO, max_shift
+
+
+def _shift_ellipse(el: Optional[Ellipse2D], dx: float, dy: float) -> Optional[Ellipse2D]:
+    if el is None:
+        return None
+    return Ellipse2D(
+        cx=el.cx + dx,
+        cy=el.cy + dy,
+        major_axis=el.major_axis,
+        minor_axis=el.minor_axis,
+        angle_deg=el.angle_deg,
+        confidence=el.confidence,
+    )
+
+
+class EyeLandmarkExtractor:
+    """
+    单眼关键点提取器：
+    - 调用 `RoiStateMachine.predict()` 获取当前帧 ROI（DETECT/TRACK/RECOVER）。
+    - ROI 内运行 EllSeg(EyeRoiModel)。
+    - 基于 EllSegResult + 当前 ROI 构造 RoiObservation，计算 RoiGeometry，并调用 `commit_success/commit_failure` 更新状态机。
+    - 返回 minimal debug payload（native_geometry + roi_debug）。
+    """
+
+    def __init__(
+        self,
+        side: str,
+        roi_state_machine: RoiStateMachine,
+        eye_model: EyeRoiModel,
+    ):
+        if side not in ("left", "right"):
+            raise ValueError(f"invalid side for EyeLandmarkExtractor: {side}")
+        self._side = side
+        self._roi_state_machine = roi_state_machine
+        self._eye_model = eye_model
+
+    def _build_fail_debug(
+        self,
+        *,
+        frame_id: int,
+        current_mode: str,
+        face_bbox: Optional[Tuple[int, int, int, int]],
+        final_roi: Optional[RoiBox],
+        track_from_previous_bbox_applied: bool,
+    ) -> Dict[str, Any]:
+        geom = RoiGeometry()
+        roi_tuple = final_roi.as_tuple() if final_roi is not None else None
+        dbg_rec = build_roi_debug_record(
+            frame_id=frame_id,
+            eye=self._side,
+            current_mode=current_mode,
+            face_bbox=face_bbox,
+            final_roi=roi_tuple,
+            union_mask_bbox=None,
+            track_from_previous_bbox_applied=track_from_previous_bbox_applied,
+            geometry=geom,
         )
-        _face_landmarker = mp.tasks.vision.FaceLandmarker.create_from_options(options)
-    return _face_landmarker
-
-
-def calculate_visibility(landmark: Landmark, image: BGRImage) -> float:
-    """计算关键点的可见性分数"""
-    try:
-        x, y, z = landmark.x, landmark.y, landmark.z
-        height, width = image.height, image.width
-
-        # 检查坐标是否在图像范围内
-        if x < 0 or x >= width or y < 0 or y >= height:
-            return 0.0
-
-        # 检查坐标是否合理（不是NaN或无穷大）
-        if not (np.isfinite(x) and np.isfinite(y) and np.isfinite(z)):
-            return 0.0
-
-        # 基于坐标位置的可见性计算
-        center_x, center_y = width // 2, height // 2
-        distance_from_center = np.sqrt((x - center_x)**2 + (y - center_y)**2)
-        max_distance = np.sqrt(center_x**2 + center_y**2)
-        visibility = max(0.1, 1.0 - (distance_from_center / max_distance) * 0.5)
-
-        try:
-            x_int, y_int = int(x), int(y)
-            if 0 <= x_int < width-1 and 0 <= y_int < height-1:
-                region = image.data[y_int-1:y_int+2, x_int-1:x_int+2]
-                if region.size > 0:
-                    brightness = np.mean(region)
-                    if 50 < brightness < 200:
-                        visibility *= 1.2
-                    elif brightness < 30 or brightness > 220:
-                        visibility *= 0.7
-        except Exception:
-            pass
-
-        return min(1.0, max(0.1, visibility))
-
-    except Exception as e:
-        logger.warning(f"计算可见性时出错: {e}")
-        return 0.5
-
-
-def extract_landmarks(bgr_image: BGRImage) -> List[Landmark]:
-    """
-    从BGR图像中提取关键点（使用 MediaPipe Tasks FaceLandmarker）
-
-    Args:
-        bgr_image: BGR图像对象
-
-    Returns:
-        landmarks: 关键点列表，每个点包含[x, y, z, visibility]
-    """
-    try:
-        # #region agent log
-        try:
-            _h, _w = bgr_image.data.shape[:2] if hasattr(bgr_image, "data") else (0, 0)
-            _payload = {"sessionId": "6d5179", "timestamp": __import__("time").time() * 1000, "location": "landmark_extractor.py:extract_landmarks", "message": "input image", "data": {"height": _h, "width": _w}, "hypothesisId": "H2"}
-            open("debug-6d5179.log", "a").write(__import__("json").dumps(_payload) + "\n")
-        except Exception:
-            pass
-        # #endregion
-        landmarker = _get_face_landmarker()
-        rgb_image = bgr_image.to_rgb()
-        # 保证连续且 uint8，避免异常 stride/dtype 导致 MediaPipe 检测失败
-        if rgb_image.dtype != np.uint8 or not rgb_image.flags.c_contiguous:
-            rgb_image = np.ascontiguousarray(rgb_image.astype(np.uint8))
-
-        # MediaPipe Tasks 需要 mp.Image 格式
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
-        result = landmarker.detect(mp_image)
-        # #region agent log
-        try:
-            _n = len(result.face_landmarks) if result.face_landmarks else 0
-            _payload = {"sessionId": "6d5179", "timestamp": __import__("time").time() * 1000, "location": "landmark_extractor.py:after detect", "message": "MediaPipe face count", "data": {"face_count": _n}, "hypothesisId": "H1"}
-            open("debug-6d5179.log", "a").write(__import__("json").dumps(_payload) + "\n")
-        except Exception:
-            pass
-        # #endregion
-
-        if not result.face_landmarks:
-            return []
-
-        face_landmarks = result.face_landmarks[0]
-        landmarks = []
-
-        for i, landmark in enumerate(face_landmarks):
-            x = landmark.x * bgr_image.width
-            y = landmark.y * bgr_image.height
-            z = landmark.z
-
-            x = max(0, min(x, bgr_image.width - 1))
-            y = max(0, min(y, bgr_image.height - 1))
-
-            if i < 10 or landmark.y > 1.0:
-                logger.debug(
-                    f"MediaPipe关键点 {i}: 原始=({landmark.x:.3f}, {landmark.y:.3f}), "
-                    f"转换后=({x:.2f}, {y:.2f})"
-                )
-                if landmark.y > 1.0:
-                    logger.warning(f"关键点 {i} 原始y坐标超出范围: {landmark.y:.3f}，已限制到边界")
-
-            landmark_obj = Landmark(x=x, y=y, z=z, visibility=1.0)
-            visibility = calculate_visibility(landmark_obj, bgr_image)
-            landmark_obj.visibility = visibility
-            landmarks.append(landmark_obj)
-
-        logger.debug(f"提取到 {len(landmarks)} 个关键点")
-        return landmarks
-
-    except Exception as e:
-        logger.error(f"提取关键点失败: {e}", exc_info=True)
-        return []
-
-
-def get_landmark_indices() -> Dict[str, Dict[str, List[int]]]:
-    """返回 MediaPipe Face Landmarker 拟合所需的关键点索引映射（数据源在 data_models.FITTING_LANDMARK_INDICES，便于维护）"""
-    return FITTING_LANDMARK_INDICES
-
-
-def get_fitting_landmarks(landmarks: List[Landmark]) -> KeyCoordinates:
-    """
-    获取所有眼部关键点，整合为 fitting 模块所需的格式
-
-    Args:
-        landmarks: 关键点列表
-
-    Returns:
-        key_coordinates: 整合后的眼部关键点
-    """
-    key_coordinates = KeyCoordinates()
-
-    try:
-        indices = get_landmark_indices()
-
-        for eye in EYE_TYPE:
-            for fitting_type in FITTING_TYPE:
-                landmark_indices = indices[eye][fitting_type]
-                points = []
-
-                for idx in landmark_indices:
-                    if idx < len(landmarks):
-                        landmark = landmarks[idx]
-                        point = Point3DWithVisibility(
-                            x=landmark.x, y=landmark.y, z=landmark.z,
-                            visibility=landmark.visibility
-                        )
-                        points.append(point)
-
-                key_coordinates.set_points(eye, fitting_type, points)
-
-        logger.debug(f"整合完成：左眼 {len(key_coordinates.left_eye)} 种类型，右眼 {len(key_coordinates.right_eye)} 种类型")
-        return key_coordinates
-
-    except Exception as e:
-        logger.error(f"整合眼部关键点失败: {e}", exc_info=True)
-        return KeyCoordinates()
-
-
-def validate_landmarks(landmarks: List[Landmark]) -> bool:
-    """验证关键点数据的有效性"""
-    if not landmarks:
-        logger.warning("验证失败: 关键点列表为空")
-        return False
-
-    if len(landmarks) != 478:
-        logger.warning(f"验证失败: 关键点数量不匹配，期望478个，实际{len(landmarks)}个")
-        return False
-
-    try:
-        for i, landmark in enumerate(landmarks):
-            if not (np.isfinite(landmark.x) and np.isfinite(landmark.y) and
-                    np.isfinite(landmark.z) and np.isfinite(landmark.visibility)):
-                logger.warning(f"验证失败: 关键点{i}包含无效值 - x:{landmark.x}, y:{landmark.y}, z:{landmark.z}, v:{landmark.visibility}")
-                return False
-
-            if (landmark.x < -1000 or landmark.x > 10000 or
-                    landmark.y < -1000 or landmark.y > 10000 or
-                    landmark.z < -1 or landmark.z > 1):
-                logger.warning(f"验证失败: 关键点{i}坐标超出范围 - x:{landmark.x}, y:{landmark.y}, z:{landmark.z}")
-                return False
-
-        logger.info("关键点验证通过")
-        return True
-    except Exception as e:
-        logger.warning(f"验证失败: 异常 {e}")
-        return False
-
-
-def calculate_data_quality(landmarks: List[Landmark], image: BGRImage) -> Dict[str, float]:
-    """计算数据质量指标"""
-    try:
-        if not landmarks:
-            return {'quality': 0.0, 'visibility': 0.0, 'stability': 0.0}
-
-        visibility_values = [landmark.visibility for landmark in landmarks]
-        avg_visibility = np.mean(visibility_values)
-
-        x_coords = [landmark.x for landmark in landmarks]
-        y_coords = [landmark.y for landmark in landmarks]
-        x_std = np.std(x_coords)
-        y_std = np.std(y_coords)
-        stability = max(0.0, 1.0 - (x_std + y_std) * 0.001)
-        quality = (avg_visibility * 0.6 + stability * 0.4)
-
         return {
-            'quality': quality,
-            'visibility': avg_visibility,
-            'stability': stability,
-            'point_count': len(landmarks),
-            'valid_points': len([l for l in landmarks if l.is_visible()])
+            "side": self._side,
+            "roi": roi_tuple,
+            "native_geometry": {},
+            "roi_mode": current_mode,
+            "roi_debug": dbg_rec.to_log_dict(),
         }
 
-    except Exception as e:
-        logger.warning(f"计算数据质量时出错: {e}")
-        return {'quality': 0.0, 'visibility': 0.0, 'stability': 0.0}
+    def extract_one(
+        self,
+        bgr_image: BGRImage,
+        face_bbox: Optional[Tuple[int, int, int, int]],
+        frame_id: int = -1,
+        face_info: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[bool, Dict[str, List[Point2D]], Optional[RoiBox], Dict[str, Any]]:
+        img = bgr_image.data
+        if img is None or img.size == 0:
+            self._roi_state_machine.commit_failure("empty_image")
+            return (
+                False,
+                {k: [] for k in CANONICAL_ORDER},
+                None,
+                self._build_fail_debug(
+                    frame_id=frame_id,
+                    current_mode=MODE_DETECT,
+                    face_bbox=face_bbox,
+                    final_roi=None,
+                    track_from_previous_bbox_applied=False,
+                ),
+            )
+
+        # ROI prediction (this decides DETECT/TRACK/RECOVER for this frame)
+        roi, roi_mode = self._roi_state_machine.predict(img, face_bbox, face_info)
+        if roi is None or not roi.valid:
+            self._roi_state_machine.commit_failure("roi_fail")
+            return (
+                False,
+                {k: [] for k in CANONICAL_ORDER},
+                roi,
+                self._build_fail_debug(
+                    frame_id=frame_id,
+                    current_mode=roi_mode,
+                    face_bbox=face_bbox,
+                    final_roi=roi,
+                    track_from_previous_bbox_applied=(roi_mode == MODE_TRACK),
+                ),
+            )
+
+        x, y, w, h = roi.as_tuple()
+        patch_bgr = img[y : y + h, x : x + w]
+        if patch_bgr.size == 0:
+            self._roi_state_machine.commit_failure("roi_out_of_image")
+            return (
+                False,
+                {k: [] for k in CANONICAL_ORDER},
+                roi,
+                self._build_fail_debug(
+                    frame_id=frame_id,
+                    current_mode=roi_mode,
+                    face_bbox=face_bbox,
+                    final_roi=roi,
+                    track_from_previous_bbox_applied=(roi_mode == MODE_TRACK),
+                ),
+            )
+
+        patch_rgb = cv2.cvtColor(patch_bgr, cv2.COLOR_BGR2RGB)
+        result: Optional[EllSegResult] = self._eye_model.infer(patch_rgb)
+        if result is None or not result.valid:
+            self._roi_state_machine.commit_failure("ellseg_invalid")
+            return (
+                False,
+                {k: [] for k in CANONICAL_ORDER},
+                roi,
+                self._build_fail_debug(
+                    frame_id=frame_id,
+                    current_mode=roi_mode,
+                    face_bbox=face_bbox,
+                    final_roi=roi,
+                    track_from_previous_bbox_applied=(roi_mode == MODE_TRACK),
+                ),
+            )
+
+        # compatibility export: pupil=1, iris=4 points
+        eye_dict_roi: Dict[str, List[Point2D]] = {k: [] for k in CANONICAL_ORDER}
+        eye_dict_roi["pupil"] = [result.pupil_center] if result.pupil_center else []
+        if result.iris_ellipse:
+            left_pt, right_pt, top_pt, bottom_pt = ellipse_to_cardinal_points(result.iris_ellipse)
+            eye_dict_roi["iris"] = [left_pt, right_pt, top_pt, bottom_pt]
+
+        if not validate_single_eye_core_dict(eye_dict_roi):
+            self._roi_state_machine.commit_failure("core_schema_incomplete")
+            return (
+                False,
+                {k: [] for k in CANONICAL_ORDER},
+                roi,
+                self._build_fail_debug(
+                    frame_id=frame_id,
+                    current_mode=roi_mode,
+                    face_bbox=face_bbox,
+                    final_roi=roi,
+                    track_from_previous_bbox_applied=(roi_mode == MODE_TRACK),
+                ),
+            )
+
+        eye_dict_img = _points_roi_to_image(eye_dict_roi, x, y)
+
+        # ------------------------------------------------------------------
+        # New main chain: RoiObservation + RoiGeometry + DETECT gating
+        # ------------------------------------------------------------------
+        obs = build_roi_observation(result=result, roi_xywh=roi.as_tuple(), side=self._side)
+        geom = compute_roi_geometry(obs)
+
+        img_h, img_w = img.shape[:2]
+        last_face_bbox = self._roi_state_machine.get_previous_face_bbox()
+        face_bbox_is_stable, face_bbox_corner_max_shift = _compute_face_bbox_stability(
+            current_face_bbox=face_bbox,
+            last_face_bbox=last_face_bbox,
+            img_w=img_w,
+            img_h=img_h,
+        )
+        geom.face_bbox_is_stable = bool(face_bbox_is_stable)
+        geom.face_bbox_corner_max_shift = float(face_bbox_corner_max_shift)
+
+        should_switch = should_switch_to_detect(
+            geometry_confidence=geom.geometry_confidence,
+            face_bbox_is_stable=geom.face_bbox_is_stable,
+        )
+        self._roi_state_machine.commit_success(
+            roi=roi,
+            observation=obs,
+            geometry=geom,
+            should_switch_to_detect=should_switch,
+        )
+
+        track_from_previous_bbox_applied = (roi_mode == MODE_TRACK)
+        dbg_rec = build_roi_debug_record(
+            frame_id=frame_id,
+            eye=self._side,
+            current_mode=roi_mode,
+            face_bbox=face_bbox,
+            final_roi=roi.as_tuple(),
+            union_mask_bbox=obs.union_mask_bbox,
+            track_from_previous_bbox_applied=track_from_previous_bbox_applied,
+            geometry=geom,
+        )
+
+        native_geometry = {
+            "segmentation_mask": result.segmentation_mask,
+            "pupil_center": (
+                Point2D(x=result.pupil_center.x + x, y=result.pupil_center.y + y) if result.pupil_center else None
+            ),
+            "pupil_ellipse": _shift_ellipse(result.pupil_ellipse, x, y),
+            "iris_ellipse": _shift_ellipse(result.iris_ellipse, x, y),
+        }
+
+        debug: Dict[str, Any] = {
+            "side": self._side,
+            "roi": roi.as_tuple(),
+            "native_geometry": native_geometry,
+            "roi_mode": roi_mode,
+            "roi_debug": dbg_rec.to_log_dict(),
+        }
+        return True, eye_dict_img, roi, debug
 
 
-def test_landmark_extractor():
-    """测试关键点提取器功能"""
-    print("=== 关键点提取器测试 ===")
+def extract_fitting_dict_for_pair(
+    left: BGRImage,
+    right: BGRImage,
+    left_extractor: EyeLandmarkExtractor,
+    right_extractor: EyeLandmarkExtractor,
+    left_bbox: Optional[Tuple[int, int, int, int]],
+    right_bbox: Optional[Tuple[int, int, int, int]],
+    frame_id: int = -1,
+    left_face_info: Optional[Dict[str, Any]] = None,
+    right_face_info: Optional[Dict[str, Any]] = None,
+) -> Tuple[bool, Dict[str, Dict[str, List[Point2D]]], Dict[str, Any]]:
+    ok_ll, dict_ll, roi_ll, debug_ll = left_extractor.extract_one(
+        left, left_bbox, frame_id=frame_id, face_info=left_face_info
+    )
+    ok_rr, dict_rr, roi_rr, debug_rr = right_extractor.extract_one(
+        right, right_bbox, frame_id=frame_id, face_info=right_face_info
+    )
 
-    test_image = BGRImage(data=np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8))
-    landmarks = extract_landmarks(test_image)
-    print(f"提取到 {len(landmarks)} 个关键点")
+    debug: Dict[str, Any] = {
+        "left": {
+            "roi": roi_ll.as_tuple() if roi_ll else None,
+            "debug": debug_ll,
+            "debug_right_eye": {},
+            "points": {"left": dict_ll, "right": {}},
+        },
+        "right": {
+            "roi": roi_rr.as_tuple() if roi_rr else None,
+            "debug": {},
+            "debug_right_eye": debug_rr,
+            "points": {"left": {}, "right": dict_rr},
+        },
+    }
 
-    is_valid = validate_landmarks(landmarks)
-    print(f"关键点验证: {'通过' if is_valid else '失败'}")
+    if not ok_ll:
+        logger.warning("left eye extraction fail (left image)")
+        debug["reason"] = "left_eye_fail"
+        return False, {"left": {}, "right": {}}, debug
+    if not ok_rr:
+        logger.warning("right eye extraction fail (right image)")
+        debug["reason"] = "right_eye_fail"
+        return False, {"left": {}, "right": {}}, debug
 
-    key_coordinates = get_fitting_landmarks(landmarks)
-    print(f"拟合数据: {key_coordinates}")
+    result: Dict[str, Dict[str, List[Point2D]]] = {
+        "left": {"left": dict_ll, "right": {}},
+        "right": {"left": {}, "right": dict_rr},
+    }
+    return True, result, debug
 
-    quality = calculate_data_quality(landmarks, test_image)
-    print(f"数据质量: {quality}")
 
+__all__ = [
+    "EyeLandmarkExtractor",
+    "extract_fitting_dict_for_pair",
+    "validate_single_eye_core_dict",
+]
 
-if __name__ == "__main__":
-    test_landmark_extractor()

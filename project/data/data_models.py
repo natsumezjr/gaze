@@ -1,3 +1,14 @@
+"""
+Data models (主定义 + 兼容层 + 历史遗留)。
+
+分层约定（不改变任何字段与行为）：
+- **Native geometry（主定义）**：EllSeg 原生几何输出所需的数据结构（如 `Ellipse2D`, `EyeNativeGeometry2D`）。
+- **Compatibility export（兼容层）**：为当前下游 fitting 保持兼容的临时导出格式（如 `CompatibilityEyePoints2D`,
+  以及 `LEGACY_COMPAT_POINT_SCHEMA` 的点数约定）。其 optional 点目前保持空列表。
+- **Legacy face landmarker（历史遗留）**：旧 Face Landmarker 的索引/字段，仅用于回溯旧数据或旧文件对齐，
+  不参与当前 EllSeg 主链（如 `LEGACY_FACE_LANDMARK_INDICES`）。
+"""
+
 from typing import Dict, List, Optional, Tuple, Union, Any
 import numpy as np
 from dataclasses import dataclass
@@ -19,12 +30,29 @@ class EyeType(Enum):
     LEFT = "left"
     RIGHT = "right"
 
-# 兼容性常量
+# =============================================================================
+# Compatibility export layer (下游 fitting 兼容层)
+# =============================================================================
+# 兼容性常量（类型枚举值）
 FITTING_TYPE = [ft.value for ft in FittingType]
 EYE_TYPE = [et.value for et in EyeType]
 
-# MediaPipe Face Landmarker 拟合点索引（与 FittingType 一一对应，便于维护与扩展）
-FITTING_LANDMARK_INDICES: Dict[str, Dict[str, List[int]]] = {
+# Compatibility schema：pupil/iris 为 EllSeg 兼容导出；canthus/eyelid 非 EllSeg 原生，仅保留键返回空。
+# 主链的“主定义”是 native geometry（`Ellipse2D` 等），此 schema 仅为当前下游 fitting 临时兼容。
+LEGACY_COMPAT_POINT_SCHEMA: Dict[str, int] = {
+    "pupil": 1,
+    "iris": 4,
+    "inner_canthus": 1,
+    "outer_canthus": 1,
+    "upper_eyelid": 5,
+    "lower_eyelid": 5,
+}
+
+# =============================================================================
+# Legacy face landmarker layer (历史遗留，不参与当前 EllSeg 主链)
+# =============================================================================
+# 该索引来自历史 Face Landmarker(468/473/iris ring 等) 的定义，仅用于回溯旧数据/旧文件对齐。
+LEGACY_FACE_LANDMARK_INDICES: Dict[str, Dict[str, List[int]]] = {
     "left": {
         "pupil": [468],
         "iris": [469, 470, 471, 472],
@@ -43,7 +71,9 @@ FITTING_LANDMARK_INDICES: Dict[str, Dict[str, List[int]]] = {
     },
 }
 
-# ================= 识别模块图像类型 =================
+# =============================================================================
+# Image / basic geometry types
+# =============================================================================
 @dataclass
 class BGRImage:
     """BGR图像数据类"""
@@ -70,49 +100,6 @@ class BGRImage:
     
     def __str__(self) -> str:
         return f"BGRImage(H={self.data.shape[0]}, W={self.data.shape[1]})"
-    
-@dataclass
-class DepthMap:
-    """深度图数据类"""
-    data: np.ndarray  # 深度图 (H,W)
-    unit: str = "camera_unit"
-    
-    def __post_init__(self):
-        if not isinstance(self.data, np.ndarray):
-            raise ValueError("depth_map必须是numpy数组")
-        if len(self.data.shape) != 2:
-            raise ValueError("depth_map必须是2维numpy数组")
-        if self.data.dtype != np.float32:
-            raise ValueError("depth_map必须是float32类型")
-        if self.unit not in ["camera_unit", "meter"]:
-            raise ValueError("unit必须是camera_unit或meter")
-    
-    @property
-    def height(self) -> int:
-        return self.data.shape[0]
-    
-    @property
-    def width(self) -> int:
-        return self.data.shape[1]
-    
-    def to_meters(self, depth_scale: float = 0.001) -> "DepthMap":
-        if self.unit == "meter":
-            return DepthMap(data=self.data, unit="meter")
-        elif self.unit == "camera_unit":
-            return DepthMap(data=self.data * depth_scale, unit="meter")
-        else:
-            raise ValueError("unit必须是camera_unit或meter")
-        
-    def validate_with_image(self, image: BGRImage) -> bool:
-        if self.height != image.height or self.width != image.width:
-            return False
-        return True
-    
-    def copy(self) -> "DepthMap":
-        return DepthMap(data=self.data.copy(), unit=self.unit)
-    
-    def __str__(self) -> str:
-        return f"DepthMap(H={self.data.shape[0]}, W={self.data.shape[1]}, unit={self.unit})"
 
 # ================= 基础坐标类型 =================
 @dataclass
@@ -138,9 +125,59 @@ class Point2D:
     def __str__(self) -> str:
         return f"Point2D({self.x:.6f}, {self.y:.6f})"
 
+
+# =============================================================================
+# Native geometry (EllSeg 主定义)
+# =============================================================================
+@dataclass
+class Ellipse2D:
+    """2D 椭圆参数（EllSeg 原生输出，像素坐标系）。"""
+
+    cx: float
+    cy: float
+    major_axis: float
+    minor_axis: float
+    angle_deg: float
+    confidence: Optional[float] = None
+
+
+@dataclass
+class EyeNativeGeometry2D:
+    """
+    EllSeg 原生几何输出（单眼，ROI 内坐标系）。
+    - segmentation_mask: 分割 mask
+    - pupil_center: 瞳孔中心（椭圆拟合中心）
+    - pupil_ellipse: 瞳孔椭圆
+    - iris_ellipse: 虹膜椭圆
+    """
+
+    segmentation_mask: Optional[np.ndarray] = None
+    pupil_center: Optional[Point2D] = None
+    pupil_ellipse: Optional["Ellipse2D"] = None
+    iris_ellipse: Optional["Ellipse2D"] = None
+    valid: bool = False
+
+
+@dataclass
+class CompatibilityEyePoints2D:
+    """
+    兼容当前下游 fitting 的导出格式（compatibility export layer）。
+    - pupil: 1 点 = EllSeg pupil_center
+    - iris: 4 点 = 由 fitted iris_ellipse 推导的 left/right/top/bottom
+    - 其它 optional 键存在但为空（非 EllSeg 原生输出）
+    """
+
+    pupil: List[Point2D]
+    iris: List[Point2D]
+    inner_canthus: List[Point2D]
+    outer_canthus: List[Point2D]
+    upper_eyelid: List[Point2D]
+    lower_eyelid: List[Point2D]
+
+
 @dataclass
 class Point3D:
-    """3D坐标点（米单位）"""
+    """3D坐标点（单位：mm，与双目 T 一致）"""
     x: float
     y: float
     z: float
@@ -188,10 +225,10 @@ Vector3D = Point3D
 
 @dataclass
 class Landmark:
-    """关键点（像素坐标 + MediaPipe估计的z + 可见性）"""
+    """关键点（像素坐标 + legacy z + 可见性）。"""
     x: float  # 像素x坐标
     y: float  # 像素y坐标
-    z: float  # MediaPipe估计的z坐标
+    z: float  # legacy z（历史遗留字段，当前 EllSeg 主链不使用该语义）
     visibility: float  # 可见性 [0,1]
     
     def to_ndarray(self) -> np.ndarray:
@@ -213,10 +250,10 @@ class Landmark:
 
 @dataclass
 class Point3DWithVisibility:
-    """3D坐标点 + 可见性（最终输出）"""
-    x: float  # 米单位
-    y: float  # 米单位
-    z: float  # 米单位
+    """3D坐标点 + 可见性（最终输出，单位：mm）"""
+    x: float  # mm
+    y: float  # mm
+    z: float  # mm
     visibility: float  # 可见性 [0,1]
     
     def to_ndarray(self) -> np.ndarray:
@@ -377,9 +414,9 @@ class GazeSamples:
     """One calibration sample.
     Provide either (target_ray) OR (target_pixel, K). If both provided, target_ray is used.
     """
-    c_eye: Point3D           # (3,)
-    c_pupil: Point3D         # (3,)
-    target_point: Optional[np.ndarray] = None  # (3,), in camera coords (optional)
+    c_eye: Point3D           # (3,) 单位：mm
+    c_pupil: Point3D         # (3,) 单位：mm
+    target_point: Optional[np.ndarray] = None  # (3,), in camera coords (optional, 单位：mm)
     target_ray: Optional[np.ndarray] = None    # (3,), unit direction ray to target
     weight: float = 1.0
 
@@ -450,9 +487,12 @@ class CalibrationResponse:
 # 导出所有类型
 __all__ = [
     # 枚举
-    'FittingType', 'EyeType', 'FITTING_TYPE', 'EYE_TYPE', 'FITTING_LANDMARK_INDICES',
+    'FittingType', 'EyeType', 'FITTING_TYPE', 'EYE_TYPE', 'LEGACY_FACE_LANDMARK_INDICES',
+    'LEGACY_COMPAT_POINT_SCHEMA',
+    # EllSeg 原生几何
+    'Ellipse2D', 'EyeNativeGeometry2D', 'CompatibilityEyePoints2D',
     # 图像类型
-    'BGRImage', 'DepthMap',
+    'BGRImage',
     # 基础类型
     'Point2D', 'Point3D', 'Vector3D', 'Landmark', 'Point3DWithVisibility',
     # 复合类型

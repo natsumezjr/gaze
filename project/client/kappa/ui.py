@@ -197,7 +197,7 @@ class EyeCalibrationApp(FrontendAdapter):
     
     def _on_calibration_start_request(self, frame_id: int = None):
         """收到校准启动请求（从后端回调）"""
-        logger.info(f"收到校准启动请求，frame_id: {frame_id}")
+        logger.info(f"=============================================\n收到校准启动请求，frame_id: {frame_id}")
         if self.state == CalibrationState.IDLE:
             self.root.after(0, lambda: self.show_calibration_start(frame_id))
     
