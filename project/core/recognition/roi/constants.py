@@ -56,6 +56,17 @@ RECOVER_MASK_OFFSET_DY_RATIO_TH = 0.25
 # Geometry confidence threshold used by DETECT/TRACK gating.
 ROI_GEOMETRY_CONFIDENCE_THRESHOLD = 0.80
 
+# Hard plausibility gates for EllSeg native geometry.
+# These are used to reject geometrically impossible observations before
+# they enter triangulation / eyeball fitting.
+ROI_PUPIL_INSIDE_IRIS_RATIO_MIN = 0.60
+ROI_PUPIL_CENTER_INSIDE_IRIS_D2_MAX = 1.15
+ROI_PUPIL_IRIS_CENTER_DIST_RATIO_MAX = 0.35
+ROI_PUPIL_TO_IRIS_MAJOR_RATIO_MIN = 0.08
+ROI_PUPIL_TO_IRIS_MAJOR_RATIO_MAX = 0.80
+ROI_PUPIL_TO_IRIS_MINOR_RATIO_MIN = 0.08
+ROI_PUPIL_TO_IRIS_MINOR_RATIO_MAX = 0.85
+
 # ---------------------------------------------------------------------------
 # additional stability parameters (kept from validated implementation)
 # ---------------------------------------------------------------------------

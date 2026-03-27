@@ -73,7 +73,8 @@ Thumbs.db
 # 日志文件
 *.log
 logs/
-
+# 项目调试目录（不上传）
+project/debug/
 # 临时文件
 *.tmp
 *.temp

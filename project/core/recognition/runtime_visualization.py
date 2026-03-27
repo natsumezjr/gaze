@@ -72,6 +72,48 @@ def ellseg_segmentation_mask_to_bgr(
     return cv2.applyColorMap(g, cv2.COLORMAP_JET)
 
 
+def ellseg_component_debug_mask_to_bgr(
+    segmentation_mask: Optional[np.ndarray],
+    main_pupil_mask: Optional[np.ndarray],
+    dropped_pupil_mask: Optional[np.ndarray],
+    main_iris_mask: Optional[np.ndarray],
+    dropped_iris_mask: Optional[np.ndarray],
+    dst_h: int,
+    dst_w: int,
+) -> Optional[np.ndarray]:
+    base = ellseg_segmentation_mask_to_bgr(segmentation_mask, dst_h=dst_h, dst_w=dst_w)
+    if base is None:
+        base = np.zeros((max(1, dst_h), max(1, dst_w), 3), dtype=np.uint8)
+    out = base.copy()
+
+    def _resize_bool(mask: Optional[np.ndarray]) -> Optional[np.ndarray]:
+        if mask is None:
+            return None
+        m = np.asarray(mask).astype(np.uint8)
+        if m.ndim != 2 or m.size == 0:
+            return None
+        if m.shape[0] != dst_h or m.shape[1] != dst_w:
+            m = cv2.resize(m, (dst_w, dst_h), interpolation=cv2.INTER_NEAREST)
+        return m.astype(bool)
+
+    mp = _resize_bool(main_pupil_mask)
+    dp = _resize_bool(dropped_pupil_mask)
+    mi = _resize_bool(main_iris_mask)
+    di = _resize_bool(dropped_iris_mask)
+
+    # BGR: main pupil bright green, dropped pupil dark green.
+    if dp is not None:
+        out[dp] = (0, 96, 0)
+    if mp is not None:
+        out[mp] = (0, 255, 0)
+    # BGR: main iris bright cyan, dropped iris dark cyan.
+    if di is not None:
+        out[di] = (96, 96, 0)
+    if mi is not None:
+        out[mi] = (255, 255, 0)
+    return out
+
+
 def native_geometry_for_roi_crop(
     native_geometry: Optional[Dict[str, Any]],
     roi_x: int,
@@ -299,6 +341,7 @@ __all__ = [
     "scale_landmarks_for_display",
     "draw_bbox_and_rois",
     "ellseg_segmentation_mask_to_bgr",
+    "ellseg_component_debug_mask_to_bgr",
     "native_geometry_for_roi_crop",
     "draw_ellseg_native_geometry",
     "draw_roi_debug_overlay",

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Any, Dict, List, Optional, Tuple
 
 import cv2
@@ -8,10 +9,16 @@ import numpy as np
 from project.config.logging_config import setup_logging
 from project.core.recognition.compat_points import CANONICAL_ORDER
 from project.core.recognition.eye_model_ellseg import EyeRoiModel, EllSegResult, ellipse_to_cardinal_points
+from project.core.recognition.pupil_tracking import (
+    LocalPupilTracker,
+    TRACK_MAX_APPLY_SHIFT,
+    shift_ellipse_center,
+)
 from project.core.recognition.roi.constants import MODE_DETECT, MODE_TRACK, FACE_BBOX_STABLE_MAX_SHIFT_RATIO
 from project.core.recognition.roi.debug import build_roi_debug_record
 from project.core.recognition.roi.geometry import (
     RoiGeometry,
+    check_observation_plausibility,
     compute_roi_geometry,
     should_switch_to_detect,
 )
@@ -103,6 +110,7 @@ class EyeLandmarkExtractor:
         self._side = side
         self._roi_state_machine = roi_state_machine
         self._eye_model = eye_model
+        self._pupil_tracker = LocalPupilTracker()
 
     def _build_fail_debug(
         self,
@@ -174,6 +182,8 @@ class EyeLandmarkExtractor:
             )
 
         x, y, w, h = roi.as_tuple()
+        if roi_mode == MODE_DETECT:
+            self._pupil_tracker.reset()
         patch_bgr = img[y : y + h, x : x + w]
         if patch_bgr.size == 0:
             self._roi_state_machine.commit_failure("roi_out_of_image")
@@ -207,6 +217,39 @@ class EyeLandmarkExtractor:
                 ),
             )
 
+        raw_result = result
+        raw_obs = build_roi_observation(result=raw_result, roi_xywh=roi.as_tuple(), side=self._side)
+        fused_pupil_center_roi, tracking_debug = self._pupil_tracker.update(
+            patch_bgr,
+            network_center=raw_result.pupil_center,
+            mask_centroid=raw_obs.pupil_mask_centroid,
+            iris_ellipse=raw_result.iris_ellipse,
+            mask_ok=raw_obs.mask_ok,
+            pupil_mask_area=raw_obs.clean_pupil_mask_area,
+            pupil_clean_area_ratio=raw_obs.pupil_clean_area_ratio,
+        )
+        tracking_shift_px = None
+        if fused_pupil_center_roi is not None and raw_result.pupil_center is not None:
+            tracking_shift_px = float(
+                np.hypot(
+                    float(fused_pupil_center_roi.x) - float(raw_result.pupil_center.x),
+                    float(fused_pupil_center_roi.y) - float(raw_result.pupil_center.y),
+                )
+            )
+        if (
+            fused_pupil_center_roi is not None
+            and raw_result.pupil_center is not None
+            and tracking_shift_px is not None
+            and tracking_shift_px <= TRACK_MAX_APPLY_SHIFT
+        ):
+            result = replace(
+                raw_result,
+                pupil_center=fused_pupil_center_roi,
+                pupil_ellipse=shift_ellipse_center(raw_result.pupil_ellipse, fused_pupil_center_roi),
+            )
+        else:
+            result = raw_result
+
         # compatibility export: pupil=1, iris=4 points
         eye_dict_roi: Dict[str, List[Point2D]] = {k: [] for k in CANONICAL_ORDER}
         eye_dict_roi["pupil"] = [result.pupil_center] if result.pupil_center else []
@@ -235,6 +278,22 @@ class EyeLandmarkExtractor:
         # New main chain: RoiObservation + RoiGeometry + DETECT gating
         # ------------------------------------------------------------------
         obs = build_roi_observation(result=result, roi_xywh=roi.as_tuple(), side=self._side)
+        plausible, plausibility_reason = check_observation_plausibility(obs)
+        if not plausible:
+            self._roi_state_machine.commit_failure(f"implausible_geometry:{plausibility_reason}")
+            return (
+                False,
+                {k: [] for k in CANONICAL_ORDER},
+                roi,
+                self._build_fail_debug(
+                    frame_id=frame_id,
+                    current_mode=roi_mode,
+                    face_bbox=face_bbox,
+                    final_roi=roi,
+                    track_from_previous_bbox_applied=(roi_mode == MODE_TRACK),
+                ),
+            )
+
         geom = compute_roi_geometry(obs)
 
         img_h, img_w = img.shape[:2]
@@ -276,6 +335,19 @@ class EyeLandmarkExtractor:
             "pupil_center": (
                 Point2D(x=result.pupil_center.x + x, y=result.pupil_center.y + y) if result.pupil_center else None
             ),
+            "raw_pupil_center": (
+                Point2D(x=raw_result.pupil_center.x + x, y=raw_result.pupil_center.y + y)
+                if raw_result.pupil_center
+                else None
+            ),
+            "tracked_pupil_center": (
+                Point2D(x=fused_pupil_center_roi.x + x, y=fused_pupil_center_roi.y + y)
+                if fused_pupil_center_roi is not None
+                else None
+            ),
+            "pupil_tracking_source": tracking_debug.get("fused_source"),
+            "pupil_tracking_score": tracking_debug.get("tracking_score"),
+            "pupil_tracking_shift_px": tracking_shift_px,
             "pupil_ellipse": _shift_ellipse(result.pupil_ellipse, x, y),
             "iris_ellipse": _shift_ellipse(result.iris_ellipse, x, y),
         }

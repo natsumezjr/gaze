@@ -1290,41 +1290,23 @@ class FittingController:
         return result
     
     def _fit_circle_to_points(self, points: List[np.ndarray]) -> Tuple[np.ndarray, float]:
-        """三点确定外接圆"""
+        """三点确定外接圆。"""
         if len(points) < 3:
             raise ValueError("至少需要3个点")
-        
-        # 取前三个点
-        p1, p2, p3 = points[:3]
-        
-        # 计算三条边的中点
-        mid1 = (p1 + p2) / 2
-        mid2 = (p2 + p3) / 2
-        
-        # 计算边的方向向量
-        v1 = p2 - p1
-        v2 = p3 - p2
-        
-        # 计算垂直向量（法向量）
-        normal = np.cross(v1, v2)
-        if np.linalg.norm(normal) < 1e-6:
+
+        p1, p2, p3 = (np.asarray(p, dtype=np.float64) for p in points[:3])
+        a = p2 - p1
+        b = p3 - p1
+        normal = np.cross(a, b)
+        norm_sq = float(np.dot(normal, normal))
+        if norm_sq < 1e-12:
             raise ValueError("三点共线，无法确定外接圆")
-        
-        # 计算垂直平分线的方向
-        perp1 = np.cross(normal, v1)
-        perp2 = np.cross(normal, v2)
-        
-        # 归一化
-        perp1 = perp1 / np.linalg.norm(perp1)
-        perp2 = perp2 / np.linalg.norm(perp2)
-        
-        # 圆心是两条垂直平分线的交点
-        # 简化：使用两条垂直平分线的中点作为圆心
-        center = (mid1 + mid2) / 2
-        
-        # 半径是圆心到任意点的距离
-        radius = np.linalg.norm(center - p1)
-        
+
+        # Exact circumcenter in the plane spanned by the 3 points.
+        center = p1 + (
+            np.cross(normal, a) * float(np.dot(b, b)) + np.cross(b, normal) * float(np.dot(a, a))
+        ) / (2.0 * norm_sq)
+        radius = float(np.linalg.norm(center - p1))
         return center, radius
 
     def _initialize_parameters(self, fitting_points: List[Tuple[np.ndarray, str]]) -> FittingParameters:
@@ -1339,9 +1321,18 @@ class FittingController:
         # 策略1：优先使用虹膜点方案
         if len(iris_points) >= 3:
             try:
-                # 随机取3个虹膜点拟合外接圆
-                import random
-                selected_iris = random.sample(iris_points, 3)
+                # 选取面积最大的三点组合，避免随机采样导致初始化抖动。
+                from itertools import combinations
+
+                def _triangle_area(a: np.ndarray, b: np.ndarray, c: np.ndarray) -> float:
+                    return 0.5 * float(np.linalg.norm(np.cross(b - a, c - a)))
+
+                selected_iris = list(
+                    max(
+                        combinations(iris_points, 3),
+                        key=lambda pts: _triangle_area(pts[0], pts[1], pts[2]),
+                    )
+                )
                 circle_center, circle_radius = self._fit_circle_to_points(selected_iris)
                 logger.debug(f"虹膜点拟合外接圆，圆心：{circle_center}，半径：{circle_radius}")
                 
